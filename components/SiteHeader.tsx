@@ -45,8 +45,17 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  /*
+    /process reads as part of Services and /studio/principles as part of
+    Studio, so the nav highlights the parent a reader navigated through
+    rather than going blank on a route it has no item for.
+  */
+  const PARENT: Record<string, string> = { "/process": "/services" };
+
   const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+    pathname === href ||
+    pathname.startsWith(`${href}/`) ||
+    PARENT[pathname] === href;
 
   return (
     <header className="site-header fixed inset-x-0 top-0 z-50 bg-void transition-colors duration-200">
