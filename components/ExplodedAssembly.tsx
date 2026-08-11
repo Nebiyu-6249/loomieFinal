@@ -53,7 +53,7 @@ const PLATES: PlateSpec[] = [
           height={MARK.gridHeight}
           rx={CAPSULE_RADIUS}
           fill="none"
-          stroke="var(--color-ink)"
+          stroke="var(--color-field)"
           strokeWidth="1.4"
         />
       </svg>
@@ -70,14 +70,14 @@ const PLATES: PlateSpec[] = [
           cx={APERTURE_INSET}
           cy={APERTURE_CY}
           r={MARK.apertureRadius}
-          fill="var(--color-ink)"
+          fill="var(--color-field)"
         />
         <circle
           cx={MARK.gridWidth - APERTURE_INSET}
           cy={APERTURE_CY}
           r={MARK.apertureRadius}
           fill="none"
-          stroke="var(--color-ink)"
+          stroke="var(--color-field)"
           strokeWidth="1.2"
         />
       </svg>
@@ -94,13 +94,13 @@ const PLATES: PlateSpec[] = [
           cx={MARK.gridWidth / 2}
           cy={APERTURE_CY}
           r={MARK.apertureRadius}
-          fill="var(--color-drift)"
+          fill="var(--color-haze)"
         />
         <circle
           cx={MARK.gridWidth / 2}
           cy={APERTURE_CY}
           r={PUPIL_R}
-          fill="var(--color-ink)"
+          fill="var(--color-field)"
         />
       </svg>
     ),
@@ -113,7 +113,7 @@ const PLATES: PlateSpec[] = [
     content: (
       // Stops short of the bottom edge so the caption has clear ground.
       <div className="flex h-[calc(100%-1.6rem)] w-full">
-        {["#0e1113", "#5f6b72", "#dde3e6", "#efd9b4"].map((fill) => (
+        {["#0a0b0d", "#3a4046", "#8a949b", "#f0b45a"].map((fill) => (
           <span key={fill} className="h-full flex-1" style={{ backgroundColor: fill }} />
         ))}
       </div>
@@ -260,7 +260,7 @@ export function ExplodedAssembly() {
             <figure
               key={plate.label}
               data-plate=""
-              className="relative aspect-[4/3] w-full border border-drift bg-field md:absolute md:left-1/2 md:top-1/2 md:h-[clamp(8rem,13vw,11rem)] md:w-[clamp(11rem,17vw,15rem)]"
+              className="relative aspect-[4/3] w-full border border-haze bg-void md:absolute md:left-1/2 md:top-1/2 md:h-[clamp(8rem,13vw,11rem)] md:w-[clamp(11rem,17vw,15rem)]"
             >
               {plate.content}
               <figcaption

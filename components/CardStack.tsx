@@ -122,7 +122,7 @@ export function CardStack({ items }: CardStackProps) {
         <button
           type="button"
           onClick={advance}
-          className="type-micro hover-line inline-flex min-h-11 items-center text-ink"
+          className="type-micro hover-line inline-flex min-h-11 items-center text-field"
         >
           [ Next ]
         </button>

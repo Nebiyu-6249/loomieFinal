@@ -106,7 +106,7 @@ export default async function CaseStudy({ params }: Params) {
                 {PROCESS.map((step, stepIndex) => (
                   <li
                     key={step.title}
-                    className="flex gap-step-3 border-t border-drift py-step-2"
+                    className="flex gap-step-3 border-t border-haze py-step-2"
                   >
                     <span className="type-micro shrink-0 text-slate">
                       {String(stepIndex + 1).padStart(2, "0")}
@@ -129,7 +129,7 @@ export default async function CaseStudy({ params }: Params) {
 
       <section className="px-step-2 pb-step-5 md:px-step-3">
         <div className="mx-auto flex max-w-[100rem] flex-wrap gap-step-3">
-          <Link href="/work" className="type-micro hover-line text-ink">
+          <Link href="/work" className="type-micro hover-line text-field">
             [ All work ]
           </Link>
           <Link

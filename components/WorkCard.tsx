@@ -33,7 +33,7 @@ export function WorkCard({ item, priority = false, sizes }: WorkCardProps) {
           the row out of alignment with its neighbours.
         */}
         {item.image ? null : (
-          <span className="type-micro absolute left-step-2 top-step-2 text-ink/70">
+          <span className="type-micro absolute left-step-2 top-step-2 text-field/70">
             Reserved
           </span>
         )}
@@ -41,7 +41,7 @@ export function WorkCard({ item, priority = false, sizes }: WorkCardProps) {
 
       <span
         aria-hidden="true"
-        className="mt-step-2 block h-px w-full bg-ink"
+        className="mt-step-2 block h-px w-full bg-field"
         data-card-rule=""
       />
 

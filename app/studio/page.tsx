@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { ContactCta } from "@/components/ContactCta";
-import { DarkSection } from "@/components/DarkSection";
+import { ToneSection } from "@/components/ToneSection";
 import { PageIntro } from "@/components/PageIntro";
 import { Plate } from "@/components/Plate";
 import { Reveal } from "@/components/Reveal";
@@ -53,9 +53,9 @@ export default function Studio() {
         </div>
       </section>
 
-      <DarkSection labelledBy="meanings">
+      <ToneSection labelledBy="meanings">
         <Reveal step={0} steps={2}>
-          <h2 id="meanings" className="type-micro text-thaw">
+          <h2 id="meanings" className="type-micro text-ember">
             The name
           </h2>
         </Reveal>
@@ -64,11 +64,11 @@ export default function Studio() {
           <div className="grid gap-step-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-center md:gap-step-5">
             <dl className="grid gap-step-3 sm:grid-cols-3">
               {MEANINGS.map((meaning) => (
-                <div key={meaning.language} className="border-t border-field/25 pt-step-2">
+                <div key={meaning.language} className="border-t border-haze pt-step-2">
                   <dt className="type-display text-[clamp(2.5rem,5vw,3.5rem)]">
                     {meaning.word}
                   </dt>
-                  <dd className="type-micro mt-step-1 text-thaw">
+                  <dd className="type-micro mt-step-1 text-ember">
                     {meaning.language}
                   </dd>
                 </div>
@@ -78,7 +78,7 @@ export default function Studio() {
             <Plate seed="studio-name" ratio="3/2" sizes="(max-width: 768px) 100vw, 40vw" />
           </div>
         </Reveal>
-      </DarkSection>
+      </ToneSection>
 
       <section
         className="px-step-2 pb-step-5 md:px-step-3"
@@ -94,7 +94,7 @@ export default function Studio() {
           <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
             <dl className="grid gap-step-3 md:grid-cols-3 md:gap-step-4">
               {VALUES.map((value) => (
-                <div key={value.name} className="border-t border-ink pt-step-2">
+                <div key={value.name} className="border-t border-slate pt-step-2">
                   <dt className="type-heading text-[clamp(1.375rem,2.8vw,2rem)]">
                     {value.name}
                   </dt>
@@ -122,7 +122,7 @@ export default function Studio() {
               {PILLARS.map((pillar) => (
                 <div
                   key={pillar.name}
-                  className="flex flex-col gap-step-1 border-t border-drift py-step-3 md:flex-row md:gap-step-4"
+                  className="flex flex-col gap-step-1 border-t border-haze py-step-3 md:flex-row md:gap-step-4"
                 >
                   <dt className="type-heading shrink-0 text-[clamp(1.5rem,3.4vw,2.5rem)] md:w-72">
                     {pillar.name}

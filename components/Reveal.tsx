@@ -131,7 +131,7 @@ export function Reveal({
         <span
           aria-hidden="true"
           className={`mb-step-2 block h-px origin-left ${
-            isFinal ? "bg-ink" : "bg-drift"
+            isFinal ? "bg-field" : "bg-haze"
           }`}
           data-reveal-rule=""
           style={{ width: `${widthPercent}%` }}
