@@ -8,7 +8,16 @@ import { siteUrl } from "./layout";
  * here would contradict that.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/work", "/services", "/studio", "/clients", "/contact"];
+  const routes = [
+    "",
+    "/work",
+    "/services",
+    "/process",
+    "/studio",
+    "/studio/principles",
+    "/clients",
+    "/contact",
+  ];
   const lastModified = new Date();
 
   return routes.map((route) => ({

@@ -134,6 +134,53 @@ export const TIMELINE: readonly TimelineWeek[] = [
   { week: "Week four", detail: "Final files and handover." },
 ];
 
+export interface Package {
+  slug: string;
+  name: string;
+  /** The founder's wording, from the proposal deck. */
+  includes: readonly string[];
+  /** What it builds on, where the deck says "everything in". */
+  builtOn?: string;
+}
+
+/**
+ * The three packages, verbatim from the founder's proposal deck.
+ *
+ * There is no pricing here and none is invented: it is not in any founder
+ * material. Every package sends the reader to /contact to ask.
+ */
+export const PACKAGES_INTRO =
+  "Choose the option that matches the current stage of the business.";
+
+export const PACKAGES: readonly Package[] = [
+  {
+    slug: "starter-identity",
+    name: "Starter Identity",
+    includes: [
+      "Logo suite — primary logo, secondary logo, icon mark, spacing rules",
+      "Colour palette — primary, secondary and neutral, with usage guidance",
+      "Typography system — font pairing, hierarchy, sample text styles",
+      "Mini brand guide",
+    ],
+  },
+  {
+    slug: "standard-identity",
+    name: "Standard Identity",
+    builtOn: "Starter Identity",
+    includes: ["Social media samples", "Stationery"],
+  },
+  {
+    slug: "full-identity-kit",
+    name: "Full Identity Kit",
+    builtOn: "Standard Identity",
+    includes: [
+      "Presentation cover",
+      "Brand pattern",
+      "Extended usage examples",
+    ],
+  },
+];
+
 export const AUDIENCE: readonly string[] = [
   "Startups, small and medium businesses, and growing brands that want a strong, consistent visual identity.",
   "Entrepreneurs, product-based businesses, and digital-first companies.",

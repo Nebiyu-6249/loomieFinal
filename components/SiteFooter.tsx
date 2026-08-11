@@ -4,10 +4,16 @@ import { LoomieEyes } from "./LoomieEyes";
 import { SITE } from "@/lib/content";
 import { clearSpaceFor } from "@/lib/mark";
 
+/*
+  The nav is capped at five, so /process and /studio/principles live here and
+  are linked from their parent pages rather than competing for a nav slot.
+*/
 const FOOTER_NAV = [
   { href: "/work", label: "Work" },
   { href: "/services", label: "Services" },
+  { href: "/process", label: "Process" },
   { href: "/studio", label: "Studio" },
+  { href: "/studio/principles", label: "Principles" },
   { href: "/clients", label: "Clients" },
   { href: "/contact", label: "Contact" },
 ] as const;
