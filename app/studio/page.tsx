@@ -71,7 +71,12 @@ export default function Studio() {
               ))}
             </dl>
 
-            <Plate seed="studio-name" ratio="3/2" sizes="(max-width: 768px) 100vw, 40vw" />
+            <Plate
+              seed="studio-name"
+              ratio="3/2"
+              index={6}
+              sizes="(max-width: 768px) 100vw, 40vw"
+            />
           </div>
         </Reveal>
       </ToneSection>

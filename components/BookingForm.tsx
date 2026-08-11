@@ -267,7 +267,7 @@ export function BookingForm({ week }: { week: readonly DayColumn[] }) {
                                 {showsBothZones ? "your time" : "in Dubai"}
                               </span>
                               <span className="type-micro block text-slate">
-                                {showsBothZones ? `${slot.dubaiTime} Dubai` : " "}
+                                {showsBothZones ? `${slot.dubaiTime} Dubai` : "\u00a0"}
                               </span>
 
                               <span className="booking-underline" aria-hidden="true" />
