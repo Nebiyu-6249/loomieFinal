@@ -678,6 +678,135 @@
   }
 }
 
+/*
+  The work corridor.
+
+  Four plates at real depth inside one perspective, and a dolly that travels
+  through them. The plates never move; only the dolly does, which is what
+  makes this a camera rather than four independently animated cards.
+
+  On a phone none of this applies: no perspective, no pin, no depth. A
+  horizontal snap-scroll row is what a thumb expects, and hijacking scroll on
+  a touch device to run a camera is how you strand someone mid-page.
+*/
+.corridor-stage {
+  position: relative;
+}
+
+.corridor-dolly {
+  display: flex;
+  gap: var(--spacing-step-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--spacing-step-2);
+}
+
+.corridor-plate {
+  flex: 0 0 82%;
+  scroll-snap-align: start;
+}
+
+.corridor-caption {
+  margin-top: var(--spacing-step-3);
+}
+
+.corridor-counter {
+  margin-top: var(--spacing-step-2);
+}
+
+@media (min-width: 48rem) {
+  .corridor-stage {
+    height: 100svh;
+    overflow: hidden;
+    perspective: 1400px;
+    perspective-origin: 50% 46%;
+  }
+
+  .corridor-dolly {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: visible;
+    padding: 0;
+    transform-style: preserve-3d;
+  }
+
+  .corridor-plate {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(46vw, 40rem);
+    /*
+      The blur is written per frame by the script. Declaring the transition
+      here rather than there keeps the script writing values and the
+      stylesheet owning timing — and a transition on filter would fight a
+      per-frame write, so there deliberately is not one.
+    */
+    will-change: opacity, filter;
+  }
+
+  /*
+    Pinned to the lower left, out of the corridor's own axis. A caption in the
+    middle of the frame is a caption the plates fly through.
+  */
+  .corridor-caption {
+    position: absolute;
+    bottom: var(--spacing-step-4);
+    left: var(--spacing-step-3);
+    z-index: 2;
+    margin: 0;
+    max-width: min(38rem, 46vw);
+    pointer-events: none;
+  }
+
+  .corridor-counter {
+    position: absolute;
+    bottom: var(--spacing-step-3);
+    left: var(--spacing-step-3);
+    z-index: 2;
+    margin: 0;
+  }
+
+  .corridor-caption {
+    bottom: calc(var(--spacing-step-3) + 3.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+    No camera at all. matchMedia reverts the tween, which leaves the plates
+    where they render — so the corridor has to render as a legible stack
+    rather than as four elements piled at the same point.
+  */
+  .corridor-stage {
+    height: auto;
+    overflow: visible;
+    perspective: none;
+  }
+
+  .corridor-dolly {
+    position: static;
+    display: grid;
+    gap: var(--spacing-step-3);
+    overflow: visible;
+    transform: none !important;
+  }
+
+  .corridor-plate {
+    position: static;
+    width: auto;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .corridor-caption,
+  .corridor-counter {
+    position: static;
+    max-width: none;
+  }
+}
+
 /* Ember as light behind the call to action, never as a fill. */
 .cta-bloom {
   position: absolute;
@@ -870,89 +999,6 @@
   animation: blink-seam 420ms linear both;
 }
 
-/*
-  Move five of fourteen: the card stack.
-
-  A perspective stack on desktop; a snap-scroll row on a phone, which is what
-  a thumb expects and what avoids stacking six cards a touch device cannot
-  peel apart. Transforms only, so the cycle is compositor work.
-*/
-.card-stack-list {
-  display: flex;
-  gap: var(--spacing-step-2);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: var(--spacing-step-2);
-  margin: 0;
-  list-style: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.card-stack-item {
-  flex: 0 0 82%;
-  scroll-snap-align: start;
-}
-
-@media (min-width: 48rem) {
-  .card-stack-list {
-    position: relative;
-    display: block;
-    height: clamp(22rem, 34vw, 30rem);
-    overflow: visible;
-    padding-bottom: 0;
-    perspective: 1200px;
-  }
-
-  .card-stack-item {
-    position: absolute;
-    inset-inline-start: 0;
-    top: 0;
-    width: min(42vw, 34rem);
-    transform: translate3d(calc(var(--depth) * 2.2rem), calc(var(--depth) * 1.1rem), 0)
-      scale(calc(1 - var(--depth) * 0.05));
-    transform-origin: left center;
-    transition:
-      transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
-      opacity 500ms ease,
-      visibility 0ms;
-  }
-
-  /*
-    Only the front card's caption is on. The cards are offset from each other
-    by 2.2rem and 1.1rem, so four captions rendered at once — every title and
-    every sector tag, stacked 35px apart and unreadable. Hidden rather than
-    faded, because a transparent caption still occupies the same overlapping
-    box and still gets picked up by find-in-page.
-
-    The card's own link carries an aria-label, so a keyboard user tabbing to a
-    card behind the front one still hears which slot it is.
-  */
-  .card-stack-item:not([data-depth="0"]) [data-card-caption] {
-    visibility: hidden;
-  }
-
-  /*
-    Anything past the fourth card is behind the stack and not worth painting.
-
-    visibility, not opacity alone: these cards hold real links, and an
-    invisible link still takes a tab stop. That was survivable when the same
-    six links sat in a grid underneath; now that the stack is the homepage's
-    only view of them, a focus ring landing on nothing would be the whole
-    keyboard path. The flip is delayed by the length of the fade so the card
-    still dissolves on its way to the back rather than popping out.
-  */
-  .card-stack-item[data-depth="4"],
-  .card-stack-item[data-depth="5"] {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-      transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
-      opacity 500ms ease,
-      visibility 0ms linear 500ms;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   /*
     The lids do not animate, they simply are not there. Unlike the grain,
@@ -962,10 +1008,6 @@
   .blink-lid,
   .blink-seam {
     animation: none;
-  }
-
-  .card-stack-item {
-    transition: none;
   }
 }
 
