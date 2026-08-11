@@ -70,8 +70,8 @@ export default function RootLayout({
 
         <SiteHeader />
 
-        {/* Clears the fixed header. */}
-        <div className="h-[4.5rem]" aria-hidden="true" />
+        {/* Clears the fixed header, which is a fixed 4rem at every width. */}
+        <div className="h-16" aria-hidden="true" />
 
         <PageTransition>
           <main id="main">{children}</main>

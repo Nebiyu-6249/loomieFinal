@@ -129,7 +129,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
           Pick one of the times below before sending the request.
         </p>
 
-        <div className="mt-step-3 grid gap-px bg-drift sm:grid-cols-3">
+        <div className="mt-step-3 grid grid-cols-2 gap-px bg-drift sm:grid-cols-3">
           {slots.map((slot) => {
             // Dubai's side arrives preformatted from the server; only the
             // visitor's side is computed here, and only after mount.

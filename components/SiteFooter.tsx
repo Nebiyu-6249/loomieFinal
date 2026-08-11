@@ -12,7 +12,7 @@ const FOOTER_NAV = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-const MARK_WIDTH = 120;
+const MARK_WIDTH = 96;
 
 export function SiteFooter() {
   return (

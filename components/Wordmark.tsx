@@ -1,49 +1,58 @@
 import { LoomieEyes } from "./LoomieEyes";
-import { clearSpaceFor, markHeightFor, safeMarkWidth } from "@/lib/mark";
+import { CLEAR_SPACE, MARK, MARK_ASPECT } from "@/lib/mark";
 
 /**
  * LOOMIE, with the mark standing in for the double O.
  *
- * The mark's width, its height and the clear space held around it all come
- * off the construction constants, so the lockup cannot drift out of spec by
- * someone nudging a margin.
+ * The whole lockup is driven by one length — the mark's rendered width — and
+ * the height, the wordmark's type size and the clear space held around the
+ * mark are all derived from the construction constants at render. Nothing
+ * here can be nudged out of spec by editing a margin, and because the derived
+ * values are ratios rather than pixels, the caller can pass a responsive
+ * length and the whole lockup rescales correctly.
  */
 
+/** Cap height of the wordmark relative to the mark's height. */
+const TYPE_TO_MARK_HEIGHT = 1.42;
+
+const CLEAR_SPACE_RATIO = CLEAR_SPACE / MARK.gridWidth;
+
 interface WordmarkProps {
-  /** Rendered width of the mark itself, in pixels. Clamped to the minimum. */
-  markWidth?: number;
+  /**
+   * Any CSS length for the mark's width. Keep the lower bound of a clamp at or
+   * above MARK.minRenderWidth — below it the apertures close up.
+   */
+  markWidth?: string;
   className?: string;
   /** The mark tracks the cursor unless this lockup is decorative repetition. */
   track?: boolean;
 }
 
 export function Wordmark({
-  markWidth = 46,
+  markWidth = `clamp(${MARK.minRenderWidth}px, 7vw, 38px)`,
   className = "",
   track = true,
 }: WordmarkProps) {
-  const width = safeMarkWidth(markWidth);
-  const height = markHeightFor(width);
-  const clear = clearSpaceFor(width);
-
   return (
     <span
       className={`inline-flex items-center type-heading leading-none ${className}`}
-      style={{ fontSize: height * 1.42 }}
+      style={
+        {
+          "--mark-w": markWidth,
+          fontSize: `calc(var(--mark-w) / ${MARK_ASPECT} * ${TYPE_TO_MARK_HEIGHT})`,
+        } as React.CSSProperties
+      }
     >
       <span aria-hidden="true">L</span>
       <span
         aria-hidden="true"
         className="inline-flex"
         style={{
-          width: width + clear * 2,
-          paddingInline: clear,
+          width: `calc(var(--mark-w) + var(--mark-w) * ${CLEAR_SPACE_RATIO} * 2)`,
+          paddingInline: `calc(var(--mark-w) * ${CLEAR_SPACE_RATIO})`,
         }}
       >
-        <LoomieEyes
-          className="w-full"
-          track={track}
-        />
+        <LoomieEyes className="w-full" track={track} />
       </span>
       <span aria-hidden="true">MIE</span>
       <span className="sr-only">Loomie</span>

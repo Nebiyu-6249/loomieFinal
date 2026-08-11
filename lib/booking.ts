@@ -13,7 +13,7 @@ export const DUBAI_UTC_OFFSET_HOURS = 4;
 
 /** Studio hours, in Dubai wall-clock time. */
 const SLOT_HOURS = [10, 13, 16] as const;
-const DAYS_OFFERED = 3;
+const DAYS_OFFERED = 2;
 
 export interface ProposedSlot {
   /** The instant, as an ISO string. The only thing the client is trusted with. */
