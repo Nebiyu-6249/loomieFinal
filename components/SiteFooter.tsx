@@ -4,10 +4,16 @@ import { LoomieEyes } from "./LoomieEyes";
 import { SITE } from "@/lib/content";
 import { clearSpaceFor } from "@/lib/mark";
 
+/*
+  The nav is capped at five, so /process and /studio/principles live here and
+  are linked from their parent pages rather than competing for a nav slot.
+*/
 const FOOTER_NAV = [
   { href: "/work", label: "Work" },
   { href: "/services", label: "Services" },
+  { href: "/process", label: "Process" },
   { href: "/studio", label: "Studio" },
+  { href: "/studio/principles", label: "Principles" },
   { href: "/clients", label: "Clients" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -16,7 +22,7 @@ const MARK_WIDTH = 96;
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-drift px-step-2 pb-step-3 pt-step-4 md:px-step-3">
+    <footer className="border-t border-haze px-step-2 pb-step-3 pt-step-4 md:px-step-3">
       <div className="mx-auto max-w-[100rem]">
         <div className="flex flex-col gap-step-4 md:flex-row md:justify-between">
           <div>
@@ -41,7 +47,7 @@ export function SiteFooter() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="type-micro hover-line inline-flex min-h-11 items-center text-slate hover:text-ink"
+                className="type-micro hover-line inline-flex min-h-11 items-center text-slate hover:text-field"
               >
                 {item.label}
               </Link>

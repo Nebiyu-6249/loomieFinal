@@ -1,30 +1,34 @@
 @import "tailwindcss";
 
 /*
-  SNOWFIELD.
+  SNOWFIELD, inverted. The ground is dark and the light comes through it.
 
-  Five values. Thaw is the only warm one, and it is light rather than paint:
-  it sits behind the mark as a glow, grounds the contact call to action, and
-  is the single accent allowed on the Ink sections. It never appears inside
-  the mark — the eyes are Field over Ink, and warmth falling on the capsule is
-  a different thing from warmth filling it.
+  Measured against the two grounds (AA needs 4.5 for body text, 3.0 for UI
+  boundaries):
+
+    field on void 17.7   frost on void 13.4   ember on void 10.7
+    field on smoke 14.9  frost on smoke 11.2  ember on smoke 9.0
+    slate on void  6.4   slate on smoke  5.4
+    haze  on void  1.9   haze  on smoke  1.6   <- decorative only
+
+  Haze fails non-text contrast, and it is meant to: it is the smoke in the
+  reference gradients, and lightening it to clear 3:1 would flatten them. So
+  it draws decorative rules and gradient stops and nothing else. Anything a
+  reader has to find or operate — an input boundary, a focus ring — uses
+  slate or field.
+
+  Ember and frost are light, not paint. They are the two poles of the brand
+  story, warm and cold, and they belong in radial gradients, glows and
+  emissive edges. There is no flat ember fill anywhere on this site.
 */
 @theme {
+  --color-void: #0a0b0d;
+  --color-smoke: #1c1f23;
+  --color-haze: #3a4046;
   --color-field: #f2f3f4;
-  --color-ink: #0e1113;
-  /*
-    Slate was specified at #7C868C, which measures 3.35:1 on Field and fails
-    AA for the captions, nav and body copy it carries. Darkened to hold 4.9:1
-    while staying the same cool grey. On Thaw it still only reaches 4.0:1, so
-    nothing on a Thaw ground uses Slate — those surfaces use Ink at 70%.
-  */
-  --color-slate: #5f6b72;
-  --color-drift: #dde3e6;
-  --color-thaw: #efd9b4;
-
-  /* LoomieEyes ships against `fill-foreground` / `fill-background`. */
-  --color-background: #f2f3f4;
-  --color-foreground: #0e1113;
+  --color-slate: #8a949b;
+  --color-ember: #f0b45a;
+  --color-frost: #bfd9e3;
 
   --font-display: var(--font-instrument), ui-serif, Georgia, serif;
   --font-sans: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
@@ -69,8 +73,8 @@
   }
 
   body {
-    background-color: var(--color-field);
-    color: var(--color-ink);
+    background-color: var(--color-void);
+    color: var(--color-field);
     font-family: var(--font-sans);
     font-synthesis-weight: none;
     -webkit-font-smoothing: antialiased;
@@ -78,22 +82,23 @@
   }
 
   /*
-    One focus treatment for the entire site: a 1px ink ring held off the
-    element by 3px of Field, so it reads on both the ground and on Drift
-    panels without ever being removed.
+    One focus treatment for the entire site. Field rather than haze: at 17.7:1
+    on void it is unmissable, where haze would have been 1.9:1 and failed
+    1.4.11 outright. Two pixels because a 1px light ring on a dark ground
+    reads thinner than the same ring on a light one.
   */
   :focus-visible {
-    outline: 1px solid var(--color-ink);
+    outline: 2px solid var(--color-field);
     outline-offset: 3px;
     border-radius: 1px;
   }
 
   ::selection {
-    background-color: var(--color-thaw);
-    color: var(--color-ink);
+    background-color: var(--color-ember);
+    color: var(--color-void);
   }
 
-  /* Everything that is not one of the nine motion moves. */
+  /* Everything that is not one of the thirteen motion moves. */
   a,
   button,
   input,
@@ -173,7 +178,7 @@
   }
 
   /*
-    Move eight of nine. One hover treatment for every card and every link on
+    Move eight of fourteen. One hover treatment for every card and every link on
     the site: a hairline draws in from the left, and a card lifts three
     pixels with it. Same easing and same duration as the text reveal, so the
     two read as one language. Focus gets it too — a keyboard should see what
@@ -222,24 +227,365 @@
   }
 }
 
-/* Move one of nine: the page transition, as a keyframe rather than a library. */
-@keyframes page-enter {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 10px, 0);
+/*
+  Move fourteen of fourteen: the image reveal.
+
+  The wrapper is the stable box — it holds the aspect ratio and never moves,
+  so nothing here can shift the page. The clip opens inside it, the picture
+  scales and drifts inside that, and the Ember glow sits behind all of it.
+
+  .frame-drift is 124% tall and pulled up 12%, so the parallax has ground to
+  travel through. Without the overscan a 12% drift would expose the frame's
+  own background at one end of the travel.
+
+  Every value the script animates is also written here, so a slot with no
+  JavaScript, a failed chunk, or reduced motion is a finished image rather
+  than a blank box: clip open, scale 1, hairline invisible.
+*/
+.frame {
+  position: relative;
+  isolation: isolate;
+}
+
+.frame-clip {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  overflow: hidden;
+  clip-path: inset(0% 0% 0% 0%);
+}
+
+/*
+  Two nested elements rather than one, because two different systems animate a
+  transform here. The script owns .frame-drift — the reveal's scale and the
+  scroll parallax, merged into one matrix by GSAP. The stylesheet owns
+  .frame-lift — the hover. On a single element GSAP's inline transform would
+  win outright and the hover would silently stop working the moment the reveal
+  had run.
+*/
+.frame-drift {
+  /*
+    Offset with `top`, not `margin-top`. A percentage margin resolves against
+    the containing block's *inline* size, so -12% on a 672x840 slot pulled the
+    artwork up by 80px instead of 101 — and by a different amount at every
+    aspect ratio, since it was tracking the width while the 124% height
+    tracked the height. `top` on a positioned element resolves against the
+    height, which is the axis this is actually about.
+  */
+  position: absolute;
+  top: -12%;
+  left: 0;
+  height: 124%;
+  width: 100%;
+  transform: scale(1);
+  transform-origin: center;
+}
+
+/* Positioned, because a next/image with `fill` needs an ancestor that is. */
+.frame-lift {
+  position: relative;
+  height: 100%;
+  transform-origin: center;
+}
+
+/* The picture fills the overscan; the frame keeps the authored ratio. */
+.frame-lift > * {
+  height: 100%;
+}
+
+/*
+  Ember behind the frame rather than over it — the same rule the hero and the
+  call to action follow.
+
+  A box-shadow, not a spilling pseudo-element. The glow has to extend past the
+  frame or it is hidden behind the picture, and an absolutely positioned
+  element that extends past its parent adds that distance to the scrollable
+  overflow of every ancestor up to the body — 49px of horizontal scroll on
+  /work and on every case study. `overflow: clip` does not help, because
+  overflow-clip-margin counts too. A shadow is ink rather than layout: it
+  cannot grow a scroll area, so this is the one way to draw outside the box
+  that has no cost.
+
+  Only on a real pointer: a glow that latches on after a tap and stays lit is
+  worse than no glow.
+*/
+
+.frame-edge {
+  position: absolute;
+  z-index: 2;
+  background-color: var(--color-haze);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.frame-edge-vertical {
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: scaleY(0);
+}
+
+.frame-edge-horizontal {
+  left: 0;
+  height: 1px;
+  width: 100%;
+  transform: scaleX(0);
+}
+
+.frame-edge-left {
+  left: 0;
+  transform-origin: top center;
+}
+
+.frame-edge-right {
+  right: 0;
+  transform-origin: bottom center;
+}
+
+.frame-edge-top {
+  top: 0;
+  transform-origin: center left;
+}
+
+.frame-edge-bottom {
+  bottom: 0;
+  transform-origin: center right;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .frame-lift {
+    transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
   }
-  to {
-    opacity: 1;
+
+  .frame {
+    transition: box-shadow 420ms ease;
+  }
+
+  /*
+    Driven from whatever link contains the frame as well as from the frame
+    itself, so a card lights its image on hover anywhere on the card and on
+    keyboard focus — not only when a pointer is over the picture.
+  */
+  .frame:hover .frame-lift,
+  a:hover .frame-lift,
+  a:focus-visible .frame-lift {
+    transform: scale(1.04);
+  }
+
+  .frame:hover,
+  a:hover .frame,
+  a:focus-visible .frame {
+    box-shadow: 0 0 3.5rem 0.75rem
+      color-mix(in oklab, var(--color-ember) 20%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame-lift {
+    transition: none;
+  }
+
+  .frame:hover .frame-lift,
+  a:hover .frame-lift,
+  a:focus-visible .frame-lift {
     transform: none;
   }
 }
 
-.page-enter {
-  animation: page-enter 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+/* Ember as light behind the call to action, never as a fill. */
+.cta-bloom {
+  position: absolute;
+  z-index: -10;
+  bottom: -60%;
+  left: -20%;
+  display: block;
+  width: min(120vw, 80rem);
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in oklab, var(--color-ember) 26%, transparent) 0%,
+    color-mix(in oklab, var(--color-ember) 10%, transparent) 34%,
+    transparent 66%
+  );
+  pointer-events: none;
 }
 
 /*
-  Move five of nine: the card stack.
+  Move ten of fourteen: the living grain.
+
+  Sits above the content and below the header, so the navigation stays crisp
+  while everything it floats over is in the same film. Never intercepts a
+  pointer.
+
+  Under reduced motion the grain stops moving but stays put. The texture is
+  the brand's ground, not an animation — removing it would change the design,
+  where freezing it only removes the flicker.
+*/
+/*
+  Each layer is its own fixed sibling. A wrapper would have created a stacking
+  context and isolated the blend group from the page behind it.
+*/
+.grain-layer {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  display: block;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  will-change: background-position;
+}
+
+.grain-fine {
+  opacity: 0.42;
+  animation: grain-cycle 0.5s steps(4) infinite;
+}
+
+.grain-coarse {
+  opacity: 0.28;
+  animation: grain-cycle 0.75s steps(4) infinite reverse;
+}
+
+@keyframes grain-cycle {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 calc(-1 * var(--grain-travel));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-fine,
+  .grain-coarse {
+    animation: none;
+  }
+}
+
+/*
+  Move eleven of fourteen: the cursor light.
+
+  z-index 39 puts it directly beneath the grain, which is the whole point.
+  The grain blends in overlay, so it is near-invisible over the deepest Void
+  and comes up as the ground lightens — the light therefore develops the grain
+  inside its own falloff rather than washing it out.
+
+  Screen blend: it can only lighten, so it crosses type without muddying it.
+  Sized in vmin so it stays a pool of light on a laptop and on a large
+  display, rather than a fixed disc that reads as a spotlight on one and a
+  smudge on the other.
+
+  No `will-change`. A 60rem element promoted for the life of the page costs
+  more than the compositor saves on a transform it can already handle.
+*/
+.cursor-light {
+  position: fixed;
+  z-index: 39;
+  top: 0;
+  left: 0;
+  height: min(60rem, 105vmin);
+  width: min(60rem, 105vmin);
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in oklab, var(--color-ember) 11%, transparent) 0%,
+    color-mix(in oklab, var(--color-ember) 5.5%, transparent) 38%,
+    color-mix(in oklab, var(--color-ember) 1.6%, transparent) 64%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms ease;
+}
+
+.cursor-light[data-lit] {
+  opacity: 1;
+}
+
+/*
+  Move twelve of fourteen: the blink, which replaces the page transition.
+
+  Two Void lids meeting at the middle and retracting, with a Field hairline at
+  the seam. 420ms end to end, expo-out — nearly all the distance is covered in
+  the first third, so the eye reads as snapping open and then settling.
+
+  The lids are 51svh so they overlap at the seam rather than risking a
+  hairline of content between them on a browser whose svh and visual viewport
+  disagree by a pixel.
+
+  z-38 puts them under the cursor light and the grain, so a shut lid is lit
+  and grained like everything else, and over the content, which is what makes
+  them lids. Nothing here is in the layout, so CLS is untouched.
+*/
+@keyframes blink-open {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes blink-seam {
+  0% {
+    opacity: 0.85;
+  }
+  14% {
+    opacity: 0.85;
+  }
+  62% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.blink-lid {
+  position: fixed;
+  z-index: 38;
+  left: 0;
+  display: block;
+  height: 51svh;
+  width: 100%;
+  background-color: var(--color-void);
+  pointer-events: none;
+  transform: scaleY(0);
+  /*
+    Not the site's usual expo-out. On a 420ms lid that curve is 86% open by
+    120ms, so the closed state is never really seen and it reads as a flash
+    rather than a blink. This holds for a beat, accelerates hard, then
+    settles — still weighted to the reveal, but the lid is visibly a lid.
+  */
+  animation: blink-open 420ms cubic-bezier(0.4, 0, 0.12, 1) both;
+}
+
+.blink-lid-top {
+  top: 0;
+  transform-origin: top center;
+}
+
+.blink-lid-bottom {
+  bottom: 0;
+  transform-origin: bottom center;
+}
+
+.blink-seam {
+  position: fixed;
+  z-index: 38;
+  top: 50svh;
+  left: 0;
+  display: block;
+  height: 1px;
+  width: 100%;
+  background-color: var(--color-field);
+  opacity: 0;
+  pointer-events: none;
+  animation: blink-seam 420ms linear both;
+}
+
+/*
+  Move five of fourteen: the card stack.
 
   A perspective stack on desktop; a snap-scroll row on a phone, which is what
   a thumb expects and what avoids stacking six cards a touch device cannot
@@ -281,19 +627,40 @@
     transform-origin: left center;
     transition:
       transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
-      opacity 500ms ease;
+      opacity 500ms ease,
+      visibility 0ms;
   }
 
-  /* Anything past the fourth card is behind the stack and not worth painting. */
+  /*
+    Anything past the fourth card is behind the stack and not worth painting.
+
+    visibility, not opacity alone: these cards hold real links, and an
+    invisible link still takes a tab stop. That was survivable when the same
+    six links sat in a grid underneath; now that the stack is the homepage's
+    only view of them, a focus ring landing on nothing would be the whole
+    keyboard path. The flip is delayed by the length of the fade so the card
+    still dissolves on its way to the back rather than popping out.
+  */
   .card-stack-item[data-depth="4"],
   .card-stack-item[data-depth="5"] {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
+    transition:
+      transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
+      opacity 500ms ease,
+      visibility 0ms linear 500ms;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-enter {
+  /*
+    The lids do not animate, they simply are not there. Unlike the grain,
+    which is the ground and stays, a lid that never retracts is a black
+    rectangle over half the page.
+  */
+  .blink-lid,
+  .blink-seam {
     animation: none;
   }
 
@@ -303,7 +670,7 @@
 }
 
 /*
-  Move four of nine: on a phone the ticker is a marquee rather than a pin.
+  Move four of fourteen: on a phone the ticker is a marquee rather than a pin.
 */
 @media (max-width: 47.99rem) {
   @keyframes ticker-drift {
@@ -345,13 +712,25 @@
   margin-top: -4rem;
 }
 
+/*
+  100svh, matching exactly what the motion stage gives this element when it
+  becomes an inset-0 layer inside a 100svh frame.
+
+  It was 78svh, and the mark is anchored at `top: 82%` of this box — so
+  hydration grew the box from 702px to 900px and dropped the mark 162px down
+  the page. The only layout shift on the site, 0.0289 of it, and invisible in
+  every screenshot because a still frame is either before it or after it.
+
+  Two states of the same hero must agree on their height or a percentage
+  anchor inside them cannot be stable.
+*/
 .hero-veil {
   position: relative;
-  min-height: 78svh;
+  min-height: 100svh;
 }
 
 .hero-meanings {
-  background-color: var(--color-thaw);
+  background-color: var(--color-void);
 }
 
 .hero-flood {
@@ -378,9 +757,9 @@
   aspect-ratio: 1;
   background: radial-gradient(
     circle at 50% 50%,
-    var(--color-thaw) 0%,
-    color-mix(in oklab, var(--color-thaw) 62%, transparent) 38%,
-    transparent 68%
+    color-mix(in oklab, var(--color-ember) 34%, transparent) 0%,
+    color-mix(in oklab, var(--color-haze) 46%, transparent) 34%,
+    transparent 70%
   );
   pointer-events: none;
 }
@@ -475,10 +854,23 @@
   pointer-events: none;
 }
 
+/*
+  On the dark ground the flood is light spilling from behind the eyes, not
+  paint covering the page. An ember core falls off through haze into void, so
+  as it scales it washes the screen back to the ground colour and leaves a
+  warm halo where the apertures were. A flat ember screen would have been
+  deafening, and the palette forbids flat ember anyway.
+*/
 .hero-stage[data-stage="motion"] .hero-flood-circle {
   position: absolute;
   border-radius: 50%;
-  background-color: var(--color-thaw);
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--color-ember) 0%,
+    color-mix(in oklab, var(--color-ember) 55%, var(--color-void)) 16%,
+    color-mix(in oklab, var(--color-haze) 70%, var(--color-void)) 34%,
+    var(--color-void) 62%
+  );
   will-change: transform;
 }
 

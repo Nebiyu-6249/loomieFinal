@@ -8,7 +8,7 @@ import { useMotionAllowed } from "./useMotionPreference";
 import type { WorkPlaceholder } from "@/lib/content";
 
 /**
- * Move five of nine — the card stack.
+ * Move five of fourteen — the card stack.
  *
  * A perspective stack that cycles: the front card drops away, the rest
  * promote forward, and the dropped card returns to the back. CSS transforms
@@ -104,6 +104,7 @@ export function CardStack({ items }: CardStackProps) {
                   src={item.image}
                   alt=""
                   sizes="(max-width: 768px) 82vw, 42vw"
+                  index={index}
                 />
                 <span className="mt-step-2 flex items-baseline justify-between gap-step-2">
                   <span className="type-heading text-[clamp(1.125rem,2vw,1.5rem)]">
@@ -117,12 +118,16 @@ export function CardStack({ items }: CardStackProps) {
         })}
       </ul>
 
-      {/* The cycle is decorative; the same links live in the grid below. */}
+      {/*
+        The stack is now the homepage's only view of these slots, so the cycle
+        has to be operable rather than decorative: [ Next ] advances it without
+        waiting for the timer, and /work holds the same set as a plain grid.
+      */}
       <div className="mt-step-3 flex items-center gap-step-2">
         <button
           type="button"
           onClick={advance}
-          className="type-micro hover-line inline-flex min-h-11 items-center text-ink"
+          className="type-micro hover-line inline-flex min-h-11 items-center text-field"
         >
           [ Next ]
         </button>

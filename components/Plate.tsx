@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { Frame } from "./Frame";
+import { SlotVideo } from "./SlotVideo";
 import {
   APERTURE_INSET,
   CLEAR_SPACE,
@@ -7,6 +9,7 @@ import {
   MARK_ASPECT,
   pupilRadiusFor,
 } from "@/lib/mark";
+import { FRAME_OVERSCAN } from "@/lib/frame";
 
 /**
  * The image slot.
@@ -26,6 +29,10 @@ import {
  *
  *   <Plate seed="identity-slot-01" ratio="4/5" />
  *   <Plate seed="identity-slot-01" ratio="4/5" src="/work/roastery.jpg" alt="…" />
+ *   <Plate seed="identity-slot-01" ratio="4/5" src="/work/roastery.jpg" video="/work/roastery.mp4" />
+ *
+ * A video slot takes the still as its poster, so the reduced-motion path and
+ * the first paint are both a real picture rather than a black rectangle.
  */
 
 type Ratio = "1/1" | "4/5" | "3/2" | "16/9";
@@ -37,10 +44,11 @@ const FRAMES: Record<Ratio, { w: number; h: number }> = {
   "16/9": { w: 640, h: 360 },
 };
 
-const INK = "#0e1113";
+const VOID = "#0a0b0d";
+const SMOKE = "#1c1f23";
+const HAZE = "#3a4046";
 const FIELD = "#f2f3f4";
-const DRIFT = "#dde3e6";
-const THAW = "#efd9b4";
+const EMBER = "#f0b45a";
 
 interface Palette {
   panel: string;
@@ -53,12 +61,16 @@ interface Palette {
   fieldOpacity: number;
 }
 
-/** Three grounds, so a grid of plates is not four of the same tone. */
+/**
+ * Four grounds, so a grid of plates is not four of the same tone. The third
+ * gives the mark ember eyes, which ties the plates to the robot rather than
+ * leaving them as an unrelated system of their own.
+ */
 const PALETTES: Palette[] = [
-  { panel: DRIFT, capsule: INK, aperture: FIELD, pupil: INK, line: INK, fieldOpacity: 0.14 },
-  { panel: INK, capsule: FIELD, aperture: INK, pupil: FIELD, line: FIELD, fieldOpacity: 0.22 },
-  { panel: THAW, capsule: INK, aperture: FIELD, pupil: INK, line: INK, fieldOpacity: 0.16 },
-  { panel: DRIFT, capsule: INK, aperture: FIELD, pupil: INK, line: INK, fieldOpacity: 0.34 },
+  { panel: SMOKE, capsule: VOID, aperture: FIELD, pupil: VOID, line: HAZE, fieldOpacity: 0.5 },
+  { panel: VOID, capsule: SMOKE, aperture: FIELD, pupil: VOID, line: HAZE, fieldOpacity: 0.7 },
+  { panel: SMOKE, capsule: VOID, aperture: EMBER, pupil: VOID, line: HAZE, fieldOpacity: 0.34 },
+  { panel: VOID, capsule: SMOKE, aperture: FIELD, pupil: SMOKE, line: HAZE, fieldOpacity: 0.42 },
 ];
 
 interface PlateProps {
@@ -69,9 +81,23 @@ interface PlateProps {
   /** Supply to replace the composition with real photography. */
   src?: string;
   alt?: string;
+  /**
+   * Supply instead of `src` where the slot suits motion. `src` is then the
+   * poster frame and is required — it is what a reader with reduced motion
+   * set actually sees.
+   */
+  video?: string;
   /** At most one per page. */
   priority?: boolean;
   sizes?: string;
+  /**
+   * Position in this page's run of slots. Only decides which edge the reveal
+   * opens from, so a page numbers its slots once instead of choosing edges by
+   * hand and accidentally making a rhythm.
+   */
+  index?: number;
+  /** Suppress the parallax where a slot is too small for 12% to read. */
+  parallax?: boolean;
 }
 
 /** FNV-1a. Small, stable, and identical on both sides of the render. */
@@ -124,16 +150,25 @@ function Capsule({ x, y, width, palette, opacity = 1 }: CapsuleProps) {
   );
 }
 
+/**
+ * `h` is the full drawn box, which is taller than the slot by the frame's
+ * overscan so the parallax has somewhere to travel. `visibleH` is what a
+ * reader actually sees at rest. Anything that fills — the dot field — uses
+ * `h`; anything sized against the slot uses `visibleH`, or it would grow by
+ * the overscan and overflow the crop.
+ */
 function Composition({
   variant,
   palette,
   w,
   h,
+  visibleH,
 }: {
   variant: number;
   palette: Palette;
   w: number;
   h: number;
+  visibleH: number;
 }) {
   switch (variant) {
     /* An aperture field, with one mark resting across it. */
@@ -176,7 +211,7 @@ function Composition({
 
     /* A detail crop: the rounded cap, the field, and one eye. */
     case 1: {
-      const markHeight = h * 0.9;
+      const markHeight = visibleH * 0.9;
       const markWidth = markHeight * MARK_ASPECT;
 
       return (
@@ -202,7 +237,7 @@ function Composition({
         0,
       );
 
-      const base = Math.min(w * 0.76, (h * 0.86) / unitRun);
+      const base = Math.min(w * 0.76, (visibleH * 0.86) / unitRun);
       const left = w * 0.12;
       let cursor = (h - base * unitRun) / 2;
 
@@ -301,17 +336,44 @@ export function Plate({
   className = "",
   src,
   alt,
+  video,
   priority = false,
   sizes = "(max-width: 768px) 100vw, 45vw",
+  index = 0,
+  parallax = true,
 }: PlateProps) {
   const frame = FRAMES[ratio];
+  const key = hash(seed);
+  const palette = PALETTES[key % PALETTES.length];
 
-  if (src) {
-    return (
-      <div
-        className={`relative overflow-hidden bg-drift ${className}`}
-        style={{ aspectRatio: ratio.replace("/", " / ") }}
-      >
+  /*
+    The composition is drawn into the overscanned box rather than scaled to
+    cover it. Authored at the slot's own ratio and then sliced into a box 24%
+    taller, every plate came out 24% too big and cropped at the sides — the
+    mark blown up and running off both edges. The viewBox now matches the box
+    it is drawn into exactly, so nothing is scaled and nothing is lost.
+  */
+  const boxHeight = Math.round(frame.h * FRAME_OVERSCAN);
+
+  /*
+    Both branches go through the same Frame, which is the point. A drawn
+    composition and a real photograph reveal, drift and light identically, so
+    nothing about how the page moves changes on the day the files land — the
+    picture just gets better.
+  */
+  return (
+    <Frame
+      index={index}
+      parallax={parallax}
+      className={className}
+      style={{
+        aspectRatio: ratio.replace("/", " / "),
+        backgroundColor: src ? SMOKE : palette.panel,
+      }}
+    >
+      {video && src ? (
+        <SlotVideo src={video} poster={src} />
+      ) : src ? (
         <Image
           src={src}
           alt={alt ?? ""}
@@ -320,40 +382,28 @@ export function Plate({
           priority={priority}
           className="object-cover"
         />
-      </div>
-    );
-  }
-
-  const key = hash(seed);
-  const palette = PALETTES[key % PALETTES.length];
-
-  return (
-    <div
-      className={`relative overflow-hidden ${className}`}
-      style={{
-        aspectRatio: ratio.replace("/", " / "),
-        backgroundColor: palette.panel,
-      }}
-    >
-      <svg
-        viewBox={`0 0 ${frame.w} ${frame.h}`}
-        preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-0 h-full w-full"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <Composition
-          variant={Math.floor(key / PALETTES.length) % 5}
-          palette={palette}
-          w={frame.w}
-          h={frame.h}
-        />
-      </svg>
-    </div>
+      ) : (
+        <svg
+          viewBox={`0 0 ${frame.w} ${boxHeight}`}
+          preserveAspectRatio="xMidYMid slice"
+          className="absolute inset-0 h-full w-full"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <Composition
+            variant={Math.floor(key / PALETTES.length) % 5}
+            palette={palette}
+            w={frame.w}
+            h={boxHeight}
+            visibleH={frame.h}
+          />
+        </svg>
+      )}
+    </Frame>
   );
 }
 
 /** So a caption can pick a legible colour against whichever panel it drew. */
 export function plateIsDark(seed: string): boolean {
-  return PALETTES[hash(seed) % PALETTES.length].panel === INK;
+  return PALETTES[hash(seed) % PALETTES.length].panel === VOID;
 }

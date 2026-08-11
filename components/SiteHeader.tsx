@@ -45,11 +45,20 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  /*
+    /process reads as part of Services and /studio/principles as part of
+    Studio, so the nav highlights the parent a reader navigated through
+    rather than going blank on a route it has no item for.
+  */
+  const PARENT: Record<string, string> = { "/process": "/services" };
+
   const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+    pathname === href ||
+    pathname.startsWith(`${href}/`) ||
+    PARENT[pathname] === href;
 
   return (
-    <header className="site-header fixed inset-x-0 top-0 z-50 bg-field transition-colors duration-200">
+    <header className="site-header fixed inset-x-0 top-0 z-50 bg-void transition-colors duration-200">
       {/*
         A fixed 4rem so the spacer in the layout can match it exactly at every
         width. A header whose height depends on its contents leaves a gap that
@@ -82,8 +91,8 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
-              className={`type-micro hover-line hover:text-ink ${
-                isActive(item.href) ? "text-ink" : "text-ink/75"
+              className={`type-micro hover-line hover:text-field ${
+                isActive(item.href) ? "text-field" : "text-field/75"
               }`}
             >
               {item.label}
@@ -93,7 +102,7 @@ export function SiteHeader() {
           <Link
             href="/contact"
             aria-current={isActive("/contact") ? "page" : undefined}
-            className="type-micro hover-line text-ink"
+            className="type-micro hover-line text-field"
           >
             [ Contact ]
           </Link>
@@ -104,7 +113,7 @@ export function SiteHeader() {
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-controls="mobile-nav"
-          className="type-micro -m-step-1 flex min-h-11 min-w-11 items-center justify-end p-step-1 text-ink md:hidden"
+          className="type-micro -m-step-1 flex min-h-11 min-w-11 items-center justify-end p-step-1 text-field md:hidden"
         >
           {open ? "[ Close ]" : "[ Menu ]"}
         </button>
@@ -112,7 +121,7 @@ export function SiteHeader() {
 
       <span
         aria-hidden="true"
-        className="site-header-rule block h-px w-full bg-drift transition-opacity duration-200"
+        className="site-header-rule block h-px w-full bg-smoke transition-opacity duration-200"
       />
 
       {/*
@@ -122,7 +131,7 @@ export function SiteHeader() {
       <div
         id="mobile-nav"
         hidden={!open}
-        className="h-[calc(100svh-4rem)] overflow-y-auto bg-field px-step-2 pb-step-4 pt-step-3 md:hidden"
+        className="h-[calc(100svh-4rem)] overflow-y-auto bg-void px-step-2 pb-step-4 pt-step-3 md:hidden"
       >
         <nav aria-label="Primary" className="flex flex-col">
           {[...NAV, { href: "/contact", label: "Contact" }].map((item) => (
@@ -130,7 +139,7 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
-              className="type-heading flex min-h-14 items-center border-b border-drift text-[clamp(1.75rem,9vw,2.5rem)]"
+              className="type-heading flex min-h-14 items-center border-b border-haze text-[clamp(1.75rem,9vw,2.5rem)]"
             >
               {item.label}
             </Link>

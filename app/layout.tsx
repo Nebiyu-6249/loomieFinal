@@ -6,7 +6,9 @@ import {
 } from "next/font/google";
 
 import "./globals.css";
-import { PageTransition } from "@/components/PageTransition";
+import { Blink } from "@/components/Blink";
+import { CursorLight } from "@/components/CursorLight";
+import { Grain } from "@/components/Grain";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SITE, TAGLINE } from "@/lib/content";
@@ -69,8 +71,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f2f3f4",
-  colorScheme: "light",
+  themeColor: "#0a0b0d",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -84,19 +86,37 @@ export default function RootLayout({
       <body className="min-h-svh">
         <a
           href="#main"
-          className="type-micro sr-only focus:not-sr-only focus:fixed focus:left-step-2 focus:top-step-2 focus:z-[60] focus:bg-field focus:px-step-2 focus:py-step-1 focus:text-ink"
+          className="type-micro sr-only focus:not-sr-only focus:fixed focus:left-step-2 focus:top-step-2 focus:z-[60] focus:bg-void focus:px-step-2 focus:py-step-1 focus:text-field"
         >
           Skip to content
         </a>
+
+        {/*
+          Both of these are root-level siblings on purpose. They blend against
+          the page, and any wrapper around them — even one carrying nothing but
+          a z-index — would make a stacking context and isolate the blend
+          group, which turns the grain into a flat grey sheet.
+
+          Order matters as much as nesting: the light is z-39 and the grain
+          z-40, so the grain develops inside the lit area.
+        */}
+        <Blink />
+        <CursorLight />
+        <Grain />
 
         <SiteHeader />
 
         {/* Clears the fixed header, which is a fixed 4rem at every width. */}
         <div className="h-16" aria-hidden="true" />
 
-        <PageTransition>
-          <main id="main">{children}</main>
-        </PageTransition>
+        {/*
+          No wrapper. The old transition animated a transform here, which made
+          this element the containing block for every fixed descendant while
+          it ran and sent the pinned sections thousands of pixels off-screen.
+          The blink lives in its own fixed siblings above, so the content tree
+          is plain again.
+        */}
+        <main id="main">{children}</main>
 
         <SiteFooter />
       </body>
