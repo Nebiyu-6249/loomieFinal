@@ -189,72 +189,146 @@ export const AUDIENCE: readonly string[] = [
 /* ------------------------------------------------------------------------ */
 
 /**
- * PLACEHOLDER DATA — not real projects.
+ * The four capability pieces.
  *
- * No client names, no testimonials, no metrics, no awards. Each entry
- * describes the kind of work that will occupy the slot, and the UI labels
- * every one of them as reserved. Replace this array wholesale when the
- * founder supplies real projects.
+ * These are sector pieces, not claimed clients — and that is the accurate
+ * thing to publish rather than a compromise. Each one describes the brand
+ * problem a sector usually arrives with, how the studio's five steps meet it,
+ * and what is handed over at the end. No client names, no testimonials, no
+ * metrics, no awards, and nothing written as though a particular project
+ * happened.
+ *
+ * A reader should finish one knowing what working with Loomie is like. That
+ * is a higher bar than a case study of invented work, and it is the only one
+ * that can be cleared honestly right now.
  */
-export interface WorkPlaceholder {
+export interface CapabilityPiece {
   slug: string;
   discipline: string;
   sector: string;
-  /** What the slot is reserved for. Never written as if it happened. */
-  reservedFor: string;
-  scope: readonly string[];
+  services: readonly string[];
+  /** One line, for the index and the corridor. */
+  summary: string;
+  /** What this sector usually arrives with. */
+  problem: string;
+  /** How the five steps meet it. Ordered, and matched to PROCESS. */
+  approach: readonly string[];
+  /** What is handed over. */
+  delivered: readonly string[];
   /** Swap to a real path and the plate composition steps aside. */
   image?: string;
 }
 
-export const WORK_PLACEHOLDERS: readonly WorkPlaceholder[] = [
+export const WORK: readonly CapabilityPiece[] = [
   {
-    slug: "identity-slot-01",
+    slug: "brand-identity-hospitality",
     discipline: "Brand identity",
     sector: "Hospitality",
-    reservedFor:
-      "A full identity build — mark, type, colour and the rules that hold them together.",
-    scope: ["Logo design", "Web brand identity"],
+    services: ["Logo suite", "Colour", "Typography", "Brand guide"],
+    summary:
+      "A full identity for a place people walk into, built to survive a menu, a shopfront and a phone screen.",
+    problem:
+      "Hospitality brands are used in more physical places than almost anything else — a sign at night, a menu in low light, a coffee cup, a delivery sticker, a phone held at arm's length across a table. Most arrive with a logo that was drawn once at one size for one use, and everything since has been an improvisation: a stretched version for the awning, a cropped one for the app, a different typeface on the menu because the original would not fit. Nothing is wrong on its own, and the whole thing does not add up.",
+    approach: [
+      "Discovery starts with where the brand is physically used, not with what it should feel like. A list of every surface — signage, menus, packaging, uniforms, the delivery platforms you do not control — sets the constraints everything else answers to.",
+      "Research looks at the sector's visual conventions to find which ones are load-bearing and which are only habit. A restaurant does not have to look like a restaurant, but it does have to be legible at four metres.",
+      "Two concept directions, both drawn at the smallest and largest sizes they will ever be used at before either is shown. A mark that only works on a presentation slide is not a mark.",
+      "Refinement is where the suite is built out: the primary logo, the secondary lockup for tight spaces, the icon for a profile picture, and the spacing rules that stop the next person crowding it.",
+      "Delivery is the full file set plus the guide, so the sign-writer, the printer and whoever runs the social account are all working from the same document.",
+    ],
+    delivered: [
+      "Primary logo, secondary lockup and icon mark, with spacing rules",
+      "Colour palette — primary, secondary and neutral — with usage guidance",
+      "Typography system: pairing, hierarchy and sample text styles",
+      "Brand guide covering the above, written to be handed to someone else",
+      "Editable source files and export formats, not a single flattened image",
+    ],
   },
   {
-    slug: "identity-slot-02",
+    slug: "identity-and-website-professional-services",
     discipline: "Identity and website",
-    sector: "Product",
-    reservedFor:
-      "An identity carried through to a working site, so the two are designed as one system.",
-    scope: ["Logo design", "Web brand identity", "Website design"],
+    sector: "Professional services",
+    services: ["Identity system", "Web design", "Build"],
+    summary:
+      "Identity and site designed as one system, so the website is not a translation of the brand into a second language.",
+    problem:
+      "A professional services firm is usually judged on its website before anyone speaks to it, and the website is usually the last thing the identity was designed for. The result is a brand that works on a document and falls apart on a screen: a mark with no small size, a palette with no interface states, type chosen for print with nothing to say about a form field or an error message. The site then gets designed around those gaps, and the two drift apart permanently.",
+    approach: [
+      "Discovery covers both at once — what the firm does, who decides, and what the site actually has to do. A brochure site and a site that has to generate enquiries are different problems wearing the same clothes.",
+      "Research maps the sector's conventions and the firm's real competitors, which are rarely the same list.",
+      "Two directions, each shown as a mark and as a page. Judging an identity in the abstract and then discovering how it behaves in a navigation bar is how the drift starts.",
+      "Refinement builds the system: not only logo and palette but the interface parts an identity normally forgets — link states, focus rings, form fields, the small type that carries most of the words.",
+      "Delivery is a built site and the identity system it came from, handed over together.",
+    ],
+    delivered: [
+      "Identity system: logo suite, colour, typography, and the interface states",
+      "Web design across the templates the site actually needs",
+      "A built, responsive site",
+      "Brand guide covering both the identity and its use on screen",
+      "Editable files and a handover walkthrough",
+    ],
   },
   {
-    slug: "campaign-slot-03",
+    slug: "marketing-design-retail",
     discipline: "Marketing design",
     sector: "Retail",
-    reservedFor:
-      "A campaign built from an existing system, tested across a full run of social assets.",
-    scope: ["Marketing design"],
+    services: ["Campaign system", "Social", "Print"],
+    summary:
+      "A campaign system rather than a set of posts, so the twentieth asset is as considered as the first.",
+    problem:
+      "Retail marketing is made under time pressure and in volume. A campaign is designed properly for its first three assets and then improvised for the next forty, because nobody wrote down how it works. Six weeks in, the sale graphics and the brand look like two companies. The problem is almost never taste — it is that no one was given a system, only examples.",
+    approach: [
+      "Discovery is about cadence and volume before it is about look: how often you post, who makes the assets, what they use, and how much time they have.",
+      "Research looks at what the existing brand already provides and what a campaign has to add. Most campaign systems fail by contradicting the brand rather than extending it.",
+      "Two directions, each presented as a rule set with examples rather than as examples alone — a grid, a type scale, a colour role, an image treatment.",
+      "Refinement tests the system on the hardest cases: the long product name, the awkward crop, the asset with too much text. A system that only works on the good cases is a mood board.",
+      "Delivery is templates the team can actually operate, plus the rules that say when to break them.",
+    ],
+    delivered: [
+      "Campaign system: grid, type scale, colour roles and image treatment",
+      "Social templates for the formats you actually publish",
+      "Print artwork set up for production",
+      "Usage guidance covering the awkward cases, not only the tidy ones",
+      "Editable source files in the tools your team uses",
+    ],
   },
   {
-    slug: "website-slot-04",
+    slug: "website-design-product",
     discipline: "Website design",
-    sector: "Professional services",
-    reservedFor:
-      "A site designed for a brand that already has its rules written down.",
-    scope: ["Website design"],
+    sector: "Product",
+    services: ["Web design", "Build", "Handover"],
+    summary:
+      "A site for a brand whose rules are already written, designed to extend them rather than reinterpret them.",
+    problem:
+      "A product company with a working identity usually does not need a rebrand — it needs a site that respects what already exists. The common failure is the opposite: a site that quietly invents a second brand, with its own type scale, its own blues, and its own idea of a button, because the existing rules said nothing about the web. Six months later there are two brands and no one can say which is correct.",
+    approach: [
+      "Discovery starts with the rules that already exist and finds the gaps rather than the faults. What does the guide say about a disabled state, about a table, about a long headline in a narrow column?",
+      "Research covers how the product is actually used and where the site sits in that — the page order most sites get wrong is the one that assumes everyone arrives at the homepage.",
+      "Two directions, both built from the existing system. If a direction requires changing the brand, that is said plainly rather than smuggled in.",
+      "Refinement resolves the gaps into additions to the system, documented as such, so the next person knows what was extended and why.",
+      "Delivery is the built site, the additions written down, and a handover so the team can keep it consistent without asking.",
+    ],
+    delivered: [
+      "Web design across the templates the site needs",
+      "A built, responsive site",
+      "Documented additions to the existing brand system",
+      "Handover session and written notes",
+      "Editable design files",
+    ],
   },
 ];
 
-/**
- * PLACEHOLDER DATA — invented names, drawn as wordmarks in the site's own
- * type. None of these are real companies, and no real company's mark appears
- * anywhere on this site.
- */
-export const PLACEHOLDER_WORDMARKS: readonly string[] = [
-  "NORTHBOUND",
-  "Saltgrove",
-  "MERIDIAN CO.",
-  "Fieldnote",
-  "ATLAS & CO",
-  "Quarry",
-];
+/*
+  The invented wordmark wall is gone rather than relabelled.
+
+  It was a grid of six made-up company names presented as a client list, and
+  the only thing that made it honest was the caption underneath saying so.
+  Every string on this site now has to read as final, which removes the
+  caption — and a fake client list without its disclaimer is just a fake
+  client list. There is no version of that section that is both finished and
+  true, so the page keeps the part that was always true: who the studio works
+  with, described rather than illustrated.
+*/
 
 export interface FaqItem {
   question: string;
@@ -285,6 +359,21 @@ export const FAQ: readonly FaqItem[] = [
   {
     question: "Can you work with the brand rules we already have?",
     answer:
-      "Yes. If the rules exist and hold up, the work extends them. If they contradict each other, that comes up in discovery.",
+      "Yes. If the rules exist and hold up, the work extends them, and the additions are documented as additions so the next person knows what changed. If they contradict each other, that comes up in discovery rather than being quietly resolved in one direction.",
+  },
+  {
+    question: "What happens if we do not like either direction?",
+    answer:
+      "That is a discovery problem rather than a concept problem, so the fix is to go back to it. It has a cost in time rather than in money, and it is better spent than a third direction drawn on the same brief.",
+  },
+  {
+    question: "Do you write the words as well?",
+    answer:
+      "No. The studio designs the system the words live in — hierarchy, length, where a line breaks — and will tell you when a piece of copy will not fit the design it has been given. Writing it is someone else's job.",
+  },
+  {
+    question: "Who owns the files at the end?",
+    answer:
+      "You do, including the editable sources. The studio keeps the right to show the work, and will ask before showing anything that has not been published yet.",
   },
 ];

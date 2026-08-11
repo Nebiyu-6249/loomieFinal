@@ -4,8 +4,10 @@ Every photographic slot on the site, with a prompt to generate it. Run these,
 drop the files in, and the drawn composition steps aside.
 
 Nothing here is blocking. Each slot already renders a finished composition
-built from the mark's own construction geometry — a specimen page, not a grey
-box. Real photography is an upgrade to a page that already works.
+built from the studio's own geometry — seven of them, two showing the robot
+itself — chosen by the slot's position so no two on a page repeat. A specimen
+page, not a grey box. Real photography is an upgrade to a page that already
+works, and the three meaning states have shipping procedural versions too.
 
 ---
 
@@ -13,29 +15,29 @@ box. Real photography is an upgrade to a page that already works.
 
 Put the file in `public/work/` (or `public/studio/`) and set one field.
 
-For the four work slots, `lib/content.ts`:
+For the four capability pieces, `lib/content.ts`:
 
 ```ts
 {
-  slug: "identity-slot-01",
+  slug: "brand-identity-hospitality",
   discipline: "Brand identity",
   // …
-  image: "/work/identity-slot-01.jpg",   // ← this line
+  image: "/work/brand-identity-hospitality.jpg",   // ← this line
 }
 ```
 
-That one field feeds the card stack on the homepage, the `/work` grid and the
-case-study page. For the `/studio` slot, set `src` on the `<Plate>` in
+That one field feeds the corridor on the homepage, the `/work` grid and the
+piece's own page. For the `/studio` slot, set `src` on the `<Plate>` in
 `app/studio/page.tsx`.
 
 For a video slot, keep `image` as the poster and add the video beside it:
 
 ```tsx
 <Plate
-  seed="identity-slot-01"
+  seed="brand-identity-hospitality"
   ratio="3/2"
-  src="/work/identity-slot-01.jpg"
-  video="/work/identity-slot-01.mp4"
+  src="/work/brand-identity-hospitality.jpg"
+  video="/work/brand-identity-hospitality.mp4"
 />
 ```
 
@@ -86,19 +88,19 @@ point is invisible.
 
 ---
 
-## The four work slots
+## The four capability pieces
 
-Reserved slots, not projects. **These images must not read as case-study
+Sector pieces, not client stories. **These images must not read as case-study
 documentation of work that happened** — no client deliverables, no "before and
-after", no branded mock-ups. They are atmosphere for a slot that is being held
-open, and the caption beside each one says "Reserved".
+after", no branded mock-ups. Each page describes a brand problem a sector
+arrives with; the image is the sector's atmosphere, not evidence of a job.
 
-One file per slot serves three places at three crops: 3/2 in the homepage card
-stack, 4/5 in the `/work` grid, 16/9 on the case-study page. **Compose for the
+One file per slot serves three places at three crops: 3/2 in the homepage
+corridor, 4/5 in the `/work` grid, 16/9 on the piece's own page. **Compose for the
 centre** and leave the outer thirds quiet, or the 4/5 crop will cut the
 subject in half.
 
-### 1 — `identity-slot-01` · Brand identity · Hospitality
+### 1 — `brand-identity-hospitality` · Brand identity · Hospitality
 
 > A close, low-key still life of unbranded hospitality materials on a dark
 > stone surface: a stack of blank uncoated cards, a folded linen napkin, a
@@ -113,7 +115,7 @@ subject in half.
 across the surface, as if a door were opening somewhere off frame. 10 seconds,
 no camera movement, only the light moves.
 
-### 2 — `identity-slot-02` · Identity and website · Product
+### 2 — `identity-and-website-professional-services` · Identity and website · Professional services
 
 > A dark tabletop with a blank matte screen at a slight angle, unbranded and
 > switched off, catching one cold specular highlight along its top edge. Cold
@@ -123,7 +125,7 @@ no camera movement, only the light moves.
 > subject rather than the object. Fine film grain. No reflections of people,
 > no interface visible, no text, no logos. Aspect ratio 3:2, subject centred.
 
-### 3 — `campaign-slot-03` · Marketing design · Retail
+### 3 — `marketing-design-retail` · Marketing design · Retail
 
 > A stack of blank uncoated poster paper on a dark floor, edges catching a
 > single warm light from a high window off frame. Colour around #F0B45A on
@@ -137,7 +139,7 @@ no camera movement, only the light moves.
 still. 12 seconds. This is the slot that most suits motion — the drift echoes
 the site's own grain.
 
-### 4 — `website-slot-04` · Website design · Professional services
+### 4 — `website-design-product` · Website design · Product
 
 > An architectural interior detail in near-darkness: the corner where a pale
 > wall meets a dark floor, with one cold shaft of daylight crossing it
@@ -174,13 +176,60 @@ more here than anywhere else.
 
 ---
 
+---
+
+## The three meaning states
+
+`/` — the section the hero's camera push opens onto. Each state is a short
+loop behind the word it belongs to, cross-fading with the ambient field over
+800ms. **Procedural versions of all three ship today** — a canvas snowfield,
+an SMIL-displaced water surface, and a CSS bokeh field — so these replace
+something that already works rather than filling a hole.
+
+Deliver as MP4, no audio track, 8–14 seconds, cut so the loop point is
+invisible, 1920×1080. Each needs a poster still from its own first frame.
+
+### 5 — `snow` · Finnish · cold
+
+> Fine snow drifting across a near-black field, shot against darkness with a
+> single cold light source off to the upper left, colour around #BFD9E3. No
+> ground, no horizon, no landmarks — only the particles and the dark. Shallow
+> depth of field so the nearest flakes are soft and the far ones resolve.
+> Slow: individual flakes should take three or four seconds to cross the
+> frame. Overall exposure very low-key, corners falling to #0A0B0D. Fine film
+> grain. No people, no structures, no text. 16:9.
+
+### 6 — `river` · Albanian · deep
+
+> Dark water moving slowly, shot from directly above, filling the frame. High
+> contrast between the near-black body of the water and the specular
+> highlights on its surface. One cold light source, colour around #BFD9E3,
+> raking from the right so the ripples catch as thin bright lines. No banks,
+> no sky, no objects in the water. The darkest areas reach #0A0B0D. Slow,
+> continuous motion with no obvious start or end. Fine film grain. No people.
+> 16:9.
+
+### 7 — `lights` · Italian · warm
+
+> Warm points of light thrown far out of focus, filling the frame as soft
+> overlapping discs. Colour around #F0B45A, no other hue. Very shallow depth
+> of field — nothing in the frame is sharp. The lights drift and change
+> intensity slowly, as if seen from a moving vehicle at a distance. Between
+> the discs the frame falls to #0A0B0D. No visible source, no filaments, no
+> street furniture, no text. Fine film grain. 16:9.
+
+---
+
 ## What is deliberately not a photographic slot
 
-- **The hero.** It is the mark itself, at ~900px, bleeding off the right and
-  bottom edges with a warm glow behind it. A photograph there would compete
-  with the one thing the homepage is for.
-- **The exploded assembly.** Six drawn plates of the mark's own construction.
-  Photographing a brand system defeats the point of showing it as drawings.
+- **The hero.** It is the robot, and the scroll pushes the camera into its
+  eye. A photograph there would compete with the one thing the homepage is
+  for, and there is nothing to push into.
+- **The exploded assembly.** The robot taking itself apart and resolving into
+  the mark. Photographing a brand system defeats the point of showing it as
+  drawings.
+- **The work corridor.** The same four plates as `/work`, at depth. It takes
+  whatever those slots are given.
 - **The ticker, the tone sections, the CTA.** Type and light only.
 - **`/clients`, `/process`, `/services`, `/studio/principles`.** These pages
   are lists and sequences; an image on any of them would be decoration hunting

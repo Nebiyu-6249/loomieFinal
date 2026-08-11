@@ -15,8 +15,9 @@ export default function NotFound() {
           Nothing here.
         </h1>
         <p className="type-body measure-tight mt-step-3 text-slate">
-          The page you asked for does not exist. It may have been a reserved
-          project slot that has since been replaced.
+          The page you asked for does not exist — a mistyped address, or a
+          link to something that has since moved. The work, the process and
+          the studio are all one click away.
         </p>
 
         <div className="mt-step-4 flex flex-wrap gap-step-3">

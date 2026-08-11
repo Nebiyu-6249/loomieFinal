@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { CardStack } from "@/components/CardStack";
+import { WorkCorridor } from "@/components/WorkCorridor";
 import { ContactCta } from "@/components/ContactCta";
 import { ToneSection } from "@/components/ToneSection";
 import { ExplodedAssembly } from "@/components/ExplodedAssembly";
@@ -9,7 +9,7 @@ import { JourneyLine } from "@/components/JourneyLine";
 import { LetterReveal } from "@/components/LetterReveal";
 import { Reveal } from "@/components/Reveal";
 import { Ticker } from "@/components/Ticker";
-import { SERVICES, STORY, WORK_PLACEHOLDERS } from "@/lib/content";
+import { SERVICES, STORY, WORK } from "@/lib/content";
 
 export default function Home() {
   return (
@@ -62,17 +62,16 @@ export default function Home() {
         </section>
 
         {/*
-          The stack is the featured view, and the only one. It used to sit
-          above a four-up grid of the same six slots, which meant the homepage
-          showed every reserved slot twice and neither presentation carried any
-          weight. The full set lives on /work, one click away.
+          A corridor, not a stack. A stack shows four things at once and asks
+          you to read the front one; a corridor shows one thing and takes you
+          to the next. The full set lives on /work, one click away.
         */}
         <section className="px-step-2 py-step-5 md:px-step-3" aria-labelledby="work">
           <div className="mx-auto max-w-[100rem]">
             {/*
-              The stack is this section's second block. It carries no hairline
-              of its own, so the heading's measure stays short and the widening
-              resumes in the section below.
+              The corridor is this section's second block. It carries no
+              hairline of its own, so the heading's measure stays short and the
+              widening resumes in the section below.
             */}
             <Reveal step={0} steps={2}>
               <LetterReveal
@@ -84,7 +83,7 @@ export default function Home() {
             </Reveal>
 
             <div className="mt-step-4">
-              <CardStack items={WORK_PLACEHOLDERS} />
+              <WorkCorridor items={WORK} />
             </div>
 
             <p className="mt-step-4">
