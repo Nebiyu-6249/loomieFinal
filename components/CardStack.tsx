@@ -106,7 +106,10 @@ export function CardStack({ items }: CardStackProps) {
                   sizes="(max-width: 768px) 82vw, 42vw"
                   index={index}
                 />
-                <span className="mt-step-2 flex items-baseline justify-between gap-step-2">
+                <span
+                  data-card-caption=""
+                  className="mt-step-2 flex items-baseline justify-between gap-step-2"
+                >
                   <span className="type-heading text-[clamp(1.125rem,2vw,1.5rem)]">
                     {item.discipline}
                   </span>

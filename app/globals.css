@@ -632,6 +632,20 @@
   }
 
   /*
+    Only the front card's caption is on. The cards are offset from each other
+    by 2.2rem and 1.1rem, so four captions rendered at once — every title and
+    every sector tag, stacked 35px apart and unreadable. Hidden rather than
+    faded, because a transparent caption still occupies the same overlapping
+    box and still gets picked up by find-in-page.
+
+    The card's own link carries an aria-label, so a keyboard user tabbing to a
+    card behind the front one still hears which slot it is.
+  */
+  .card-stack-item:not([data-depth="0"]) [data-card-caption] {
+    visibility: hidden;
+  }
+
+  /*
     Anything past the fourth card is behind the stack and not worth painting.
 
     visibility, not opacity alone: these cards hold real links, and an
