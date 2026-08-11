@@ -136,11 +136,17 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
             const { dubaiTime, dubaiDay } = slot;
             const isSelected = selected === slot.iso;
 
+            // The radio itself is visually hidden, so the focus ring has to
+            // move to the label a reader can actually see — otherwise it lands
+            // on a one-pixel box and keyboard focus is invisible. Drawn inside
+            // the cell, and inverted when the cell is selected.
             return (
               <label
                 key={slot.iso}
-                className={`flex min-h-24 cursor-pointer flex-col justify-center gap-1 p-step-2 transition-colors duration-200 ${
-                  isSelected ? "bg-ink text-field" : "bg-field hover:bg-drift"
+                className={`flex min-h-24 cursor-pointer flex-col justify-center gap-1 p-step-2 transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-4 ${
+                  isSelected
+                    ? "bg-ink text-field has-[:focus-visible]:outline-field"
+                    : "bg-field hover:bg-drift has-[:focus-visible]:outline-ink"
                 }`}
               >
                 <input
@@ -188,7 +194,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
             type="text"
             required
             autoComplete="name"
-            className="min-h-12 border-b border-ink bg-transparent pb-2 text-[1rem] outline-none focus-visible:border-b-2"
+            className="min-h-12 border-b border-ink bg-transparent pb-2 text-[1rem]"
           />
         </p>
 
@@ -203,7 +209,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
             required
             autoComplete="email"
             inputMode="email"
-            className="min-h-12 border-b border-ink bg-transparent pb-2 text-[1rem] outline-none focus-visible:border-b-2"
+            className="min-h-12 border-b border-ink bg-transparent pb-2 text-[1rem]"
           />
         </p>
       </div>
@@ -216,7 +222,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
           id={noteId}
           name="note"
           rows={3}
-          className="border-b border-ink bg-transparent pb-2 text-[1rem] outline-none focus-visible:border-b-2"
+          className="border-b border-ink bg-transparent pb-2 text-[1rem]"
         />
       </p>
 

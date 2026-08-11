@@ -15,12 +15,12 @@ export function ContactCta({ className = "" }: { className?: string }) {
         </h2>
 
         <div className="mt-step-4 flex flex-col gap-step-2 md:flex-row md:items-center md:gap-step-4">
-          <Link href="/contact" className="type-micro hover-line text-ink">
+          <Link href="/contact" className="type-micro hover-line inline-flex min-h-11 items-center text-ink">
             [ Request a time ]
           </Link>
           <a
             href={`mailto:${SITE.email}`}
-            className="type-micro hover-line text-ink/70"
+            className="type-micro hover-line inline-flex min-h-11 items-center text-ink/70"
           >
             {SITE.email}
           </a>

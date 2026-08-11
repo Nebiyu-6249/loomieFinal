@@ -36,7 +36,7 @@ export function SiteFooter() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="type-micro text-slate hover:text-ink"
+                className="type-micro hover-line inline-flex min-h-11 items-center text-slate hover:text-ink"
               >
                 {item.label}
               </Link>
@@ -47,7 +47,7 @@ export function SiteFooter() {
             <p className="type-micro text-slate">Contact</p>
             <a
               href={`mailto:${SITE.email}`}
-              className="type-heading mt-step-1 block text-[clamp(1.125rem,2.6vw,1.5rem)] hover:opacity-60"
+              className="type-heading hover-line mt-step-1 inline-flex min-h-11 items-center text-[clamp(1.125rem,2.6vw,1.5rem)]"
             >
               {SITE.email}
             </a>

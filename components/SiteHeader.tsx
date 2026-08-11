@@ -59,7 +59,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-step-2">
           <Link
             href="/"
-            className="hover:opacity-70"
+            className="inline-flex min-h-11 items-center hover:opacity-70"
             aria-label="Loomie — home"
           >
             <Wordmark />
