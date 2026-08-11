@@ -6,6 +6,7 @@ import {
 } from "next/font/google";
 
 import "./globals.css";
+import { CursorLight } from "@/components/CursorLight";
 import { Grain } from "@/components/Grain";
 import { PageTransition } from "@/components/PageTransition";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -90,6 +91,16 @@ export default function RootLayout({
           Skip to content
         </a>
 
+        {/*
+          Both of these are root-level siblings on purpose. They blend against
+          the page, and any wrapper around them — even one carrying nothing but
+          a z-index — would make a stacking context and isolate the blend
+          group, which turns the grain into a flat grey sheet.
+
+          Order matters as much as nesting: the light is z-39 and the grain
+          z-40, so the grain develops inside the lit area.
+        */}
+        <CursorLight />
         <Grain />
 
         <SiteHeader />
