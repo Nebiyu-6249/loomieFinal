@@ -87,7 +87,7 @@ export default function Home() {
           </Reveal>
 
           <Reveal step={1} steps={2} className="mt-step-3">
-            <p className="type-heading measure text-[clamp(1.375rem,3.2vw,2.25rem)] leading-[1.25]">
+            <p className="type-display measure text-[clamp(2.5rem,3.8vw,3.5rem)]">
               {STORY}
             </p>
             <p className="mt-step-3">

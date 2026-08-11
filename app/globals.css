@@ -26,7 +26,8 @@
   --color-background: #f2f3f4;
   --color-foreground: #0e1113;
 
-  --font-display: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-sans: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-martian), ui-monospace, monospace;
 
   /*
@@ -70,7 +71,7 @@
   body {
     background-color: var(--color-field);
     color: var(--color-ink);
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     font-synthesis-weight: none;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -109,19 +110,26 @@
 
 @layer utilities {
   /*
-    Display setting. Familjen Grotesk is doing the whole job here, so the
-    tracking is pulled in hard at size and released as the type gets smaller.
+    Display. Instrument Serif, 400 only, and never set below 40px — every
+    clamp that uses this class holds its lower bound at 2.5rem.
+
+    Tracking scales with size rather than being one fixed value: (1rem - 1em)
+    is zero at 16px and grows negative as the type grows, so a 96px headline
+    is pulled tight and a 40px one is barely touched. Applying one -0.02em to
+    both is what made small headings feel cramped.
   */
   .type-display {
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 0.92;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: calc((1rem - 1em) * 0.018);
+    line-height: 0.94;
   }
 
   .type-heading {
+    font-family: var(--font-sans);
     font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.02;
+    letter-spacing: calc((1rem - 1em) * 0.032);
+    line-height: 1.06;
   }
 
   /* Martian Mono, at the two sizes it is allowed to appear at. */
@@ -141,9 +149,18 @@
   }
 
   .type-body {
-    font-size: 0.9375rem;
-    line-height: 1.7;
-    letter-spacing: 0.005em;
+    font-size: 1rem;
+    line-height: 1.65;
+    letter-spacing: 0.003em;
+  }
+
+  /* The one step up from body, for a paragraph that opens a section. */
+  .type-lead {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: -0.004em;
   }
 
   /* Body copy exists on /studio and the case studies. Nowhere else. */

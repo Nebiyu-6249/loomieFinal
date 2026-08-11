@@ -41,13 +41,13 @@ export default function Studio() {
           </Reveal>
 
           <Reveal step={1} steps={3} className="mt-step-3">
-            <p className="type-heading measure text-[clamp(1.375rem,3.2vw,2.25rem)] leading-[1.28]">
+            <p className="type-display measure text-[clamp(2.5rem,3.8vw,3.5rem)]">
               {STORY}
             </p>
           </Reveal>
 
           <Reveal step={2} steps={3} className="mt-step-4">
-            <p className="type-body measure text-slate">{TAGLINE}</p>
+            <p className="type-lead measure text-slate">{TAGLINE}</p>
           </Reveal>
         </div>
       </section>
@@ -68,7 +68,7 @@ export default function Studio() {
               <dl className="grid gap-step-3 sm:grid-cols-3">
                 {MEANINGS.map((meaning) => (
                   <div key={meaning.language} className="border-t border-drift pt-step-2">
-                    <dt className="type-display text-[clamp(2rem,5vw,3.5rem)]">
+                    <dt className="type-display text-[clamp(2.5rem,5vw,3.5rem)]">
                       {meaning.word}
                     </dt>
                     <dd className="type-micro mt-step-1 text-slate">

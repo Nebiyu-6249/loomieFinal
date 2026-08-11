@@ -48,7 +48,7 @@ export default function Contact() {
                 Local time — {SITE.timezone.label} (UTC+
                 {SITE.timezone.offsetHours})
               </h3>
-              <p className="type-display mt-step-2 text-[clamp(2.5rem,6vw,4rem)]">
+              <p className="type-heading mt-step-2 text-[clamp(2.5rem,6vw,4rem)]">
                 <DubaiClock />
               </p>
               <p className="type-meta mt-step-2">
