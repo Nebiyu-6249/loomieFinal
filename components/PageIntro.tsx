@@ -21,7 +21,7 @@ export function PageIntro({ eyebrow, title, lede }: PageIntroProps) {
             {title}
           </h1>
           {lede ? (
-            <p className="type-body measure-tight mt-step-3 text-slate">{lede}</p>
+            <p className="type-lead measure mt-step-3 text-slate">{lede}</p>
           ) : null}
         </Reveal>
       </div>

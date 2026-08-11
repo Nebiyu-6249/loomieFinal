@@ -1,22 +1,29 @@
 import { ImageResponse } from "next/og";
 
-import { MARK, MARK_ASPECT, PUPIL_INSET } from "@/lib/mark";
+import {
+  APERTURE_INSET,
+  MARK,
+  MARK_ASPECT,
+  pupilRadiusFor,
+} from "@/lib/mark";
 
 export const alt = "Loomie — clear, connected, complete";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 /**
- * The share card is the hero, reduced: Field ground, the mark bleeding off the
- * right in Drift with Thaw apertures. Geometry comes off the same constants
- * the site uses, so the card cannot drift out of spec either.
+ * The share card is the hero, reduced: Field ground, a Thaw glow, and the Ink
+ * mark bleeding off the right with Field apertures and Ink pupils. Geometry
+ * comes off the same constants the site uses, so the card cannot drift out of
+ * spec either.
  */
 export default function OpengraphImage() {
   const markWidth = 760;
   const markHeight = markWidth / MARK_ASPECT;
   const unit = markWidth / MARK.gridWidth;
-  const pupil = MARK.pupilRadius * unit * 2;
-  const inset = PUPIL_INSET * unit;
+  const aperture = MARK.apertureRadius * unit * 2;
+  const pupil = pupilRadiusFor(markWidth) * unit * 2;
+  const inset = APERTURE_INSET * unit;
 
   return new ImageResponse(
     (
@@ -32,6 +39,20 @@ export default function OpengraphImage() {
           fontFamily: "sans-serif",
         }}
       >
+        {/* Warmth behind the mark, never inside it. */}
+        <div
+          style={{
+            position: "absolute",
+            right: -320,
+            top: 630 / 2 - 460,
+            width: 920,
+            height: 920,
+            borderRadius: 920,
+            backgroundColor: "#efd9b4",
+            display: "flex",
+          }}
+        />
+
         <div
           style={{
             position: "absolute",
@@ -39,32 +60,39 @@ export default function OpengraphImage() {
             top: 630 / 2 - markHeight / 2,
             width: markWidth,
             height: markHeight,
-            backgroundColor: "#dde3e6",
+            backgroundColor: "#0e1113",
             borderRadius: markHeight / 2,
             display: "flex",
             alignItems: "center",
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              left: inset - pupil / 2,
-              width: pupil,
-              height: pupil,
-              borderRadius: pupil,
-              backgroundColor: "#efd9b4",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              left: markWidth - inset - pupil / 2,
-              width: pupil,
-              height: pupil,
-              borderRadius: pupil,
-              backgroundColor: "#efd9b4",
-            }}
-          />
+          {[inset, markWidth - inset].map((centre) => (
+            <div
+              key={centre}
+              style={{
+                position: "absolute",
+                left: centre - aperture / 2,
+                top: markHeight / 2 - aperture / 2,
+                width: aperture,
+                height: aperture,
+                borderRadius: aperture,
+                backgroundColor: "#f2f3f4",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: pupil,
+                  height: pupil,
+                  borderRadius: pupil,
+                  backgroundColor: "#0e1113",
+                  display: "flex",
+                }}
+              />
+            </div>
+          ))}
         </div>
 
         {/* Painted after the mark, so it sits above it — Satori has no z-index. */}

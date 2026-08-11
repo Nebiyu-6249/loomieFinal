@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ContactCta } from "@/components/ContactCta";
+import { DarkSection } from "@/components/DarkSection";
 import { PageIntro } from "@/components/PageIntro";
 import { Plate } from "@/components/Plate";
 import { Reveal } from "@/components/Reveal";
@@ -41,48 +42,43 @@ export default function Studio() {
           </Reveal>
 
           <Reveal step={1} steps={3} className="mt-step-3">
-            <p className="type-heading measure text-[clamp(1.375rem,3.2vw,2.25rem)] leading-[1.28]">
+            <p className="type-display measure text-[clamp(2.5rem,3.8vw,3.5rem)]">
               {STORY}
             </p>
           </Reveal>
 
           <Reveal step={2} steps={3} className="mt-step-4">
-            <p className="type-body measure text-slate">{TAGLINE}</p>
+            <p className="type-lead measure text-slate">{TAGLINE}</p>
           </Reveal>
         </div>
       </section>
 
-      <section
-        className="px-step-2 pb-step-5 md:px-step-3"
-        aria-labelledby="meanings"
-      >
-        <div className="mx-auto max-w-[100rem]">
-          <Reveal step={0} steps={2}>
-            <h2 id="meanings" className="type-micro text-slate">
-              The name
-            </h2>
-          </Reveal>
+      <DarkSection labelledBy="meanings">
+        <Reveal step={0} steps={2}>
+          <h2 id="meanings" className="type-micro text-thaw">
+            The name
+          </h2>
+        </Reveal>
 
-          <Reveal step={1} steps={2} className="mt-step-4" rule={false}>
-            <div className="grid gap-step-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-center md:gap-step-5">
-              <dl className="grid gap-step-3 sm:grid-cols-3">
-                {MEANINGS.map((meaning) => (
-                  <div key={meaning.language} className="border-t border-drift pt-step-2">
-                    <dt className="type-display text-[clamp(2rem,5vw,3.5rem)]">
-                      {meaning.word}
-                    </dt>
-                    <dd className="type-micro mt-step-1 text-slate">
-                      {meaning.language}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+        <Reveal step={1} steps={2} className="mt-step-4" rule={false}>
+          <div className="grid gap-step-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-center md:gap-step-5">
+            <dl className="grid gap-step-3 sm:grid-cols-3">
+              {MEANINGS.map((meaning) => (
+                <div key={meaning.language} className="border-t border-field/25 pt-step-2">
+                  <dt className="type-display text-[clamp(2.5rem,5vw,3.5rem)]">
+                    {meaning.word}
+                  </dt>
+                  <dd className="type-micro mt-step-1 text-thaw">
+                    {meaning.language}
+                  </dd>
+                </div>
+              ))}
+            </dl>
 
-              <Plate seed="studio-name" ratio="3/2" sizes="(max-width: 768px) 100vw, 40vw" />
-            </div>
-          </Reveal>
-        </div>
-      </section>
+            <Plate seed="studio-name" ratio="3/2" sizes="(max-width: 768px) 100vw, 40vw" />
+          </div>
+        </Reveal>
+      </DarkSection>
 
       <section
         className="px-step-2 pb-step-5 md:px-step-3"

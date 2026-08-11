@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Familjen_Grotesk, Martian_Mono } from "next/font/google";
+import {
+  Familjen_Grotesk,
+  Instrument_Serif,
+  Martian_Mono,
+} from "next/font/google";
 
 import "./globals.css";
 import { PageTransition } from "@/components/PageTransition";
@@ -8,10 +12,24 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SITE, TAGLINE } from "@/lib/content";
 
 /*
-  One family carries the whole site, from eleven pixels to a hundred and
-  ninety. A second voice would contradict the thing the studio sells, so the
-  only other face is the mono, and it is never allowed above thirteen pixels.
+  Three registers, three jobs.
+
+  Instrument Serif carries display only, at 400 and never below 40px — its
+  thin strokes need the size, and holding it above that keeps it a voice
+  rather than a texture. Familjen Grotesk runs everything from 15px to 32px.
+  Martian Mono is the chrome: counters, labels, annotations, at 10 to 11px.
+
+  A high-contrast serif against a neutral grotesque against a technical mono
+  reads as three voices. One grotesque doing all three jobs is what made the
+  earlier build read as competent and nothing else.
 */
+const instrument = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-instrument",
+});
+
 const familjen = Familjen_Grotesk({
   subsets: ["latin"],
   display: "swap",
@@ -59,7 +77,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${familjen.variable} ${martian.variable}`}>
+    <html
+      lang="en"
+      className={`${instrument.variable} ${familjen.variable} ${martian.variable}`}
+    >
       <body className="min-h-svh">
         <a
           href="#main"
