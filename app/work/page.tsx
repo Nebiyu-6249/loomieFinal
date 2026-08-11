@@ -44,7 +44,7 @@ export default function WorkIndex() {
             <h2 className="type-micro text-slate">Working with the studio</h2>
           </Reveal>
           <Reveal step={1} steps={2} className="mt-step-3">
-            <p className="type-heading measure text-[clamp(1.25rem,2.8vw,2rem)] leading-[1.3]">
+            <p className="type-display measure text-[clamp(2.5rem,3.4vw,3rem)]">
               Every project runs the same five steps, on a four-week timeline,
               and ends with editable files rather than a single export.
             </p>
