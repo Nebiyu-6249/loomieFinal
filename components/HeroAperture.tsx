@@ -269,7 +269,12 @@ export function HeroAperture() {
 
           {/* Everything the reader reads, so it can recede as one thing. */}
           <div ref={veilContentRef} className="hero-veil-content">
-            <div className="mx-auto flex h-full max-w-[100rem] flex-col justify-center px-step-2 pb-step-5 pt-step-4 md:px-step-3">
+            {/*
+              Phone: the headline sits in the upper third and the mark takes
+              the lower half. Desktop: the headline is optically centred and
+              the mark bleeds off the right.
+            */}
+            <div className="mx-auto flex h-full max-w-[100rem] flex-col justify-start px-step-2 pb-step-5 pt-step-5 md:justify-center md:px-step-3 md:pt-step-4">
               <h1 className="type-display max-w-[13ch] text-[clamp(3rem,11vw,11.875rem)]">
                 Snow, river, lights.
               </h1>

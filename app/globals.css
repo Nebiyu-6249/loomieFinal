@@ -43,6 +43,24 @@
   --text-meta: 0.8125rem;
 }
 
+/*
+  The mobile pass, in one place.
+
+  The spacing utilities compile to var(--spacing-step-*), so retuning the scale
+  here retunes every section on the site at once. A phone gets roughly half the
+  vertical rhythm: the same composition needs far less air when the viewport is
+  390px wide, and at desktop values the page reads as abandoned rather than
+  quiet. The type scale is left alone — it is already clamped.
+*/
+@media (max-width: 47.999rem) {
+  :root {
+    --spacing-step-3: 1.5rem;
+    --spacing-step-4: 2.5rem;
+    --spacing-step-5: 4rem;
+    --spacing-step-6: 6rem;
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -214,12 +232,18 @@
   height: 100%;
 }
 
+/*
+  On a phone the mark sits below the headline with both apertures fully in
+  frame. They are the thing that opens, so cropping them off the bottom edge
+  would cost the hero its whole point — the desktop bleed is a luxury of a
+  wide viewport, not the composition itself.
+*/
 .hero-mark {
   position: absolute;
   z-index: 0;
-  right: -34%;
-  bottom: 4%;
-  width: 132%;
+  right: -20%;
+  bottom: 11%;
+  width: 118%;
   height: auto;
 }
 

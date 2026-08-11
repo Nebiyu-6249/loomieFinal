@@ -50,14 +50,19 @@ export function SiteHeader() {
 
   return (
     <header className="site-header fixed inset-x-0 top-0 z-50 bg-field transition-colors duration-200">
-      <div className="mx-auto flex max-w-[100rem] items-start justify-between gap-step-3 px-step-2 py-step-2 md:px-step-3">
+      {/*
+        A fixed 4rem so the spacer in the layout can match it exactly at every
+        width. A header whose height depends on its contents leaves a gap that
+        is right at one breakpoint and wrong at the others.
+      */}
+      <div className="mx-auto flex h-16 max-w-[100rem] items-center justify-between gap-step-3 px-step-2 md:px-step-3">
         <div className="flex items-center gap-step-2">
           <Link
             href="/"
             className="hover:opacity-70"
             aria-label="Loomie — home"
           >
-            <Wordmark markWidth={38} />
+            <Wordmark />
           </Link>
 
           {/* The descriptor, set at the size the reference sets it. */}
@@ -117,7 +122,7 @@ export function SiteHeader() {
       <div
         id="mobile-nav"
         hidden={!open}
-        className="h-[calc(100svh-4.5rem)] overflow-y-auto bg-field px-step-2 pb-step-4 pt-step-3 md:hidden"
+        className="h-[calc(100svh-4rem)] overflow-y-auto bg-field px-step-2 pb-step-4 pt-step-3 md:hidden"
       >
         <nav aria-label="Primary" className="flex flex-col">
           {[...NAV, { href: "/contact", label: "Contact" }].map((item) => (
