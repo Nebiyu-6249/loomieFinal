@@ -4,6 +4,8 @@ import { ContactCta } from "@/components/ContactCta";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
 import { ToneSection } from "@/components/ToneSection";
+import { LineMask } from "@/components/LineMask";
+import { PrincipleReveal } from "@/components/SectionEffects";
 import { MISSION, PILLARS, VALUES, VISION } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -34,18 +36,31 @@ export default function Principles() {
           </Reveal>
 
           <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
-            <dl className="grid gap-step-3 md:grid-cols-3 md:gap-step-4">
-              {VALUES.map((value) => (
-                <div key={value.name} className="border-t border-slate pt-step-2">
-                  <dt className="type-heading text-[clamp(1.375rem,2.8vw,2rem)]">
-                    {value.name}
-                  </dt>
-                  <dd className="type-body mt-step-2 text-slate">
-                    {value.detail}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            {/*
+              Each value scales up from 0.94 with its hairline opening from
+              the centre. It is the only rule on the site that draws both ways
+              — everything else runs left to right — and that is what marks
+              these as statements rather than as another sequence.
+            */}
+            <PrincipleReveal>
+              <dl className="grid gap-step-3 md:grid-cols-3 md:gap-step-4">
+                {VALUES.map((value) => (
+                  <div key={value.name} data-principle="">
+                    <span
+                      data-principle-rule=""
+                      aria-hidden="true"
+                      className="block h-px w-full bg-slate"
+                    />
+                    <dt className="type-heading mt-step-2 text-[clamp(1.375rem,2.8vw,2rem)]">
+                      {value.name}
+                    </dt>
+                    <dd className="type-body mt-step-2 text-slate">
+                      {value.detail}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </PrincipleReveal>
           </Reveal>
         </div>
       </section>
@@ -67,9 +82,12 @@ export default function Principles() {
                 <dt className="type-display shrink-0 text-[clamp(2.5rem,3.4vw,3rem)] md:w-96">
                   {pillar.name}
                 </dt>
-                <dd className="type-body measure self-end text-field/75">
+                <LineMask
+                  as="dd"
+                  className="type-body measure self-end text-field/75"
+                >
                   {pillar.detail}
-                </dd>
+                </LineMask>
               </div>
             ))}
           </dl>

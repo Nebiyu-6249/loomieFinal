@@ -6,6 +6,7 @@ import {
 } from "next/font/google";
 
 import "./globals.css";
+import { AmbientField } from "@/components/SectionEffects";
 import { Blink } from "@/components/Blink";
 import { CursorLight } from "@/components/CursorLight";
 import { Grain } from "@/components/Grain";
@@ -92,10 +93,18 @@ export default function RootLayout({
         </a>
 
         {/*
-          Both of these are root-level siblings on purpose. They blend against
-          the page, and any wrapper around them — even one carrying nothing but
-          a z-index — would make a stacking context and isolate the blend
-          group, which turns the grain into a flat grey sheet.
+          The page's weather, below everything. Its position is scrubbed
+          against the whole document, so descending a route moves the light
+          rather than swapping one gradient for another at each boundary.
+        */}
+        <AmbientField />
+
+        {/*
+          The light and the grain are root-level siblings on purpose. They
+          blend against the page, and any wrapper around them — even one
+          carrying nothing but a z-index — would make a stacking context and
+          isolate the blend group, which turns the grain into a flat grey
+          sheet.
 
           Order matters as much as nesting: the light is z-39 and the grain
           z-40, so the grain develops inside the lit area.
