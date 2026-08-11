@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/*
+  SNOWFIELD.
+
+  Five colours. Thaw is the only warm value in the system and appears in
+  exactly two places on the whole site: behind the hero apertures, and on the
+  contact call to action. If a third use appears, one of the first two was
+  wrong.
+*/
+@theme {
+  --color-field: #f2f3f4;
+  --color-ink: #0e1113;
+  --color-slate: #7c868c;
+  --color-drift: #dde3e6;
+  --color-thaw: #efd9b4;
+
+  /* LoomieEyes ships against `fill-foreground` / `fill-background`. */
+  --color-background: #f2f3f4;
+  --color-foreground: #0e1113;
+
+  --font-display: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-martian), ui-monospace, monospace;
+
+  /*
+    Big jumps. The gaps carry the direction, so the scale is deliberately
+    sparse — there is no 20px or 40px step to reach for.
+  */
+  --spacing-step-1: 0.5rem;
+  --spacing-step-2: 1rem;
+  --spacing-step-3: 2rem;
+  --spacing-step-4: 4rem;
+  --spacing-step-5: 8rem;
+  --spacing-step-6: 14rem;
+
+  --text-micro: 0.6875rem;
+  --text-meta: 0.8125rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-field);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /*
+    One focus treatment for the entire site: a 1px ink ring held off the
+    element by 3px of Field, so it reads on both the ground and on Drift
+    panels without ever being removed.
+  */
+  :focus-visible {
+    outline: 1px solid var(--color-ink);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background-color: var(--color-thaw);
+    color: var(--color-ink);
+  }
+
+  /* Everything that is not one of the five motion moves. */
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary {
+    transition:
+      color 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease,
+      opacity 180ms ease;
+  }
+}
+
+@layer utilities {
+  /*
+    Display setting. Familjen Grotesk is doing the whole job here, so the
+    tracking is pulled in hard at size and released as the type gets smaller.
+  */
+  .type-display {
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 0.92;
+  }
+
+  .type-heading {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+  }
+
+  /* Martian Mono, at the two sizes it is allowed to appear at. */
+  .type-micro {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .type-meta {
+    font-size: var(--text-meta);
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+    color: var(--color-slate);
+  }
+
+  .type-body {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    letter-spacing: 0.005em;
+  }
+
+  /* Body copy exists on /studio and the case studies. Nowhere else. */
+  .measure {
+    max-width: 58ch;
+  }
+
+  .measure-tight {
+    max-width: 42ch;
+  }
+}
+
+/*
+  Every move renders in its final visible state when motion is reduced. The
+  individual components check the query too — this is the backstop for
+  anything that slips through as a CSS transition.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
