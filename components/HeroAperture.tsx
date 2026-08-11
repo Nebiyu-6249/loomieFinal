@@ -4,21 +4,28 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { LetterReveal } from "./LetterReveal";
 import { subscribeToPointerFrame } from "./pointerStore";
 import { useMotionAllowed } from "./useMotionPreference";
 import { MEANINGS, SITE } from "@/lib/content";
-import { MARK, PUPIL_INSET } from "@/lib/mark";
+import {
+  APERTURE_CY,
+  APERTURE_INSET,
+  CAPSULE_RADIUS,
+  MARK,
+  pupilRadiusFor,
+} from "@/lib/mark";
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Move two of five. The signature scroll moment, homepage only.
  *
- * The mark sits at the right of the hero at enormous scale in Drift, close
- * enough to the ground that it reads as a change in the light rather than as
- * a logo. Its two apertures are the only warm thing on the page. Scroll, and
- * they open: the warmth floods out from the pupils and the three meanings
- * arrive inside it. Snow to sun, performed by the mark's own eyes.
+ * The mark sits at the right of the hero at enormous scale in Ink — the
+ * darkest thing on the page apart from the headline, so the two are in
+ * tension. Warmth sits behind it as a glow rather than inside its eyes.
+ * Scroll, and the apertures open: the warmth spills out from behind them and
+ * floods the screen, and the three meanings arrive inside it.
  *
  * The flood is two circles scaled with transforms — compositor work, no
  * per-frame repaint of a viewport-sized mask. The apertures track the cursor
@@ -32,6 +39,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 /** Matches LoomieEyes: five percent of the mark's own width. */
 const MAX_OFFSET_RATIO = 0.05;
+
+/** The hero is always large, so the pupil uses the full-size ratio. */
+const HERO_PUPIL_R = pupilRadiusFor(Number.MAX_SAFE_INTEGER);
 const SATURATION_DISTANCE = 300;
 const LERP = 0.12;
 
@@ -71,11 +81,11 @@ export function HeroAperture() {
     if (markRect.width === 0) return;
 
     const unit = markRect.width / MARK.gridWidth;
-    const radius = MARK.pupilRadius * unit;
+    const radius = MARK.apertureRadius * unit;
     const centreY = markRect.top - frameRect.top + markRect.height / 2;
-    const leftX = markRect.left - frameRect.left + PUPIL_INSET * unit;
+    const leftX = markRect.left - frameRect.left + APERTURE_INSET * unit;
     const rightX =
-      markRect.left - frameRect.left + markRect.width - PUPIL_INSET * unit;
+      markRect.left - frameRect.left + markRect.width - APERTURE_INSET * unit;
 
     // The furthest corner from either aperture, so the flood always finishes.
     const corners = [
@@ -159,7 +169,9 @@ export function HeroAperture() {
       const frame = frameRef.current;
       if (!geometry || !frame) return;
 
-      const maxOffset = geometry.radius * (MAX_OFFSET_RATIO / (MARK.pupilRadius / MARK.gridWidth));
+      const maxOffset =
+        geometry.radius *
+        (MAX_OFFSET_RATIO / (MARK.apertureRadius / MARK.gridWidth));
 
       let targetX = 0;
       let targetY = 0;
@@ -193,15 +205,20 @@ export function HeroAperture() {
       if (pupilsRef.current) {
         pupilsRef.current.setAttribute(
           "transform",
-          `translate(${(x / geometry.radius) * MARK.pupilRadius} ${
-            (y / geometry.radius) * MARK.pupilRadius
+          `translate(${(x / geometry.radius) * MARK.apertureRadius} ${
+            (y / geometry.radius) * MARK.apertureRadius
           })`,
         );
       }
 
       const transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-      if (leftFloodRef.current) leftFloodRef.current.style.transform = transform;
-      if (rightFloodRef.current) rightFloodRef.current.style.transform = transform;
+      const floodIn = `${Math.min(Math.max((progress - 0.04) / 0.08, 0), 1)}`;
+
+      for (const node of [leftFloodRef.current, rightFloodRef.current]) {
+        if (!node) continue;
+        node.style.transform = transform;
+        node.style.opacity = floodIn;
+      }
 
       // The hero recedes before the meanings arrive, so the two never overlap.
       if (veilContentRef.current) {
@@ -234,9 +251,13 @@ export function HeroAperture() {
       <div ref={frameRef} className="hero-frame">
         {/* The hero itself. */}
         <div className="hero-layer hero-veil bg-field">
+          {/* Warmth behind the mark, not inside it. The sun is behind the snow. */}
+          <div className="hero-glow" aria-hidden="true" />
+
           {/*
-            Drift on Field. Bleeds off the right and bottom edges so it reads
-            as a field the page is sitting on rather than as a placed object.
+            Ink on Field, bleeding off the right and bottom. The darkest thing
+            on the page apart from the headline, so the two are in tension
+            rather than the mark dissolving into the ground.
           */}
           <svg
             ref={markRef}
@@ -248,21 +269,32 @@ export function HeroAperture() {
             <rect
               width={MARK.gridWidth}
               height={MARK.gridHeight}
-              rx={MARK.gridHeight / 2}
-              fill="#dde3e6"
+              rx={CAPSULE_RADIUS}
+              fill="#0e1113"
             />
+
+            {/* The white of the eye. Static — an aperture does not wander. */}
+            <circle cx={APERTURE_INSET} cy={APERTURE_CY} r={MARK.apertureRadius} fill="#f2f3f4" />
+            <circle
+              cx={MARK.gridWidth - APERTURE_INSET}
+              cy={APERTURE_CY}
+              r={MARK.apertureRadius}
+              fill="#f2f3f4"
+            />
+
+            {/* The pupil. Dark, concentric, and the part that tracks. */}
             <g ref={pupilsRef}>
               <circle
-                cx={PUPIL_INSET}
-                cy={MARK.gridHeight / 2}
-                r={MARK.pupilRadius}
-                fill="#efd9b4"
+                cx={APERTURE_INSET}
+                cy={APERTURE_CY}
+                r={HERO_PUPIL_R}
+                fill="#0e1113"
               />
               <circle
-                cx={MARK.gridWidth - PUPIL_INSET}
-                cy={MARK.gridHeight / 2}
-                r={MARK.pupilRadius}
-                fill="#efd9b4"
+                cx={MARK.gridWidth - APERTURE_INSET}
+                cy={APERTURE_CY}
+                r={HERO_PUPIL_R}
+                fill="#0e1113"
               />
             </g>
           </svg>
@@ -275,12 +307,18 @@ export function HeroAperture() {
               the mark bleeds off the right.
             */}
             <div className="mx-auto flex h-full max-w-[100rem] flex-col justify-start px-step-2 pb-step-5 pt-step-5 md:justify-center md:px-step-3 md:pt-step-4">
-              <h1 className="type-display max-w-[13ch] text-[clamp(3rem,11vw,11.875rem)]">
-                Snow, river, lights.
-              </h1>
-              <p className="type-meta mt-step-3 max-w-[42ch]">
-                One pronunciation. Three meanings. One identity.
-              </p>
+              {/* Held to the left half so the mark can never crowd it. */}
+              <div className="md:w-[50%]">
+                <LetterReveal
+                  as="h1"
+                  text="Snow, river, lights."
+                  onMount
+                  className="type-display block text-[clamp(3rem,8.4vw,8.5rem)]"
+                />
+                <p className="type-meta mt-step-3 max-w-[42ch]">
+                  One pronunciation. Three meanings. One identity.
+                </p>
+              </div>
             </div>
 
             <p className="type-micro hero-scroll text-slate">

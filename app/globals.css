@@ -3,10 +3,11 @@
 /*
   SNOWFIELD.
 
-  Five colours. Thaw is the only warm value in the system and appears in
-  exactly two places on the whole site: behind the hero apertures, and on the
-  contact call to action. If a third use appears, one of the first two was
-  wrong.
+  Five values. Thaw is the only warm one, and it is light rather than paint:
+  it sits behind the mark as a glow, grounds the contact call to action, and
+  is the single accent allowed on the Ink sections. It never appears inside
+  the mark — the eyes are Field over Ink, and warmth falling on the capsule is
+  a different thing from warmth filling it.
 */
 @theme {
   --color-field: #f2f3f4;
@@ -25,7 +26,8 @@
   --color-background: #f2f3f4;
   --color-foreground: #0e1113;
 
-  --font-display: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-sans: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-martian), ui-monospace, monospace;
 
   /*
@@ -69,7 +71,7 @@
   body {
     background-color: var(--color-field);
     color: var(--color-ink);
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     font-synthesis-weight: none;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -91,7 +93,7 @@
     color: var(--color-ink);
   }
 
-  /* Everything that is not one of the five motion moves. */
+  /* Everything that is not one of the nine motion moves. */
   a,
   button,
   input,
@@ -108,19 +110,26 @@
 
 @layer utilities {
   /*
-    Display setting. Familjen Grotesk is doing the whole job here, so the
-    tracking is pulled in hard at size and released as the type gets smaller.
+    Display. Instrument Serif, 400 only, and never set below 40px — every
+    clamp that uses this class holds its lower bound at 2.5rem.
+
+    Tracking scales with size rather than being one fixed value: (1rem - 1em)
+    is zero at 16px and grows negative as the type grows, so a 96px headline
+    is pulled tight and a 40px one is barely touched. Applying one -0.02em to
+    both is what made small headings feel cramped.
   */
   .type-display {
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 0.92;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: calc((1rem - 1em) * 0.018);
+    line-height: 0.94;
   }
 
   .type-heading {
+    font-family: var(--font-sans);
     font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.02;
+    letter-spacing: calc((1rem - 1em) * 0.032);
+    line-height: 1.06;
   }
 
   /* Martian Mono, at the two sizes it is allowed to appear at. */
@@ -140,9 +149,18 @@
   }
 
   .type-body {
-    font-size: 0.9375rem;
-    line-height: 1.7;
-    letter-spacing: 0.005em;
+    font-size: 1rem;
+    line-height: 1.65;
+    letter-spacing: 0.003em;
+  }
+
+  /* The one step up from body, for a paragraph that opens a section. */
+  .type-lead {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: -0.004em;
   }
 
   /* Body copy exists on /studio and the case studies. Nowhere else. */
@@ -155,7 +173,7 @@
   }
 
   /*
-    Move four of five. One hover treatment for every card and every link on
+    Move eight of nine. One hover treatment for every card and every link on
     the site: a hairline draws in from the left, and a card lifts three
     pixels with it. Same easing and same duration as the text reveal, so the
     two read as one language. Focus gets it too — a keyboard should see what
@@ -204,6 +222,110 @@
   }
 }
 
+/* Move one of nine: the page transition, as a keyframe rather than a library. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-enter {
+  animation: page-enter 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/*
+  Move five of nine: the card stack.
+
+  A perspective stack on desktop; a snap-scroll row on a phone, which is what
+  a thumb expects and what avoids stacking six cards a touch device cannot
+  peel apart. Transforms only, so the cycle is compositor work.
+*/
+.card-stack-list {
+  display: flex;
+  gap: var(--spacing-step-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--spacing-step-2);
+  margin: 0;
+  list-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.card-stack-item {
+  flex: 0 0 82%;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 48rem) {
+  .card-stack-list {
+    position: relative;
+    display: block;
+    height: clamp(22rem, 34vw, 30rem);
+    overflow: visible;
+    padding-bottom: 0;
+    perspective: 1200px;
+  }
+
+  .card-stack-item {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    width: min(42vw, 34rem);
+    transform: translate3d(calc(var(--depth) * 2.2rem), calc(var(--depth) * 1.1rem), 0)
+      scale(calc(1 - var(--depth) * 0.05));
+    transform-origin: left center;
+    transition:
+      transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
+      opacity 500ms ease;
+  }
+
+  /* Anything past the fourth card is behind the stack and not worth painting. */
+  .card-stack-item[data-depth="4"],
+  .card-stack-item[data-depth="5"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+
+  .card-stack-item {
+    transition: none;
+  }
+}
+
+/*
+  Move four of nine: on a phone the ticker is a marquee rather than a pin.
+*/
+@media (max-width: 47.99rem) {
+  @keyframes ticker-drift {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .ticker-track {
+    animation: ticker-drift 38s linear infinite;
+  }
+}
+
+@media (max-width: 47.99rem) and (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}
+
 /*
   The signature scroll moment. Homepage only.
 
@@ -213,6 +335,16 @@
   script, so the fallback is the thing that ships by default rather than an
   afterthought.
 */
+/*
+  The stage starts under the fixed header rather than after it. Without this
+  the 100svh frame begins 4rem down the document, so a viewport-height hero
+  runs 4rem past the fold and crops its own eyes. The header is transparent
+  over the hero anyway, which is what makes the overlap read as intended.
+*/
+.hero-stage {
+  margin-top: -4rem;
+}
+
 .hero-veil {
   position: relative;
   min-height: 78svh;
@@ -233,14 +365,35 @@
 }
 
 /*
-  On a phone the mark sits below the headline with both apertures fully in
-  frame. They are the thing that opens, so cropping them off the bottom edge
-  would cost the hero its whole point — the desktop bleed is a luxury of a
-  wide viewport, not the composition itself.
+  The warmth sits behind the mark rather than inside it — light falling on the
+  capsule, not paint filling its eyes. Snow becomes a river under the warmth
+  of the sun, and the sun is behind the snow.
+*/
+.hero-glow {
+  position: absolute;
+  z-index: 0;
+  right: -46%;
+  bottom: -14%;
+  width: 190%;
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--color-thaw) 0%,
+    color-mix(in oklab, var(--color-thaw) 62%, transparent) 38%,
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+/*
+  On a phone the mark sits below the headline with both eyes fully in frame.
+  They are the thing that opens, so cropping them off the bottom edge would
+  cost the hero its whole point — the desktop bleed is a luxury of a wide
+  viewport, not the composition itself.
 */
 .hero-mark {
   position: absolute;
-  z-index: 0;
+  z-index: 1;
   right: -20%;
   bottom: 11%;
   width: 118%;
@@ -257,12 +410,30 @@
 }
 
 @media (min-width: 768px) {
-  .hero-mark {
-    top: 54%;
-    right: -11%;
+  .hero-glow {
+    top: calc(82% - min(78vw, 66rem) / 2);
+    right: -24%;
     bottom: auto;
-    width: min(70vw, 62rem);
-    transform: translateY(-50%);
+    width: min(78vw, 66rem);
+  }
+
+  /*
+    Roughly 900px at a 1440 viewport, sitting low and right so it bleeds off
+    both edges while leaving the left half clear for the headline. The two are
+    meant to be in tension, not overlapping.
+  */
+  /*
+    Anchored by the eyes rather than by an edge: the aperture centreline is
+    height/2, so placing top at 82% minus half the height puts the gaze at a
+    fixed 82% of the viewport whatever its height, and lets the capsule bleed
+    off the bottom without ever cropping an eye.
+  */
+  .hero-mark {
+    --mark-w: min(56vw, 50rem);
+    top: calc(82% - var(--mark-w) / 1.9444 / 2);
+    right: -12%;
+    bottom: auto;
+    width: var(--mark-w);
   }
 
   .hero-scroll {

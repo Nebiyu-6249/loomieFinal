@@ -2,25 +2,42 @@
 
 import React, { useEffect, useRef } from "react";
 import { subscribeToPointerFrame, type PointerState } from "./pointerStore";
+import { MARK } from "@/lib/mark";
 
 /**
  * The mark, with optional cursor tracking.
  *
  * Pointer position and the frame loop come from the shared pointerStore, so
  * however many instances are mounted there is still exactly one listener and
- * one rAF loop for the whole application, shared with the magnetic elements
- * and the tilting work cards.
+ * one rAF loop for the whole application.
+ *
+ * Three tones. The capsule is Ink, the aperture is Field, and a smaller
+ * concentric pupil in Ink sits inside the aperture. The pupil is what moves;
+ * the aperture stays put, the way an eye actually works. The earlier version
+ * translated the white of the eye and drew no pupil at all, which is why the
+ * mark read as a pill with two dots rather than as something looking back.
+ *
+ * Each eye is a group so the blink can squash the whole eye while the pupil
+ * keeps its own translation — writing both a transform attribute and a CSS
+ * transform onto one element loses the attribute, which is what the previous
+ * version did.
  */
 
-/** Exact 5.142857x scale of the 70x36 LoomieLogoMark geometry. */
+/** Exact 5.142857x scale of the 70x36 grid. */
 const VIEWBOX_WIDTH = 360;
 const VIEWBOX_HEIGHT = 185;
+const UNIT = VIEWBOX_WIDTH / MARK.gridWidth;
+
+const APERTURE_R = MARK.apertureRadius * UNIT;
+const APERTURE_CY = (MARK.gridHeight / 2) * UNIT;
+const LEFT_CX = MARK.apertureRadius * MARK.apertureInsetRatio * UNIT;
+const RIGHT_CX = VIEWBOX_WIDTH - LEFT_CX;
 
 /**
- * The original 18px cap was tuned against this 360-unit viewBox. Holding it
- * as a fraction of the viewBox width means the offset is expressed in
- * viewBox units, so a 56px navbar mark and a 340px blueprint deflect by the
- * same proportion of their own size.
+ * Deflection cap, in viewBox units, so a 38px navbar mark and a 900px hero
+ * mark deflect by the same proportion of their own size. Held under the
+ * aperture radius minus the pupil radius, so the pupil can never leave the
+ * white of the eye.
  */
 const MAX_OFFSET = VIEWBOX_WIDTH * 0.05;
 
@@ -31,8 +48,10 @@ const LERP = 0.12;
 
 interface EyeInstance {
   svg: SVGSVGElement;
-  left: SVGCircleElement;
-  right: SVGCircleElement;
+  leftPupil: SVGGElement;
+  rightPupil: SVGGElement;
+  leftEye: SVGGElement;
+  rightEye: SVGGElement;
   current: { x: number; y: number };
   /** Cached so the blink styles are only written when they change. */
   blinkScale: number;
@@ -136,20 +155,20 @@ const applyFrame = (time: number, pointer: Readonly<PointerState>) => {
     instance.current.y += (targetY - instance.current.y) * LERP;
 
     const transform = `translate(${instance.current.x.toFixed(2)} ${instance.current.y.toFixed(2)})`;
-    instance.left.setAttribute("transform", transform);
-    instance.right.setAttribute("transform", transform);
+    instance.leftPupil.setAttribute("transform", transform);
+    instance.rightPupil.setAttribute("transform", transform);
 
-    // The blink is a vertical squash of the apertures.
+    // The blink closes the whole eye, aperture and pupil together.
     const scale = glance?.blink ? 0.08 : 1;
     if (instance.blinkScale !== scale) {
       instance.blinkScale = scale;
       const squash = `scale(1 ${scale})`;
-      instance.left.style.transformOrigin = "113px 92.5px";
-      instance.right.style.transformOrigin = "247px 92.5px";
-      instance.left.style.transform = squash;
-      instance.right.style.transform = squash;
-      instance.left.style.transition = "transform 90ms linear";
-      instance.right.style.transition = "transform 90ms linear";
+      instance.leftEye.style.transformOrigin = `${LEFT_CX}px ${APERTURE_CY}px`;
+      instance.rightEye.style.transformOrigin = `${RIGHT_CX}px ${APERTURE_CY}px`;
+      instance.leftEye.style.transform = squash;
+      instance.rightEye.style.transform = squash;
+      instance.leftEye.style.transition = "transform 90ms linear";
+      instance.rightEye.style.transition = "transform 90ms linear";
     }
   });
 };
@@ -178,16 +197,39 @@ interface LoomieEyesProps {
   track?: boolean;
   /** Supply only where the mark is the content; otherwise it stays decorative. */
   label?: string;
+  /**
+   * Rendered width in pixels, used only to decide whether the pupil needs the
+   * compact ratio. Pass it wherever the mark is drawn small.
+   */
+  renderWidth?: number;
+  /** Overrides the capsule fill; defaults to the foreground token. */
+  capsuleClassName?: string;
+  /** Overrides the aperture fill; defaults to the background token. */
+  apertureClassName?: string;
+  /** Overrides the pupil fill; defaults to the foreground token. */
+  pupilClassName?: string;
 }
 
 export function LoomieEyes({
   className = "w-12 h-6",
   track = true,
   label,
+  renderWidth = 120,
+  capsuleClassName = "fill-foreground",
+  apertureClassName = "fill-background",
+  pupilClassName = "fill-foreground",
 }: LoomieEyesProps) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const leftPupilRef = useRef<SVGCircleElement>(null);
-  const rightPupilRef = useRef<SVGCircleElement>(null);
+  const leftPupilRef = useRef<SVGGElement>(null);
+  const rightPupilRef = useRef<SVGGElement>(null);
+  const leftEyeRef = useRef<SVGGElement>(null);
+  const rightEyeRef = useRef<SVGGElement>(null);
+
+  const ratio =
+    renderWidth < MARK.compactBelowWidth
+      ? MARK.compactPupilRatio
+      : MARK.pupilRatio;
+  const pupilR = APERTURE_R * ratio;
 
   useEffect(() => {
     if (!track) return;
@@ -196,14 +238,18 @@ export function LoomieEyes({
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const svg = svgRef.current;
-    const left = leftPupilRef.current;
-    const right = rightPupilRef.current;
-    if (!svg || !left || !right) return;
+    const leftPupil = leftPupilRef.current;
+    const rightPupil = rightPupilRef.current;
+    const leftEye = leftEyeRef.current;
+    const rightEye = rightEyeRef.current;
+    if (!svg || !leftPupil || !rightPupil || !leftEye || !rightEye) return;
 
     return registerEyes({
       svg,
-      left,
-      right,
+      leftPupil,
+      rightPupil,
+      leftEye,
+      rightEye,
       current: { x: 0, y: 0 },
       blinkScale: 1,
     });
@@ -226,11 +272,23 @@ export function LoomieEyes({
         width="350"
         height="175"
         rx="87.5"
-        className="fill-foreground stroke-foreground"
-        strokeWidth="10"
+        className={capsuleClassName}
+        stroke="none"
       />
-      <circle ref={leftPupilRef} cx="113" cy="92.5" r="46" className="fill-background" />
-      <circle ref={rightPupilRef} cx="247" cy="92.5" r="46" className="fill-background" />
+
+      <g ref={leftEyeRef}>
+        <circle cx={LEFT_CX} cy={APERTURE_CY} r={APERTURE_R} className={apertureClassName} />
+        <g ref={leftPupilRef}>
+          <circle cx={LEFT_CX} cy={APERTURE_CY} r={pupilR} className={pupilClassName} />
+        </g>
+      </g>
+
+      <g ref={rightEyeRef}>
+        <circle cx={RIGHT_CX} cy={APERTURE_CY} r={APERTURE_R} className={apertureClassName} />
+        <g ref={rightPupilRef}>
+          <circle cx={RIGHT_CX} cy={APERTURE_CY} r={pupilR} className={pupilClassName} />
+        </g>
+      </g>
     </svg>
   );
 }
