@@ -486,9 +486,37 @@
   animation-delay: -2.7s;
 }
 
+/*
+  Acknowledgement: the three indicators fire left to right, once. It is the
+  machine's only way of saying it noticed, and it is deliberately the same
+  three lights that idle — a new element lighting up would read as an alert.
+*/
+@keyframes robot-acknowledge {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  22% {
+    opacity: 1;
+  }
+}
+
+.robot-acknowledge .robot-dot {
+  animation: robot-acknowledge 0.5s ease-out 1 both;
+}
+
+.robot-acknowledge .robot-dot-2 {
+  animation-delay: 0.16s;
+}
+
+.robot-acknowledge .robot-dot-3 {
+  animation-delay: 0.32s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .robot-breathe,
-  .robot-dot {
+  .robot-dot,
+  .robot-acknowledge .robot-dot {
     animation: none;
   }
 
@@ -901,6 +929,176 @@
     font-size: 22px;
     letter-spacing: 3px;
     text-transform: uppercase;
+  }
+}
+
+/*
+  The booking week.
+
+  A strip of day columns that scrolls horizontally rather than a vertical list
+  of times: the day is the axis a reader is actually navigating, and a list
+  makes them read it off every row.
+*/
+.booking-layout {
+  display: grid;
+  gap: var(--spacing-step-3);
+}
+
+.booking-robot {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .booking-layout {
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .booking-robot {
+    display: block;
+    height: 15rem;
+  }
+}
+
+.booking-week {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(8.5rem, 1fr);
+  gap: 1px;
+  overflow-x: auto;
+  background-color: var(--color-smoke);
+  scroll-snap-type: x proximity;
+}
+
+.booking-day {
+  background-color: var(--color-void);
+  padding: var(--spacing-step-2);
+  scroll-snap-align: start;
+}
+
+.booking-day[data-today] {
+  /* The only column with a ground of its own, so "you are here" is one look. */
+  background-color: #101316;
+}
+
+.booking-day[data-closed] {
+  opacity: 0.55;
+}
+
+.booking-day-head {
+  margin: 0 0 var(--spacing-step-2);
+  border-bottom: 1px solid var(--color-smoke);
+  padding-bottom: var(--spacing-step-1);
+}
+
+.booking-empty {
+  color: var(--color-slate);
+}
+
+.booking-times {
+  display: grid;
+  gap: var(--spacing-step-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+  The chosen slot grows and the rest step back. Both sides matter: expanding
+  one cell in a row of identical cells is easy to miss, and receding the
+  others is what makes the choice unmistakable without any colour at all.
+*/
+.booking-slot {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  padding: var(--spacing-step-1) 0;
+  transform-origin: left center;
+  transition:
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.booking-slot:has(:focus-visible) {
+  outline: 2px solid var(--color-field);
+  outline-offset: 3px;
+}
+
+.booking-week[data-chosen] .booking-slot:not([data-selected]) {
+  opacity: 0.4;
+  transform: scale(0.94);
+}
+
+.booking-slot[data-selected] {
+  transform: scale(1.04);
+}
+
+/* Ember as a drawn line, never as a fill. */
+.booking-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: var(--color-ember);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.booking-slot[data-selected] .booking-underline {
+  transform: scaleX(1);
+}
+
+/*
+  One button, three labels. The width is held by the longest of them so the
+  control does not resize under a pointer that is already on it.
+*/
+.booking-submit {
+  min-height: 3rem;
+  min-width: 12rem;
+  border: 1px solid var(--color-field);
+  padding: 0 var(--spacing-step-3);
+  color: var(--color-field);
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    opacity 200ms ease;
+}
+
+.booking-submit:hover:not(:disabled) {
+  background-color: var(--color-field);
+  color: var(--color-void);
+}
+
+.booking-submit[data-state="sending"] {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.booking-confirmed {
+  display: grid;
+  gap: var(--spacing-step-3);
+  border-top: 1px solid var(--color-haze);
+  padding-top: var(--spacing-step-3);
+}
+
+@media (min-width: 48rem) {
+  .booking-confirmed {
+    grid-template-columns: 8rem minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.booking-confirmed-robot {
+  height: 12rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-slot,
+  .booking-underline {
+    transition-duration: 1ms;
   }
 }
 

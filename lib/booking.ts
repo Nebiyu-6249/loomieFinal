@@ -13,7 +13,18 @@ export const DUBAI_UTC_OFFSET_HOURS = 4;
 
 /** Studio hours, in Dubai wall-clock time. */
 const SLOT_HOURS = [10, 13, 16] as const;
-const DAYS_OFFERED = 2;
+
+/**
+ * A full week, starting today.
+ *
+ * The list used to start tomorrow and skip the weekend entirely, which is
+ * right for a list and wrong for a strip: a week with two days missing is not
+ * a week, and there is no "today" column to mark. Closed days are now shown
+ * and labelled rather than omitted, and today appears even when every slot on
+ * it has already passed — a reader needs to see where they are in the week
+ * before they can read the rest of it.
+ */
+const DAYS_OFFERED = 7;
 
 export interface ProposedSlot {
   /** The instant, as an ISO string. The only thing the client is trusted with. */
@@ -37,51 +48,79 @@ function isWeekend(year: number, month: number, day: number): boolean {
   return weekday === 6 || weekday === 0;
 }
 
-/**
- * The next few working days in Dubai, from tomorrow, at the studio's hours.
- */
-export function proposedSlots(now: Date = new Date()): ProposedSlot[] {
+export interface DayColumn {
+  /** Stable key, and what the column is labelled by. */
+  key: string;
+  weekday: string;
+  dayNumber: string;
+  month: string;
+  isToday: boolean;
+  /** The UAE weekend. Shown, so the week is a week, but empty. */
+  closed: boolean;
+  slots: ProposedSlot[];
+}
+
+/** Seven days in Dubai from today, with the studio's hours on each open one. */
+export function proposedWeek(now: Date = new Date()): DayColumn[] {
   // Move into Dubai's calendar day before stepping forward.
   const dubaiNow = new Date(
     now.getTime() + DUBAI_UTC_OFFSET_HOURS * 60 * 60 * 1000,
   );
 
-  const slots: ProposedSlot[] = [];
-  let cursor = 1;
-  let daysAdded = 0;
-
-  while (daysAdded < DAYS_OFFERED && cursor < 14) {
+  return Array.from({ length: DAYS_OFFERED }, (_unused, offset) => {
     const day = new Date(
       Date.UTC(
         dubaiNow.getUTCFullYear(),
         dubaiNow.getUTCMonth(),
-        dubaiNow.getUTCDate() + cursor,
+        dubaiNow.getUTCDate() + offset,
       ),
     );
 
     const year = day.getUTCFullYear();
     const month = day.getUTCMonth();
     const date = day.getUTCDate();
+    const closed = isWeekend(year, month, date);
 
-    if (!isWeekend(year, month, date)) {
-      for (const hour of SLOT_HOURS) {
-        const iso = new Date(
-          Date.UTC(year, month, date, hour - DUBAI_UTC_OFFSET_HOURS),
-        ).toISOString();
+    const slots = closed
+      ? []
+      : SLOT_HOURS.map((hour) =>
+          new Date(
+            Date.UTC(year, month, date, hour - DUBAI_UTC_OFFSET_HOURS),
+          ).toISOString(),
+        )
+          // A time that has already passed is not a time you can ask for.
+          .filter((iso) => new Date(iso).getTime() > now.getTime())
+          .map((iso) => ({
+            iso,
+            dubaiTime: formatTime(iso, DUBAI_TIME_ZONE),
+            dubaiDay: formatDay(iso, DUBAI_TIME_ZONE),
+          }));
 
-        slots.push({
-          iso,
-          dubaiTime: formatTime(iso, DUBAI_TIME_ZONE),
-          dubaiDay: formatDay(iso, DUBAI_TIME_ZONE),
-        });
-      }
-      daysAdded += 1;
-    }
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone: DUBAI_TIME_ZONE,
+    }).formatToParts(day);
 
-    cursor += 1;
-  }
+    const part = (type: string) =>
+      parts.find((entry) => entry.type === type)?.value ?? "";
 
-  return slots;
+    return {
+      key: `${year}-${month + 1}-${date}`,
+      weekday: part("weekday"),
+      dayNumber: part("day"),
+      month: part("month"),
+      isToday: offset === 0,
+      closed,
+      slots,
+    };
+  });
+}
+
+/** Every offered instant, flattened. */
+export function proposedSlots(now: Date = new Date()): ProposedSlot[] {
+  return proposedWeek(now).flatMap((day) => day.slots);
 }
 
 export function formatTime(iso: string, timeZone: string): string {
