@@ -475,9 +475,21 @@
   margin-top: -4rem;
 }
 
+/*
+  100svh, matching exactly what the motion stage gives this element when it
+  becomes an inset-0 layer inside a 100svh frame.
+
+  It was 78svh, and the mark is anchored at `top: 82%` of this box — so
+  hydration grew the box from 702px to 900px and dropped the mark 162px down
+  the page. The only layout shift on the site, 0.0289 of it, and invisible in
+  every screenshot because a still frame is either before it or after it.
+
+  Two states of the same hero must agree on their height or a percentage
+  anchor inside them cannot be stable.
+*/
 .hero-veil {
   position: relative;
-  min-height: 78svh;
+  min-height: 100svh;
 }
 
 .hero-meanings {
