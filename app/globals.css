@@ -93,7 +93,7 @@
     color: var(--color-ink);
   }
 
-  /* Everything that is not one of the five motion moves. */
+  /* Everything that is not one of the nine motion moves. */
   a,
   button,
   input,
@@ -173,7 +173,7 @@
   }
 
   /*
-    Move four of five. One hover treatment for every card and every link on
+    Move eight of nine. One hover treatment for every card and every link on
     the site: a hairline draws in from the left, and a card lifts three
     pixels with it. Same easing and same duration as the text reveal, so the
     two read as one language. Focus gets it too — a keyboard should see what
@@ -219,6 +219,110 @@
   .hover-card:hover [data-card-rule],
   .hover-card:focus-visible [data-card-rule] {
     transform: scaleX(1);
+  }
+}
+
+/* Move one of nine: the page transition, as a keyframe rather than a library. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-enter {
+  animation: page-enter 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/*
+  Move five of nine: the card stack.
+
+  A perspective stack on desktop; a snap-scroll row on a phone, which is what
+  a thumb expects and what avoids stacking six cards a touch device cannot
+  peel apart. Transforms only, so the cycle is compositor work.
+*/
+.card-stack-list {
+  display: flex;
+  gap: var(--spacing-step-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--spacing-step-2);
+  margin: 0;
+  list-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.card-stack-item {
+  flex: 0 0 82%;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 48rem) {
+  .card-stack-list {
+    position: relative;
+    display: block;
+    height: clamp(22rem, 34vw, 30rem);
+    overflow: visible;
+    padding-bottom: 0;
+    perspective: 1200px;
+  }
+
+  .card-stack-item {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    width: min(42vw, 34rem);
+    transform: translate3d(calc(var(--depth) * 2.2rem), calc(var(--depth) * 1.1rem), 0)
+      scale(calc(1 - var(--depth) * 0.05));
+    transform-origin: left center;
+    transition:
+      transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
+      opacity 500ms ease;
+  }
+
+  /* Anything past the fourth card is behind the stack and not worth painting. */
+  .card-stack-item[data-depth="4"],
+  .card-stack-item[data-depth="5"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+
+  .card-stack-item {
+    transition: none;
+  }
+}
+
+/*
+  Move four of nine: on a phone the ticker is a marquee rather than a pin.
+*/
+@media (max-width: 47.99rem) {
+  @keyframes ticker-drift {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .ticker-track {
+    animation: ticker-drift 38s linear infinite;
+  }
+}
+
+@media (max-width: 47.99rem) and (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
   }
 }
 

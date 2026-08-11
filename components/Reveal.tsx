@@ -20,6 +20,9 @@ gsap.registerPlugin(ScrollTrigger);
  * pixels. Both are transforms, so nothing reflows and the text never re-wraps
  * mid-animation.
  *
+ * The last rule of a sequence is Ink rather than Drift, so the arrival at
+ * full width is something you see rather than something you infer.
+ *
  * The hidden state is only ever applied by script, after the reduced-motion
  * check has passed — so reduced motion, a GSAP failure and no JavaScript at
  * all each leave the block in its final, readable state rather than blank.
@@ -73,6 +76,8 @@ export function Reveal({
       ? MAX_RULE
       : MIN_RULE + ((MAX_RULE - MIN_RULE) * step) / (steps - 1);
 
+  const isFinal = steps <= 1 || step === steps - 1;
+
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -125,7 +130,9 @@ export function Reveal({
       {rule ? (
         <span
           aria-hidden="true"
-          className="mb-step-2 block h-px origin-left bg-drift"
+          className={`mb-step-2 block h-px origin-left ${
+            isFinal ? "bg-ink" : "bg-drift"
+          }`}
           data-reveal-rule=""
           style={{ width: `${widthPercent}%` }}
         />
