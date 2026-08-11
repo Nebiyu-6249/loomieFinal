@@ -31,6 +31,23 @@ const MAX_RULE = 100;
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+/**
+ * Web fonts land after the first measurement and move everything down the
+ * page, which leaves every trigger position stale — and a block whose trigger
+ * has been pushed below its start never reveals. One refresh once the fonts
+ * have settled, for the whole document.
+ */
+let refreshScheduled = false;
+
+function refreshOnFontsReady() {
+  if (refreshScheduled) return;
+  refreshScheduled = true;
+
+  document.fonts?.ready
+    .then(() => ScrollTrigger.refresh())
+    .catch(() => undefined);
+}
+
 interface RevealProps {
   children: ReactNode;
   /** Zero-based position in the page's sequence of blocks. */
@@ -60,6 +77,8 @@ export function Reveal({
     const root = rootRef.current;
     if (!root) return;
     if (prefersReducedMotion()) return;
+
+    refreshOnFontsReady();
 
     const ruleEl = root.querySelector<HTMLElement>("[data-reveal-rule]");
     const contentEl = root.querySelector<HTMLElement>("[data-reveal-content]");
