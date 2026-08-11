@@ -5,6 +5,8 @@ import { ContactCta } from "@/components/ContactCta";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
 import { ToneSection } from "@/components/ToneSection";
+import { LineMask } from "@/components/LineMask";
+import { PackageReveal, ProcessReveal } from "@/components/SectionEffects";
 import { PACKAGES, PACKAGES_INTRO, PROCESS, TIMELINE } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -32,20 +34,32 @@ export default function Process() {
         </Reveal>
 
         <Reveal step={1} steps={2} className="mt-step-4" rule={false}>
-          <ol className="grid gap-px bg-haze sm:grid-cols-2 lg:grid-cols-5">
-            {PROCESS.map((step, index) => (
-              <li
-                key={step.title}
-                className="flex flex-col gap-step-2 bg-smoke p-step-3 lg:min-h-64"
-              >
-                <span className="type-micro text-ember">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3 className="type-heading text-[1.25rem]">{step.title}</h3>
-                <p className="type-body text-field/70">{step.detail}</p>
-              </li>
-            ))}
-          </ol>
+          {/*
+            The connecting line is drawn as you scroll and each step arrives as
+            it reaches them, so the sequence is demonstrated rather than
+            asserted by five numbers in a row.
+          */}
+          <ProcessReveal>
+            <div className="process-run">
+              <span data-process-line="" className="process-line" aria-hidden="true" />
+
+              <ol className="grid gap-px bg-haze sm:grid-cols-2 lg:grid-cols-5">
+                {PROCESS.map((step, index) => (
+                  <li
+                    key={step.title}
+                    data-process-step=""
+                    className="flex flex-col gap-step-2 bg-smoke p-step-3 lg:min-h-64"
+                  >
+                    <span className="type-micro text-ember">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="type-heading text-[1.25rem]">{step.title}</h3>
+                    <p className="type-body text-field/70">{step.detail}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </ProcessReveal>
         </Reveal>
       </ToneSection>
 
@@ -89,22 +103,34 @@ export default function Process() {
             <h2 id="packages" className="type-micro text-slate">
               Packages
             </h2>
-            <p className="type-lead measure mt-step-2">{PACKAGES_INTRO}</p>
+            <LineMask className="type-lead measure mt-step-2" delay={0.1}>
+              {PACKAGES_INTRO}
+            </LineMask>
           </Reveal>
 
           <Reveal step={1} steps={2} className="mt-step-4" rule={false}>
-            <ul className="grid gap-step-2 lg:grid-cols-3">
-              {PACKAGES.map((pack) => (
+            <PackageReveal>
+            <ul className="package-grid grid gap-step-2 lg:grid-cols-3">
+              {PACKAGES.map((pack, index) => (
                 <li
                   key={pack.slug}
-                  className="flex flex-col border border-haze bg-smoke p-step-3"
+                  data-package-card=""
+                  /*
+                    The sweep marks the tier the studio leads with. It is the
+                    most complete one rather than the most expensive one,
+                    since there is no pricing on this page to be expensive.
+                  */
+                  data-package-lead={index === PACKAGES.length - 1 || undefined}
+                  className="package-card flex flex-col border border-haze bg-smoke p-step-3"
                 >
-                  <h3 className="type-display text-[clamp(2.5rem,3vw,2.75rem)]">
+                  <span className="package-sweep" aria-hidden="true" />
+
+                  <h3 data-package-item="" className="type-display text-[clamp(2.5rem,3vw,2.75rem)]">
                     {pack.name}
                   </h3>
 
                   {pack.builtOn ? (
-                    <p className="type-micro mt-step-2 text-ember">
+                    <p data-package-item="" className="type-micro mt-step-2 text-ember">
                       Everything in {pack.builtOn}, plus
                     </p>
                   ) : null}
@@ -113,6 +139,7 @@ export default function Process() {
                     {pack.includes.map((line) => (
                       <li
                         key={line}
+                        data-package-item=""
                         className="type-body border-t border-haze pt-step-1 text-field/75"
                       >
                         {line}
@@ -135,6 +162,7 @@ export default function Process() {
                 </li>
               ))}
             </ul>
+            </PackageReveal>
           </Reveal>
         </div>
       </section>

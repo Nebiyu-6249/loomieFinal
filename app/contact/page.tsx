@@ -5,7 +5,7 @@ import { ToneSection } from "@/components/ToneSection";
 import { DubaiClock } from "@/components/DubaiClock";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
-import { proposedSlots } from "@/lib/booking";
+import { proposedWeek } from "@/lib/booking";
 import { FAQ, SITE } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default function Contact() {
-  const slots = proposedSlots();
+  const week = proposedWeek();
 
   return (
     <>
@@ -63,7 +63,7 @@ export default function Contact() {
           <div className="border-t border-haze pt-step-3">
             <h2 className="type-micro text-slate">Request a call</h2>
             <div className="mt-step-3">
-              <BookingForm slots={slots} />
+              <BookingForm week={week} />
             </div>
           </div>
         </div>

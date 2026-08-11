@@ -2,188 +2,191 @@
 
 import gsap from "gsap";
 
+import {
+  Arm,
+  Base,
+  ChestPanel,
+  Eye,
+  HeadShell,
+  NeckRings,
+  RobotDefs,
+  Torso,
+} from "./RobotParts";
 import { useScrollEffect } from "./useScrollEffect";
 import {
   APERTURE_CY,
   APERTURE_INSET,
   CAPSULE_RADIUS,
-  CLEAR_SPACE,
   MARK,
   pupilRadiusFor,
 } from "@/lib/mark";
+import {
+  BASE_Y,
+  CHEST,
+  EYE_CY,
+  HEAD_Y,
+  NECK_Y,
+  ROBOT,
+  TORSO_Y,
+} from "@/lib/robot";
 
 /**
  * Move three of fourteen — the exploded assembly.
  *
- * Six plates, stacked as one object, that explode outward on scroll with
- * rotation and scale and then lock into a labelled grid. 2D throughout: CSS
- * transforms only, no WebGL, no perspective.
+ * The robot comes apart along Z and outward, each piece labelled, and then
+ * draws back together and locks. Then the head simplifies into the flat mark.
  *
- * Every plate is drawn from the construction constants, so this is the brand
- * system taking itself apart and putting itself back together rather than six
- * decorative rectangles.
+ * That last move is the point of the whole section. It was six abstract
+ * plates labelled CAPSULE, GRID, TYPE and so on — a diagram of nothing in
+ * particular, running in parallel to the robot rather than connected to it.
+ * Exploding the machine itself and resolving it into the logo demonstrates
+ * Connectivity with the site's own centrepiece: one system carrying a single
+ * idea from a three-dimensional object down to a wordmark.
  *
- * Pinned with scrub: 1 and end "+=120%". The preset's 180% held the page for
- * nearly two screens of scroll on an animation that has finished its work in
- * one, which read as the page having stopped rather than the object having
- * been examined. On a phone there is no pin — pinning a viewport-height
- * section on a touch device fights the scroll — so the plates stagger into a
- * two-column grid instead.
+ * Every part here is imported from RobotParts, the same module the assembled
+ * robot draws from, so there is no second copy of the machine to drift out of
+ * step. Each part is drawn in the figure's own coordinates and moved by a
+ * transform — an exploded part is the same path translated, not a redrawing.
+ *
+ * Pinned at +=120% with pinType transform. On a phone there is no pin: the
+ * parts stagger into a two-column grid, which is the same information without
+ * hijacking a touch scroll.
  */
 
 const PUPIL_R = pupilRadiusFor(Number.MAX_SAFE_INTEGER);
 
-interface PlateSpec {
+interface Part {
   label: string;
-  /** Final resting slot in the assembled grid. */
   content: React.ReactNode;
-  /** Where it flies to, as a fraction of the container. */
+  /** Where it flies to, as a fraction of the stage. */
   x: number;
   y: number;
-  rotate: number;
+  /** Depth, so the explosion has front and back rather than being a starburst. */
+  z: number;
+  /** Where the label sits, in the figure's own coordinates. */
+  labelY: number;
 }
 
-const PLATES: PlateSpec[] = [
+const PARTS: Part[] = [
   {
-    label: "Capsule",
-    x: -0.34,
-    y: -0.22,
-    rotate: -9,
-    content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
-        <rect
-          width={MARK.gridWidth}
-          height={MARK.gridHeight}
-          rx={CAPSULE_RADIUS}
-          fill="none"
-          stroke="var(--color-field)"
-          strokeWidth="1.4"
-        />
-      </svg>
-    ),
-  },
-  {
-    label: "Aperture",
-    x: 0.34,
+    label: "Head capsule",
+    x: -0.3,
     y: -0.26,
-    rotate: 7,
+    z: 260,
+    labelY: HEAD_Y + ROBOT.headHeight + 34,
+    content: <HeadShell />,
+  },
+  {
+    label: "Apertures",
+    x: 0.3,
+    y: -0.28,
+    z: 190,
+    labelY: EYE_CY + ROBOT.headHeight * 0.6,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
-        <circle
-          cx={APERTURE_INSET}
-          cy={APERTURE_CY}
-          r={MARK.apertureRadius}
-          fill="var(--color-field)"
-        />
-        <circle
-          cx={MARK.gridWidth - APERTURE_INSET}
-          cy={APERTURE_CY}
-          r={MARK.apertureRadius}
-          fill="none"
-          stroke="var(--color-field)"
-          strokeWidth="1.2"
-        />
-      </svg>
+      <>
+        <Eye side="left" />
+        <Eye side="right" />
+      </>
     ),
   },
   {
-    label: "Pupil",
-    x: -0.38,
-    y: 0.2,
-    rotate: 6,
+    label: "Neck rings",
+    x: -0.34,
+    y: 0.0,
+    z: 60,
+    labelY: NECK_Y + ROBOT.neckHeight + 30,
+    content: <NeckRings />,
+  },
+  {
+    label: "Chassis",
+    x: 0.3,
+    y: 0.04,
+    z: -60,
+    labelY: TORSO_Y + ROBOT.torsoHeight + 30,
+    content: <Torso />,
+  },
+  {
+    label: "Chest panel",
+    x: -0.05,
+    y: 0.26,
+    z: 120,
+    labelY: CHEST.y + CHEST.height + 32,
+    content: <ChestPanel pulse={false} />,
+  },
+  {
+    label: "Arms",
+    x: 0.32,
+    y: 0.28,
+    z: -160,
+    // Above the chassis label rather than beside it — at the same
+    // height the two ran into each other.
+    labelY: TORSO_Y - 26,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
-        <circle
-          cx={MARK.gridWidth / 2}
-          cy={APERTURE_CY}
-          r={MARK.apertureRadius}
-          fill="var(--color-haze)"
-        />
-        <circle
-          cx={MARK.gridWidth / 2}
-          cy={APERTURE_CY}
-          r={PUPIL_R}
-          fill="var(--color-field)"
-        />
-      </svg>
+      <>
+        <Arm side="left" />
+        <Arm side="right" />
+      </>
     ),
   },
   {
-    label: "Colour",
-    x: 0.38,
-    y: 0.18,
-    rotate: -6,
-    content: (
-      // Stops short of the bottom edge so the caption has clear ground.
-      <div className="flex h-[calc(100%-1.6rem)] w-full">
-        {["#0a0b0d", "#3a4046", "#8a949b", "#f0b45a"].map((fill) => (
-          <span key={fill} className="h-full flex-1" style={{ backgroundColor: fill }} />
-        ))}
-      </div>
-    ),
-  },
-  {
-    label: "Type",
-    x: -0.06,
-    y: 0.34,
-    rotate: 3,
-    content: (
-      <div className="flex h-full w-full flex-col justify-center gap-1 p-3">
-        <span className="type-display text-[2rem] leading-none">Aa</span>
-        <span className="type-heading text-[0.9rem]">Aa</span>
-        <span className="type-micro">Aa</span>
-      </div>
-    ),
-  },
-  {
-    label: "Grid",
-    // Was 0.08, which put its right edge through the Aperture plate at every
-    // width from 1280 up. Two plates of the same Void fill, separated by a
-    // Haze hairline, do not read as a deliberate overlap the way two white
-    // plates with Ink hairlines did — they read as a collision.
-    x: -0.02,
-    y: -0.36,
-    rotate: -4,
-    content: (
-      // The only plate that draws outside the mark's own box: the clear-space
-      // rule is a statement about the space around the mark, so the viewBox
-      // opens up to hold it. At 0 0 70 36 it was clipped to two stubs at the
-      // plate's edges and read as crop marks.
-      <svg
-        viewBox={`${-CLEAR_SPACE / 2 - 2} ${-CLEAR_SPACE / 2 - 2} ${
-          MARK.gridWidth + CLEAR_SPACE + 4
-        } ${MARK.gridHeight + CLEAR_SPACE + 4}`}
-        className="h-full w-full px-3 pb-8 pt-3"
-        aria-hidden="true"
-      >
-        <rect
-          x={-CLEAR_SPACE / 2}
-          y={-CLEAR_SPACE / 2}
-          width={MARK.gridWidth + CLEAR_SPACE}
-          height={MARK.gridHeight + CLEAR_SPACE}
-          fill="none"
-          stroke="var(--color-slate)"
-          strokeWidth="0.8"
-          strokeDasharray="2 2"
-        />
-        <line x1={APERTURE_INSET} y1="0" x2={APERTURE_INSET} y2="36" stroke="var(--color-slate)" strokeWidth="0.6" />
-        <line x1={MARK.gridWidth - APERTURE_INSET} y1="0" x2={MARK.gridWidth - APERTURE_INSET} y2="36" stroke="var(--color-slate)" strokeWidth="0.6" />
-        <line x1="0" y1={APERTURE_CY} x2="70" y2={APERTURE_CY} stroke="var(--color-slate)" strokeWidth="0.6" />
-      </svg>
-    ),
+    label: "Base",
+    x: -0.28,
+    y: 0.3,
+    z: -240,
+    labelY: BASE_Y + ROBOT.baseHeight + 34,
+    content: <Base />,
   },
 ];
 
+/** The flat mark the head resolves into, drawn at the head's own position. */
+function FlatMark() {
+  const width = ROBOT.headWidth;
+  const unit = width / MARK.gridWidth;
+  const x = ROBOT.cx - width / 2;
+  const y = ROBOT.top;
+
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={MARK.gridHeight * unit}
+        rx={CAPSULE_RADIUS * unit}
+        fill="var(--color-smoke)"
+      />
+      {[APERTURE_INSET, MARK.gridWidth - APERTURE_INSET].map((inset) => (
+        <g key={inset}>
+          <circle
+            cx={x + inset * unit}
+            cy={y + APERTURE_CY * unit}
+            r={MARK.apertureRadius * unit}
+            fill="var(--color-field)"
+          />
+          <circle
+            cx={x + inset * unit}
+            cy={y + APERTURE_CY * unit}
+            r={PUPIL_R * unit}
+            fill="var(--color-void)"
+          />
+        </g>
+      ))}
+    </g>
+  );
+}
+
 export function ExplodedAssembly() {
   const rootRef = useScrollEffect<HTMLElement>(({ root, onMotion }) => {
-    // Desktop: pinned, stacked, exploding outward and locking into a grid.
     onMotion("(min-width: 48rem)", () => {
       const stage = root.querySelector<HTMLElement>("[data-assembly-stage]");
-      const plates = gsap.utils.toArray<HTMLElement>("[data-plate]", root);
-      const labels = gsap.utils.toArray<HTMLElement>("[data-plate-label]", root);
-      if (!stage || plates.length === 0) return;
+      const parts = gsap.utils.toArray<HTMLElement>("[data-part]", root);
+      const labels = gsap.utils.toArray<HTMLElement>("[data-part-label]", root);
+      const flat = root.querySelector<HTMLElement>("[data-flat-mark]");
+      const head = root.querySelector<HTMLElement>('[data-part="0"]');
+      if (!stage || parts.length === 0) return;
 
       gsap.set(labels, { opacity: 0 });
+      if (flat) gsap.set(flat, { opacity: 0 });
 
       const timeline = gsap.timeline({
         scrollTrigger: {
@@ -193,45 +196,51 @@ export function ExplodedAssembly() {
           scrub: 1,
           pin: stage,
           anticipatePin: 1,
-          // Pinned with transforms rather than position: fixed. The cause
-          // is gone — the transition that wrapped main in an animating
-          // transform, making it the containing block for fixed descendants
-          // and landing this pin thousands of pixels off, is now two fixed
-          // lids outside the content tree. The setting stays because it does
-          // not depend on nothing above it ever growing a transform again.
+          // Pinned with transforms rather than position: fixed, which does not
+          // depend on nothing above this ever growing a transform.
           pinType: "transform",
           invalidateOnRefresh: true,
         },
       });
 
-      plates.forEach((plate, index) => {
-        const spec = PLATES[index];
-
+      /*
+        Out, hold, back. One timeline rather than two triggers, so the
+        reassembly is genuinely the reverse of the explosion and cannot drift
+        out of register with it.
+      */
+      parts.forEach((part, index) => {
+        const spec = PARTS[index];
         timeline.fromTo(
-          plate,
-          // xPercent/yPercent do the centring, so x and y are free for the
-          // timeline to own and the plate is centred whatever the pinned
-          // container measures.
-          { xPercent: -50, yPercent: -50, x: 0, y: 0, rotate: 0, scale: 0.78 },
+          part,
+          { x: 0, y: 0, z: 0, rotate: 0 },
           {
-            // Resolved on refresh, against the viewport rather than the pin
-            // spacer — the spacer is taller than the screen by the scroll
-            // distance, so measuring it scatters the plates off-screen.
-            x: () => spec.x * window.innerWidth * 0.6,
-            y: () => spec.y * window.innerHeight * 0.62,
-            xPercent: -50,
-            yPercent: -50,
-            rotate: spec.rotate,
-            scale: 1,
-            ease: "none",
+            x: () => spec.x * window.innerWidth * 0.42,
+            y: () => spec.y * window.innerHeight * 0.3,
+            z: spec.z,
+            rotate: spec.x * 10,
+            ease: "power2.inOut",
+            duration: 1,
           },
           0,
         );
       });
 
-      // Then it squares up: rotation out, and the labels arrive.
-      timeline.to(plates, { rotate: 0, ease: "none", stagger: 0.02 }, ">-0.2");
-      timeline.to(labels, { opacity: 1, ease: "none", stagger: 0.03 }, "<");
+      timeline.to(labels, { opacity: 1, ease: "none", stagger: 0.03, duration: 0.3 }, 0.55);
+      timeline.to(labels, { opacity: 0, ease: "none", duration: 0.25 }, 1.35);
+
+      parts.forEach((part) => {
+        timeline.to(
+          part,
+          { x: 0, y: 0, z: 0, rotate: 0, ease: "power2.inOut", duration: 1 },
+          1.35,
+        );
+      });
+
+      // The payoff: the machine's head becomes the logo.
+      if (flat && head) {
+        timeline.to(head, { opacity: 0, duration: 0.3, ease: "none" }, 2.5);
+        timeline.to(flat, { opacity: 1, duration: 0.3, ease: "none" }, 2.5);
+      }
 
       return () => {
         timeline.scrollTrigger?.kill();
@@ -239,12 +248,11 @@ export function ExplodedAssembly() {
       };
     });
 
-    // Phone: no pin. Pinning a full-height section on a touch device fights
-    // the scroll, so the plates simply stagger into the two-column grid.
+    // Phone: no pin, no depth. The parts stagger in as a labelled grid.
     onMotion("(max-width: 47.99rem)", () => {
-      const plates = gsap.utils.toArray<HTMLElement>("[data-plate]", root);
+      const parts = gsap.utils.toArray<HTMLElement>("[data-part-cell]", root);
 
-      const tween = gsap.from(plates, {
+      const tween = gsap.from(parts, {
         opacity: 0,
         y: 24,
         duration: 0.5,
@@ -260,6 +268,8 @@ export function ExplodedAssembly() {
     });
   });
 
+  const view = `0 0 ${ROBOT.viewWidth} ${ROBOT.viewHeight}`;
+
   return (
     <section
       ref={rootRef}
@@ -272,24 +282,63 @@ export function ExplodedAssembly() {
         </h2>
       </div>
 
-      <div data-assembly-stage="" className="relative md:h-svh">
-        <div className="mt-step-4 grid grid-cols-2 gap-step-2 md:absolute md:inset-0 md:mt-0 md:block">
-          {PLATES.map((plate) => (
-            <figure
-              key={plate.label}
-              data-plate=""
-              className="relative aspect-[4/3] w-full border border-haze bg-void md:absolute md:left-1/2 md:top-1/2 md:h-[clamp(8rem,13vw,11rem)] md:w-[clamp(11rem,17vw,15rem)]"
-            >
-              {plate.content}
-              <figcaption
-                data-plate-label=""
-                className="type-micro absolute bottom-2 left-3 text-slate"
-              >
-                {plate.label}
-              </figcaption>
-            </figure>
+      <div data-assembly-stage="" className="assembly-stage">
+        {/*
+          The head's face is Void, and on the assembled robot it is the ember
+          behind the head that makes it read at all. Exploded, that glow flies
+          away with nothing — so the section carries its own field.
+        */}
+        <span className="assembly-field" aria-hidden="true" />
+        {/*
+          Desktop: every part drawn in the figure's own coordinates, stacked as
+          full-size SVG layers so a part's exploded position is a transform on
+          the layer rather than a different drawing.
+        */}
+        <div className="assembly-figure">
+          {PARTS.map((part, index) => (
+            <div key={part.label} data-part={index} className="assembly-part">
+              {/*
+                The label is drawn inside the SVG, at the part's own
+                coordinates. Positioned in the layer instead, it sat at the
+                layer's bottom-centre and travelled with the transform but not
+                with the part — seven captions bunched at the foot of the
+                frame, none of them next to the thing they named.
+              */}
+              <svg viewBox={view} className="h-full w-full" aria-hidden="true">
+                {index === 0 ? <RobotDefs /> : null}
+                {part.content}
+                <text
+                  data-part-label=""
+                  className="assembly-label"
+                  x={ROBOT.cx}
+                  y={part.labelY}
+                  textAnchor="middle"
+                >
+                  {part.label}
+                </text>
+              </svg>
+            </div>
           ))}
+
+          <div data-flat-mark="" className="assembly-part">
+            <svg viewBox={view} className="h-full w-full" aria-hidden="true">
+              <FlatMark />
+            </svg>
+          </div>
         </div>
+
+        {/* Phone: the same seven parts as a plain labelled grid. */}
+        <ul className="assembly-grid">
+          {PARTS.map((part, index) => (
+            <li key={part.label} data-part-cell="" className="assembly-cell">
+              <svg viewBox={view} className="h-full w-full" aria-hidden="true">
+                {index === 0 ? <RobotDefs /> : null}
+                {part.content}
+              </svg>
+              <span className="type-micro assembly-cell-label">{part.label}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

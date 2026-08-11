@@ -7,8 +7,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Placeholder projects and the request endpoint are not for crawlers.
-      disallow: ["/work/", "/api/"],
+      // The request endpoint is not for crawlers. The work pages are.
+      disallow: ["/api/"],
     },
     sitemap: `${siteUrl}/sitemap.xml`,
   };

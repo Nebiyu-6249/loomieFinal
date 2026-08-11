@@ -392,6 +392,879 @@
   }
 }
 
+/*
+  Move thirteen of fourteen: the robot.
+
+  Three layers at three depths inside one perspective. Standing still that
+  costs nothing — it is three absolutely positioned SVGs — and it is what lets
+  the hero's camera push move *through* the machine rather than scale a
+  picture of it.
+
+  The eyes' blink transition lives here rather than in the script so the
+  script only ever writes a transform, never a duration.
+*/
+.robot {
+  position: relative;
+  aspect-ratio: 460 / 900;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.robot-layer {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.robot-field {
+  transform: translateZ(-90px) scale(1.07);
+}
+
+.robot-body {
+  transform: translateZ(0);
+}
+
+.robot-head {
+  transform: translateZ(46px) rotateX(4deg);
+  transform-origin: 50% 78%;
+}
+
+.robot-head g {
+  transition: transform 90ms linear;
+}
+
+/*
+  The torso rises and falls 1.5%, easing at both ends. Anchored at the waist,
+  because a body that breathes from its centre reads as a balloon.
+*/
+@keyframes robot-breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.015);
+  }
+}
+
+.robot-breathe {
+  transform-origin: 50% 100%;
+  animation: robot-breathe 4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/*
+  Three indicators on three periods that share no common multiple worth
+  noticing, so they never fall into step and the machine never looks like it
+  is keeping time.
+*/
+@keyframes robot-dot {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.robot-dot {
+  animation: robot-dot 4s ease-in-out infinite;
+}
+
+.robot-dot-1 {
+  animation-duration: 3.4s;
+}
+
+.robot-dot-2 {
+  animation-duration: 4.1s;
+  animation-delay: -1.2s;
+}
+
+.robot-dot-3 {
+  animation-duration: 4.8s;
+  animation-delay: -2.7s;
+}
+
+/*
+  Acknowledgement: the three indicators fire left to right, once. It is the
+  machine's only way of saying it noticed, and it is deliberately the same
+  three lights that idle — a new element lighting up would read as an alert.
+*/
+@keyframes robot-acknowledge {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  22% {
+    opacity: 1;
+  }
+}
+
+.robot-acknowledge .robot-dot {
+  animation: robot-acknowledge 0.5s ease-out 1 both;
+}
+
+.robot-acknowledge .robot-dot-2 {
+  animation-delay: 0.16s;
+}
+
+.robot-acknowledge .robot-dot-3 {
+  animation-delay: 0.32s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .robot-breathe,
+  .robot-dot,
+  .robot-acknowledge .robot-dot {
+    animation: none;
+  }
+
+  /* Lit, not dark: a still robot should read as on, not as unplugged. */
+  .robot-dot {
+    opacity: 0.7;
+  }
+
+  .robot-head g {
+    transition: none;
+  }
+}
+
+/*
+  The three-languages section, as three states.
+
+  Everything cross-fades on one duration so the picture and the temperature
+  change together. All three media stay mounted — mounting a canvas or an SVG
+  filter mid-transition drops frames at exactly the moment somebody is
+  watching — and the inactive ones are told to stop painting rather than being
+  unmounted.
+
+  `data-meaning` on the root drives all of it, so a state change is one
+  attribute write and the browser does the interpolation.
+*/
+.meanings {
+  position: relative;
+  height: 100%;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.meanings-ambient,
+.meanings-media {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.meanings-ambient {
+  z-index: -2;
+}
+
+.meanings-media {
+  z-index: -1;
+}
+
+.meanings-ambient > span,
+.meanings-media > div {
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.meanings[data-meaning="snow"] [data-field="snow"],
+.meanings[data-meaning="snow"] [data-state="snow"],
+.meanings[data-meaning="river"] [data-field="river"],
+.meanings[data-meaning="river"] [data-state="river"],
+.meanings[data-meaning="lights"] [data-field="lights"],
+.meanings[data-meaning="lights"] [data-state="lights"] {
+  opacity: 1;
+}
+
+/*
+  The ambient fields. Each one moves the light as well as recolouring it, so
+  the section's weather changes rather than its tint: cold and high for snow,
+  deep and central for the river, warm and low for the lights.
+*/
+[data-field="snow"] {
+  background:
+    radial-gradient(
+      120% 90% at 24% 8%,
+      color-mix(in oklab, var(--color-frost) 22%, transparent) 0%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, #0f1418 0%, var(--color-void) 78%);
+}
+
+[data-field="river"] {
+  background:
+    radial-gradient(
+      110% 80% at 62% 52%,
+      color-mix(in oklab, var(--color-frost) 10%, transparent) 0%,
+      transparent 68%
+    ),
+    linear-gradient(180deg, #0c1013 0%, var(--color-void) 82%);
+}
+
+[data-field="lights"] {
+  background:
+    radial-gradient(
+      130% 100% at 74% 88%,
+      color-mix(in oklab, var(--color-ember) 26%, transparent) 0%,
+      transparent 64%
+    ),
+    linear-gradient(180deg, var(--color-void) 0%, #14100c 100%);
+}
+
+.meaning-media {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/* Held back so the words never fight the picture for contrast. */
+.meanings-media [data-state="snow"] {
+  opacity: 0;
+}
+
+.meanings-media > div {
+  mix-blend-mode: screen;
+}
+
+.meaning-bokeh-point {
+  position: absolute;
+  display: block;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in oklab, var(--color-ember) 62%, transparent) 0%,
+    color-mix(in oklab, var(--color-ember) 22%, transparent) 52%,
+    transparent 78%
+  );
+  filter: blur(6px);
+  animation: bokeh-pulse 8s ease-in-out infinite;
+}
+
+@keyframes bokeh-pulse {
+  0%,
+  100% {
+    opacity: 0.34;
+    scale: 0.92;
+  }
+  50% {
+    opacity: 0.9;
+    scale: 1.06;
+  }
+}
+
+/*
+  A real button, so focus behaves exactly as hover does and the browser
+  supplies the keyboard handling. Stripped of the chrome a button arrives
+  with, but not of the semantics.
+*/
+.meaning-word {
+  display: block;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  transition:
+    opacity 400ms ease,
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The two that are not active step back rather than the active one shouting. */
+.meanings[data-meaning="snow"] li:not(:nth-child(1)) .meaning-word,
+.meanings[data-meaning="river"] li:not(:nth-child(2)) .meaning-word,
+.meanings[data-meaning="lights"] li:not(:nth-child(3)) .meaning-word {
+  opacity: 0.42;
+}
+
+@media (min-width: 48rem) {
+  .meanings[data-meaning="snow"] li:nth-child(1) .meaning-word,
+  .meanings[data-meaning="river"] li:nth-child(2) .meaning-word,
+  .meanings[data-meaning="lights"] li:nth-child(3) .meaning-word {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meanings-ambient > span,
+  .meanings-media > div,
+  .meaning-word {
+    transition-duration: 1ms;
+  }
+
+  .meaning-bokeh-point {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+/*
+  The work corridor.
+
+  Four plates at real depth inside one perspective, and a dolly that travels
+  through them. The plates never move; only the dolly does, which is what
+  makes this a camera rather than four independently animated cards.
+
+  On a phone none of this applies: no perspective, no pin, no depth. A
+  horizontal snap-scroll row is what a thumb expects, and hijacking scroll on
+  a touch device to run a camera is how you strand someone mid-page.
+*/
+.corridor-stage {
+  position: relative;
+}
+
+.corridor-dolly {
+  display: flex;
+  gap: var(--spacing-step-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--spacing-step-2);
+}
+
+.corridor-plate {
+  flex: 0 0 82%;
+  scroll-snap-align: start;
+}
+
+.corridor-caption {
+  margin-top: var(--spacing-step-3);
+}
+
+.corridor-counter {
+  margin-top: var(--spacing-step-2);
+}
+
+@media (min-width: 48rem) {
+  .corridor-stage {
+    height: 100svh;
+    overflow: hidden;
+    perspective: 1400px;
+    perspective-origin: 50% 46%;
+  }
+
+  .corridor-dolly {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: visible;
+    padding: 0;
+    transform-style: preserve-3d;
+  }
+
+  .corridor-plate {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(46vw, 40rem);
+    /*
+      The blur is written per frame by the script. Declaring the transition
+      here rather than there keeps the script writing values and the
+      stylesheet owning timing — and a transition on filter would fight a
+      per-frame write, so there deliberately is not one.
+    */
+    will-change: opacity, filter;
+  }
+
+  /*
+    Pinned to the lower left, out of the corridor's own axis. A caption in the
+    middle of the frame is a caption the plates fly through.
+  */
+  .corridor-caption {
+    position: absolute;
+    bottom: var(--spacing-step-4);
+    left: var(--spacing-step-3);
+    z-index: 2;
+    margin: 0;
+    max-width: min(38rem, 46vw);
+    pointer-events: none;
+  }
+
+  .corridor-counter {
+    position: absolute;
+    bottom: var(--spacing-step-3);
+    left: var(--spacing-step-3);
+    z-index: 2;
+    margin: 0;
+  }
+
+  .corridor-caption {
+    bottom: calc(var(--spacing-step-3) + 3.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+    No camera at all. matchMedia reverts the tween, which leaves the plates
+    where they render — so the corridor has to render as a legible stack
+    rather than as four elements piled at the same point.
+  */
+  .corridor-stage {
+    height: auto;
+    overflow: visible;
+    perspective: none;
+  }
+
+  .corridor-dolly {
+    position: static;
+    display: grid;
+    gap: var(--spacing-step-3);
+    overflow: visible;
+    transform: none !important;
+  }
+
+  .corridor-plate {
+    position: static;
+    width: auto;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .corridor-caption,
+  .corridor-counter {
+    position: static;
+    max-width: none;
+  }
+}
+
+/*
+  The exploded assembly.
+
+  Every part is a full-size SVG layer stacked at the same origin, so an
+  exploded position is a transform on the layer rather than a second drawing
+  of the same shape at a different place. That is what keeps the reassembly
+  exact: returning a part to 0,0,0 puts it back in the figure by construction.
+*/
+/*
+  `clip` at every width, not only where the parts fly. The field below bleeds
+  20% either side, and on a phone — where there is no pinned figure and the
+  desktop clip does not apply — that bleed was the only horizontal scroll left
+  on the site.
+*/
+.assembly-stage {
+  position: relative;
+  overflow: clip;
+}
+
+.assembly-field {
+  position: absolute;
+  inset: -10% -20%;
+  display: block;
+  background: radial-gradient(
+    60% 50% at 50% 44%,
+    color-mix(in oklab, var(--color-ember) 13%, transparent) 0%,
+    color-mix(in oklab, var(--color-haze) 12%, transparent) 42%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+.assembly-figure {
+  display: none;
+}
+
+.assembly-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-step-2);
+  margin-top: var(--spacing-step-4);
+  list-style: none;
+  padding: 0;
+}
+
+.assembly-cell {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--color-haze);
+  background-color: var(--color-void);
+  overflow: hidden;
+}
+
+.assembly-cell svg {
+  /* The figure is 460x900; a 4:3 cell needs it scaled down to fit. */
+  transform: scale(0.72);
+}
+
+.assembly-cell-label {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.75rem;
+  color: var(--color-slate);
+}
+
+@media (min-width: 48rem) {
+  /*
+    The parts fly up to 180px either side of the figure, which the base rule's
+    clip contains. `clip` rather than `hidden` throughout: it holds the spill
+    without making this a scroll container, which a pinned element must not
+    become.
+  */
+  .assembly-stage {
+    height: 100svh;
+  }
+
+  .assembly-grid {
+    display: none;
+  }
+
+  .assembly-figure {
+    position: absolute;
+    inset: 0;
+    display: block;
+    perspective: 1600px;
+    transform-style: preserve-3d;
+  }
+
+  .assembly-part {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+
+  .assembly-part svg {
+    height: 84%;
+    width: auto;
+  }
+
+  /* An SVG text node, so it is positioned in the figure's own coordinates. */
+  .assembly-label {
+    fill: var(--color-slate);
+    font-family: var(--font-mono);
+    font-size: 22px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+}
+
+/*
+  The booking week.
+
+  A strip of day columns that scrolls horizontally rather than a vertical list
+  of times: the day is the axis a reader is actually navigating, and a list
+  makes them read it off every row.
+*/
+.booking-layout {
+  display: grid;
+  gap: var(--spacing-step-3);
+}
+
+.booking-robot {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .booking-layout {
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .booking-robot {
+    display: block;
+    height: 15rem;
+  }
+}
+
+.booking-week {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(8.5rem, 1fr);
+  gap: 1px;
+  overflow-x: auto;
+  background-color: var(--color-smoke);
+  scroll-snap-type: x proximity;
+}
+
+.booking-day {
+  background-color: var(--color-void);
+  padding: var(--spacing-step-2);
+  scroll-snap-align: start;
+}
+
+.booking-day[data-today] {
+  /* The only column with a ground of its own, so "you are here" is one look. */
+  background-color: #101316;
+}
+
+.booking-day[data-closed] {
+  opacity: 0.55;
+}
+
+.booking-day-head {
+  margin: 0 0 var(--spacing-step-2);
+  border-bottom: 1px solid var(--color-smoke);
+  padding-bottom: var(--spacing-step-1);
+}
+
+.booking-empty {
+  color: var(--color-slate);
+}
+
+.booking-times {
+  display: grid;
+  gap: var(--spacing-step-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+  The chosen slot grows and the rest step back. Both sides matter: expanding
+  one cell in a row of identical cells is easy to miss, and receding the
+  others is what makes the choice unmistakable without any colour at all.
+*/
+.booking-slot {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  padding: var(--spacing-step-1) 0;
+  transform-origin: left center;
+  transition:
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.booking-slot:has(:focus-visible) {
+  outline: 2px solid var(--color-field);
+  outline-offset: 3px;
+}
+
+.booking-week[data-chosen] .booking-slot:not([data-selected]) {
+  opacity: 0.4;
+  transform: scale(0.94);
+}
+
+.booking-slot[data-selected] {
+  transform: scale(1.04);
+}
+
+/* Ember as a drawn line, never as a fill. */
+.booking-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: var(--color-ember);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.booking-slot[data-selected] .booking-underline {
+  transform: scaleX(1);
+}
+
+/*
+  One button, three labels. The width is held by the longest of them so the
+  control does not resize under a pointer that is already on it.
+*/
+.booking-submit {
+  min-height: 3rem;
+  min-width: 12rem;
+  border: 1px solid var(--color-field);
+  padding: 0 var(--spacing-step-3);
+  color: var(--color-field);
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    opacity 200ms ease;
+}
+
+.booking-submit:hover:not(:disabled) {
+  background-color: var(--color-field);
+  color: var(--color-void);
+}
+
+.booking-submit[data-state="sending"] {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.booking-confirmed {
+  display: grid;
+  gap: var(--spacing-step-3);
+  border-top: 1px solid var(--color-haze);
+  padding-top: var(--spacing-step-3);
+}
+
+@media (min-width: 48rem) {
+  .booking-confirmed {
+    grid-template-columns: 8rem minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.booking-confirmed-robot {
+  height: 12rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-slot,
+  .booking-underline {
+    transition-duration: 1ms;
+  }
+}
+
+/*
+  The line mask.
+
+  The inner span is what moves; the outer one is the mask it moves out from
+  behind. Both are inline-block because an inline element has no reliable box
+  to clip against — an overflow rule on an inline span is ignored, which is
+  the failure that makes most line-mask implementations look like a fade.
+*/
+.line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.line-mask-inner {
+  display: inline-block;
+  will-change: transform;
+}
+
+/*
+  The page's weather. One fixed field per route whose position is scrubbed
+  against the whole document, so descending the page moves the light rather
+  than swapping one gradient for another at each boundary.
+
+  It sits below everything — behind content, behind the cursor light, behind
+  the grain — because it is the ground those things are lit against.
+*/
+.ambient-field {
+  --field-x: 22%;
+  --field-y: 18%;
+
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    68% 52% at var(--field-x) var(--field-y),
+    color-mix(in oklab, var(--tone) 15%, transparent) 0%,
+    color-mix(in oklab, var(--tone) 5%, transparent) 42%,
+    transparent 74%
+  );
+}
+
+.ambient-field[data-tone="warm"] {
+  --tone: var(--color-ember);
+}
+
+.ambient-field[data-tone="cold"] {
+  --tone: var(--color-frost);
+}
+
+.ambient-field[data-tone="neutral"] {
+  --tone: var(--color-haze);
+}
+
+/*
+  Cards rise on Z, so the container needs the depth to rise through — and the
+  clip, because a perspective container renders its children at a size the
+  layout does not know about, which turned into 37px of horizontal scroll on
+  /process.
+*/
+.package-grid {
+  perspective: 1200px;
+  overflow-x: clip;
+}
+
+/*
+  The one rule on the site that opens from its centre rather than an edge.
+  Everything else draws left to right; these are statements, not sequence.
+*/
+[data-principle-rule] {
+  transform-origin: center;
+}
+
+/*
+  The process run. The line is drawn behind the steps and scrubbed as you
+  descend, so the sequence is demonstrated rather than asserted by five
+  numbers in a row.
+*/
+.process-run {
+  position: relative;
+}
+
+.process-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  display: block;
+  height: 100%;
+  width: 1px;
+  background-color: var(--color-ember);
+  opacity: 0.45;
+  transform-origin: top;
+}
+
+@media (min-width: 64rem) {
+  /* Five across on a wide screen, so the line runs the other way. */
+  .process-line {
+    top: 50%;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    transform-origin: left;
+  }
+}
+
+/*
+  Packages. An ember edge-light sweeping the tier the studio leads with, once
+  the card has arrived — light passing over it rather than a border it wears.
+*/
+.package-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.package-sweep {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    104deg,
+    transparent 34%,
+    color-mix(in oklab, var(--color-ember) 22%, transparent) 50%,
+    transparent 66%
+  );
+}
+
+@keyframes package-sweep {
+  from {
+    opacity: 1;
+    translate: -110% 0;
+  }
+  to {
+    opacity: 1;
+    translate: 110% 0;
+  }
+}
+
+.package-card[data-package-lead] .package-sweep {
+  animation: package-sweep 1.9s cubic-bezier(0.4, 0, 0.2, 1) 0.5s 1 both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .package-card[data-package-lead] .package-sweep {
+    animation: none;
+  }
+}
+
 /* Ember as light behind the call to action, never as a fill. */
 .cta-bloom {
   position: absolute;
@@ -584,75 +1457,6 @@
   animation: blink-seam 420ms linear both;
 }
 
-/*
-  Move five of fourteen: the card stack.
-
-  A perspective stack on desktop; a snap-scroll row on a phone, which is what
-  a thumb expects and what avoids stacking six cards a touch device cannot
-  peel apart. Transforms only, so the cycle is compositor work.
-*/
-.card-stack-list {
-  display: flex;
-  gap: var(--spacing-step-2);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: var(--spacing-step-2);
-  margin: 0;
-  list-style: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.card-stack-item {
-  flex: 0 0 82%;
-  scroll-snap-align: start;
-}
-
-@media (min-width: 48rem) {
-  .card-stack-list {
-    position: relative;
-    display: block;
-    height: clamp(22rem, 34vw, 30rem);
-    overflow: visible;
-    padding-bottom: 0;
-    perspective: 1200px;
-  }
-
-  .card-stack-item {
-    position: absolute;
-    inset-inline-start: 0;
-    top: 0;
-    width: min(42vw, 34rem);
-    transform: translate3d(calc(var(--depth) * 2.2rem), calc(var(--depth) * 1.1rem), 0)
-      scale(calc(1 - var(--depth) * 0.05));
-    transform-origin: left center;
-    transition:
-      transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
-      opacity 500ms ease,
-      visibility 0ms;
-  }
-
-  /*
-    Anything past the fourth card is behind the stack and not worth painting.
-
-    visibility, not opacity alone: these cards hold real links, and an
-    invisible link still takes a tab stop. That was survivable when the same
-    six links sat in a grid underneath; now that the stack is the homepage's
-    only view of them, a focus ring landing on nothing would be the whole
-    keyboard path. The flip is delayed by the length of the fade so the card
-    still dissolves on its way to the back rather than popping out.
-  */
-  .card-stack-item[data-depth="4"],
-  .card-stack-item[data-depth="5"] {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-      transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
-      opacity 500ms ease,
-      visibility 0ms linear 500ms;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   /*
     The lids do not animate, they simply are not there. Unlike the grain,
@@ -662,10 +1466,6 @@
   .blink-lid,
   .blink-seam {
     animation: none;
-  }
-
-  .card-stack-item {
-    transition: none;
   }
 }
 
@@ -770,13 +1570,29 @@
   cost the hero its whole point — the desktop bleed is a luxury of a wide
   viewport, not the composition itself.
 */
-.hero-mark {
+/*
+  The camera.
+
+  The push is a viewBox animation, not a CSS scale. A scale looked right for
+  about three frames and then fell apart: the robot's three layers are 3D
+  transformed, so the compositor promotes and rasterises them once, and at 85x
+  a vector eye came back as a blurred smear with visible pixel edges. Writing
+  the viewBox makes the browser re-render the vector at every frame, so the
+  pupil has a hard edge the whole way in — which is the entire reason for
+  pushing into a drawing rather than a photograph.
+
+  It also does the re-aim for free: narrowing the box onto the pupil moves the
+  frame there. Two transforms became one attribute.
+*/
+.hero-robot {
   position: absolute;
-  z-index: 1;
-  right: -20%;
-  bottom: 11%;
-  width: 118%;
-  height: auto;
+  inset: 0;
+}
+
+.robot-fill {
+  aspect-ratio: auto;
+  height: 100%;
+  width: 100%;
 }
 
 .hero-scroll {
@@ -794,25 +1610,6 @@
     right: -24%;
     bottom: auto;
     width: min(78vw, 66rem);
-  }
-
-  /*
-    Roughly 900px at a 1440 viewport, sitting low and right so it bleeds off
-    both edges while leaving the left half clear for the headline. The two are
-    meant to be in tension, not overlapping.
-  */
-  /*
-    Anchored by the eyes rather than by an edge: the aperture centreline is
-    height/2, so placing top at 82% minus half the height puts the gaze at a
-    fixed 82% of the viewport whatever its height, and lets the capsule bleed
-    off the bottom without ever cropping an eye.
-  */
-  .hero-mark {
-    --mark-w: min(56vw, 50rem);
-    top: calc(82% - var(--mark-w) / 1.9444 / 2);
-    right: -12%;
-    bottom: auto;
-    width: var(--mark-w);
   }
 
   .hero-scroll {
