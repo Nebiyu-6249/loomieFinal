@@ -250,7 +250,7 @@ export function HeroAperture() {
     >
       <div ref={frameRef} className="hero-frame">
         {/* The hero itself. */}
-        <div className="hero-layer hero-veil bg-field">
+        <div className="hero-layer hero-veil bg-void">
           {/* Warmth behind the mark, not inside it. The sun is behind the snow. */}
           <div className="hero-glow" aria-hidden="true" />
 
@@ -270,16 +270,16 @@ export function HeroAperture() {
               width={MARK.gridWidth}
               height={MARK.gridHeight}
               rx={CAPSULE_RADIUS}
-              fill="#0e1113"
+              fill="var(--color-smoke)"
             />
 
             {/* The white of the eye. Static — an aperture does not wander. */}
-            <circle cx={APERTURE_INSET} cy={APERTURE_CY} r={MARK.apertureRadius} fill="#f2f3f4" />
+            <circle cx={APERTURE_INSET} cy={APERTURE_CY} r={MARK.apertureRadius} fill="var(--color-field)" />
             <circle
               cx={MARK.gridWidth - APERTURE_INSET}
               cy={APERTURE_CY}
               r={MARK.apertureRadius}
-              fill="#f2f3f4"
+              fill="var(--color-field)"
             />
 
             {/* The pupil. Dark, concentric, and the part that tracks. */}
@@ -288,13 +288,13 @@ export function HeroAperture() {
                 cx={APERTURE_INSET}
                 cy={APERTURE_CY}
                 r={HERO_PUPIL_R}
-                fill="#0e1113"
+                fill="var(--color-void)"
               />
               <circle
                 cx={MARK.gridWidth - APERTURE_INSET}
                 cy={APERTURE_CY}
                 r={HERO_PUPIL_R}
-                fill="#0e1113"
+                fill="var(--color-void)"
               />
             </g>
           </svg>
@@ -322,7 +322,7 @@ export function HeroAperture() {
             </div>
 
             <p className="type-micro hero-scroll text-slate">
-              <span aria-hidden="true" className="block h-8 w-px bg-drift" />
+              <span aria-hidden="true" className="block h-8 w-px bg-smoke" />
               Scroll
             </p>
           </div>
@@ -337,7 +337,7 @@ export function HeroAperture() {
         {/* What the apertures open onto. */}
         <div ref={meaningsRef} className="hero-layer hero-meanings">
           <div className="mx-auto flex h-full max-w-[100rem] flex-col justify-center px-step-2 py-step-4 md:px-step-3">
-            <h2 className="type-micro text-ink/70">One name, three languages</h2>
+            <h2 className="type-micro text-field/70">One name, three languages</h2>
 
             <dl className="mt-step-3 flex flex-col gap-step-3 md:mt-step-4 md:flex-row md:gap-step-5">
               {MEANINGS.map((meaning) => (
@@ -345,14 +345,14 @@ export function HeroAperture() {
                   <dt className="type-display text-[clamp(2.5rem,7vw,5.5rem)]">
                     {meaning.word}
                   </dt>
-                  <dd className="type-micro mt-step-1 text-ink/70">
+                  <dd className="type-micro mt-step-1 text-field/70">
                     {meaning.language}
                   </dd>
                 </div>
               ))}
             </dl>
 
-            <p className="type-body mt-step-4 measure-tight text-ink/85">
+            <p className="type-body mt-step-4 measure-tight text-field/85">
               {SITE.origin}
             </p>
           </div>

@@ -6,6 +6,7 @@ import {
 } from "next/font/google";
 
 import "./globals.css";
+import { Grain } from "@/components/Grain";
 import { PageTransition } from "@/components/PageTransition";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -69,8 +70,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f2f3f4",
-  colorScheme: "light",
+  themeColor: "#0a0b0d",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -84,10 +85,12 @@ export default function RootLayout({
       <body className="min-h-svh">
         <a
           href="#main"
-          className="type-micro sr-only focus:not-sr-only focus:fixed focus:left-step-2 focus:top-step-2 focus:z-[60] focus:bg-field focus:px-step-2 focus:py-step-1 focus:text-ink"
+          className="type-micro sr-only focus:not-sr-only focus:fixed focus:left-step-2 focus:top-step-2 focus:z-[60] focus:bg-void focus:px-step-2 focus:py-step-1 focus:text-field"
         >
           Skip to content
         </a>
+
+        <Grain />
 
         <SiteHeader />
 

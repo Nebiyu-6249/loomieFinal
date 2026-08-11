@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { ContactCta } from "@/components/ContactCta";
-import { DarkSection } from "@/components/DarkSection";
+import { ToneSection } from "@/components/ToneSection";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
 import { PROCESS, SERVICES, TIMELINE } from "@/lib/content";
@@ -59,21 +59,21 @@ export default function Services() {
       </section>
 
       {/* A real sequence, which is why it is the one thing here that counts. */}
-      <DarkSection labelledBy="process">
+      <ToneSection labelledBy="process">
         <Reveal step={0} steps={2}>
-          <h2 id="process" className="type-micro text-thaw">
+          <h2 id="process" className="type-micro text-ember">
             How the work runs — five steps
           </h2>
         </Reveal>
 
         <Reveal step={1} steps={2} className="mt-step-4" rule={false}>
-          <ol className="grid gap-px bg-field/20 sm:grid-cols-2 lg:grid-cols-5">
+          <ol className="grid gap-px bg-void/20 sm:grid-cols-2 lg:grid-cols-5">
             {PROCESS.map((step, index) => (
               <li
                 key={step.title}
-                className="flex flex-col gap-step-2 bg-ink p-step-3 lg:min-h-64"
+                className="flex flex-col gap-step-2 bg-smoke p-step-3 lg:min-h-64"
               >
-                <span className="type-micro text-thaw">
+                <span className="type-micro text-ember">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <h3 className="type-heading text-[1.25rem]">{step.title}</h3>
@@ -82,7 +82,7 @@ export default function Services() {
             ))}
           </ol>
         </Reveal>
-      </DarkSection>
+      </ToneSection>
 
       <section
         className="px-step-2 pb-step-5 md:px-step-3"
@@ -100,7 +100,7 @@ export default function Services() {
               {TIMELINE.map((entry) => (
                 <div
                   key={entry.week}
-                  className="flex flex-col gap-step-1 border-t border-drift py-step-2 sm:flex-row sm:gap-step-4"
+                  className="flex flex-col gap-step-1 border-t border-haze py-step-2 sm:flex-row sm:gap-step-4"
                 >
                   <dt className="type-micro shrink-0 text-slate sm:w-40">
                     {entry.week}

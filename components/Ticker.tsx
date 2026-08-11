@@ -48,9 +48,9 @@ function ApertureGlyph() {
         rx={CAPSULE_RADIUS}
         fill="currentColor"
       />
-      <circle cx={APERTURE_INSET} cy={MARK.gridHeight / 2} r={MARK.apertureRadius} fill="var(--color-field)" />
+      <circle cx={APERTURE_INSET} cy={MARK.gridHeight / 2} r={MARK.apertureRadius} fill="var(--color-void)" />
       <circle cx={APERTURE_INSET} cy={MARK.gridHeight / 2} r={PUPIL_R} fill="currentColor" />
-      <circle cx={MARK.gridWidth - APERTURE_INSET} cy={MARK.gridHeight / 2} r={MARK.apertureRadius} fill="var(--color-field)" />
+      <circle cx={MARK.gridWidth - APERTURE_INSET} cy={MARK.gridHeight / 2} r={MARK.apertureRadius} fill="var(--color-void)" />
       <circle cx={MARK.gridWidth - APERTURE_INSET} cy={MARK.gridHeight / 2} r={PUPIL_R} fill="currentColor" />
     </svg>
   );

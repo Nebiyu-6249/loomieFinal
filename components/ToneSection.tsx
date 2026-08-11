@@ -11,12 +11,14 @@ gsap.registerPlugin(ScrollTrigger);
 /**
  * The one tonal event on a page.
  *
- * Every route was Field on Field on Field, which is half of why the site read
- * as flat. Each page now gets exactly one full-bleed Ink section: Ink ground,
- * Field type, Thaw as the single accent.
+ * On the light build this dropped to Ink. Inverted, it lifts instead: a
+ * full-bleed Smoke panel off the Void ground, with Ember as the single
+ * accent. Smoke on Void is only 1.19:1, which is deliberately almost nothing
+ * — on a dark site the event is the lift plus the light behind it, not a
+ * slab of contrast.
  *
  * It arrives rather than fades. The ground is a separate layer that scales up
- * on its Y axis as the section approaches, so the black opens out from a band
+ * on its Y axis as the section approaches, so the panel opens out from a band
  * into the full height — a transform, so it costs nothing and never reflows
  * the text sitting on top of it. The scrub is tied to the approach rather
  * than to a pin, so the page never stops scrolling for it.
@@ -28,18 +30,18 @@ gsap.registerPlugin(ScrollTrigger);
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-interface DarkSectionProps {
+interface ToneSectionProps {
   children: ReactNode;
   className?: string;
   /** Labels the section for assistive technology. */
   labelledBy?: string;
 }
 
-export function DarkSection({
+export function ToneSection({
   children,
   className = "",
   labelledBy,
-}: DarkSectionProps) {
+}: ToneSectionProps) {
   const rootRef = useRef<HTMLElement>(null);
 
   useIsomorphicLayoutEffect(() => {
@@ -72,16 +74,16 @@ export function DarkSection({
     <section
       ref={rootRef}
       aria-labelledby={labelledBy}
-      className={`relative isolate overflow-hidden bg-field px-step-2 py-step-6 text-field md:px-step-3 ${className}`}
+      className={`relative isolate overflow-hidden px-step-2 py-step-6 text-field md:px-step-3 ${className}`}
     >
       {/*
         A separate layer so the scale never touches the type. Origin at the
-        centre, so the black opens from the middle outward.
+        centre, so the panel opens from the middle outward.
       */}
       <span
         aria-hidden="true"
         data-dark-ground=""
-        className="absolute inset-0 -z-10 block origin-center bg-ink"
+        className="tone-ground absolute inset-0 -z-10 block origin-center bg-smoke"
       />
       <div className="mx-auto max-w-[100rem]">{children}</div>
     </section>

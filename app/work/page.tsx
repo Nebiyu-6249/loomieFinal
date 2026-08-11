@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { ContactCta } from "@/components/ContactCta";
-import { DarkSection } from "@/components/DarkSection";
+import { ToneSection } from "@/components/ToneSection";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
 import { WorkCard } from "@/components/WorkCard";
@@ -39,9 +39,9 @@ export default function WorkIndex() {
         </div>
       </section>
 
-      <DarkSection labelledBy="working">
+      <ToneSection labelledBy="working">
         <Reveal step={0} steps={2}>
-          <h2 id="working" className="type-micro text-thaw">
+          <h2 id="working" className="type-micro text-ember">
             Working with the studio
           </h2>
         </Reveal>
@@ -51,7 +51,7 @@ export default function WorkIndex() {
             and ends with editable files rather than a single export.
           </p>
         </Reveal>
-      </DarkSection>
+      </ToneSection>
 
       <ContactCta />
     </>

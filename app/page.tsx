@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { CardStack } from "@/components/CardStack";
 import { ContactCta } from "@/components/ContactCta";
-import { DarkSection } from "@/components/DarkSection";
+import { ToneSection } from "@/components/ToneSection";
 import { ExplodedAssembly } from "@/components/ExplodedAssembly";
 import { HeroAperture } from "@/components/HeroAperture";
 import { JourneyLine } from "@/components/JourneyLine";
@@ -55,7 +55,7 @@ export default function Home() {
             </ul>
 
             <p className="mt-step-4">
-              <Link href="/services" className="type-micro hover-line text-ink">
+              <Link href="/services" className="type-micro hover-line text-field">
                 [ How the work runs ]
               </Link>
             </p>
@@ -93,7 +93,7 @@ export default function Home() {
             </Reveal>
 
             <p className="mt-step-4">
-              <Link href="/work" className="type-micro hover-line text-ink">
+              <Link href="/work" className="type-micro hover-line text-field">
                 [ All work ]
               </Link>
             </p>
@@ -104,13 +104,13 @@ export default function Home() {
       <Ticker />
 
       {/* The page's one tonal event. */}
-      <DarkSection labelledBy="studio">
+      <ToneSection labelledBy="studio">
         <Reveal step={0} steps={2}>
           <LetterReveal
             as="h2"
             id="studio"
             text="The studio"
-            className="type-micro text-thaw"
+            className="type-micro text-ember"
           />
         </Reveal>
 
@@ -119,12 +119,12 @@ export default function Home() {
             {STORY}
           </p>
           <p className="mt-step-4">
-            <Link href="/studio" className="type-micro hover-line text-thaw">
+            <Link href="/studio" className="type-micro hover-line text-ember">
               [ Read the studio ]
             </Link>
           </p>
         </Reveal>
-      </DarkSection>
+      </ToneSection>
 
       <ContactCta />
     </>

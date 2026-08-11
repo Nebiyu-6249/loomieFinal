@@ -1,30 +1,34 @@
 @import "tailwindcss";
 
 /*
-  SNOWFIELD.
+  SNOWFIELD, inverted. The ground is dark and the light comes through it.
 
-  Five values. Thaw is the only warm one, and it is light rather than paint:
-  it sits behind the mark as a glow, grounds the contact call to action, and
-  is the single accent allowed on the Ink sections. It never appears inside
-  the mark — the eyes are Field over Ink, and warmth falling on the capsule is
-  a different thing from warmth filling it.
+  Measured against the two grounds (AA needs 4.5 for body text, 3.0 for UI
+  boundaries):
+
+    field on void 17.7   frost on void 13.4   ember on void 10.7
+    field on smoke 14.9  frost on smoke 11.2  ember on smoke 9.0
+    slate on void  6.4   slate on smoke  5.4
+    haze  on void  1.9   haze  on smoke  1.6   <- decorative only
+
+  Haze fails non-text contrast, and it is meant to: it is the smoke in the
+  reference gradients, and lightening it to clear 3:1 would flatten them. So
+  it draws decorative rules and gradient stops and nothing else. Anything a
+  reader has to find or operate — an input boundary, a focus ring — uses
+  slate or field.
+
+  Ember and frost are light, not paint. They are the two poles of the brand
+  story, warm and cold, and they belong in radial gradients, glows and
+  emissive edges. There is no flat ember fill anywhere on this site.
 */
 @theme {
+  --color-void: #0a0b0d;
+  --color-smoke: #1c1f23;
+  --color-haze: #3a4046;
   --color-field: #f2f3f4;
-  --color-ink: #0e1113;
-  /*
-    Slate was specified at #7C868C, which measures 3.35:1 on Field and fails
-    AA for the captions, nav and body copy it carries. Darkened to hold 4.9:1
-    while staying the same cool grey. On Thaw it still only reaches 4.0:1, so
-    nothing on a Thaw ground uses Slate — those surfaces use Ink at 70%.
-  */
-  --color-slate: #5f6b72;
-  --color-drift: #dde3e6;
-  --color-thaw: #efd9b4;
-
-  /* LoomieEyes ships against `fill-foreground` / `fill-background`. */
-  --color-background: #f2f3f4;
-  --color-foreground: #0e1113;
+  --color-slate: #8a949b;
+  --color-ember: #f0b45a;
+  --color-frost: #bfd9e3;
 
   --font-display: var(--font-instrument), ui-serif, Georgia, serif;
   --font-sans: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
@@ -69,8 +73,8 @@
   }
 
   body {
-    background-color: var(--color-field);
-    color: var(--color-ink);
+    background-color: var(--color-void);
+    color: var(--color-field);
     font-family: var(--font-sans);
     font-synthesis-weight: none;
     -webkit-font-smoothing: antialiased;
@@ -78,22 +82,23 @@
   }
 
   /*
-    One focus treatment for the entire site: a 1px ink ring held off the
-    element by 3px of Field, so it reads on both the ground and on Drift
-    panels without ever being removed.
+    One focus treatment for the entire site. Field rather than haze: at 17.7:1
+    on void it is unmissable, where haze would have been 1.9:1 and failed
+    1.4.11 outright. Two pixels because a 1px light ring on a dark ground
+    reads thinner than the same ring on a light one.
   */
   :focus-visible {
-    outline: 1px solid var(--color-ink);
+    outline: 2px solid var(--color-field);
     outline-offset: 3px;
     border-radius: 1px;
   }
 
   ::selection {
-    background-color: var(--color-thaw);
-    color: var(--color-ink);
+    background-color: var(--color-ember);
+    color: var(--color-void);
   }
 
-  /* Everything that is not one of the nine motion moves. */
+  /* Everything that is not one of the thirteen motion moves. */
   a,
   button,
   input,
@@ -173,7 +178,7 @@
   }
 
   /*
-    Move eight of nine. One hover treatment for every card and every link on
+    Move eight of thirteen. One hover treatment for every card and every link on
     the site: a hairline draws in from the left, and a card lifts three
     pixels with it. Same easing and same duration as the text reveal, so the
     two read as one language. Focus gets it too — a keyboard should see what
@@ -222,7 +227,77 @@
   }
 }
 
-/* Move one of nine: the page transition, as a keyframe rather than a library. */
+/* Ember as light behind the call to action, never as a fill. */
+.cta-bloom {
+  position: absolute;
+  z-index: -10;
+  bottom: -60%;
+  left: -20%;
+  display: block;
+  width: min(120vw, 80rem);
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in oklab, var(--color-ember) 26%, transparent) 0%,
+    color-mix(in oklab, var(--color-ember) 10%, transparent) 34%,
+    transparent 66%
+  );
+  pointer-events: none;
+}
+
+/*
+  Move ten of thirteen: the living grain.
+
+  Sits above the content and below the header, so the navigation stays crisp
+  while everything it floats over is in the same film. Never intercepts a
+  pointer.
+
+  Under reduced motion the grain stops moving but stays put. The texture is
+  the brand's ground, not an animation — removing it would change the design,
+  where freezing it only removes the flicker.
+*/
+/*
+  Each layer is its own fixed sibling. A wrapper would have created a stacking
+  context and isolated the blend group from the page behind it.
+*/
+.grain-layer {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  display: block;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  will-change: background-position;
+}
+
+.grain-fine {
+  opacity: 0.42;
+  animation: grain-cycle 0.5s steps(4) infinite;
+}
+
+.grain-coarse {
+  opacity: 0.28;
+  animation: grain-cycle 0.75s steps(4) infinite reverse;
+}
+
+@keyframes grain-cycle {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 calc(-1 * var(--grain-travel));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-fine,
+  .grain-coarse {
+    animation: none;
+  }
+}
+
+/* Move one of thirteen: the page transition, as a keyframe rather than a library. */
 @keyframes page-enter {
   from {
     opacity: 0;
@@ -239,7 +314,7 @@
 }
 
 /*
-  Move five of nine: the card stack.
+  Move five of thirteen: the card stack.
 
   A perspective stack on desktop; a snap-scroll row on a phone, which is what
   a thumb expects and what avoids stacking six cards a touch device cannot
@@ -303,7 +378,7 @@
 }
 
 /*
-  Move four of nine: on a phone the ticker is a marquee rather than a pin.
+  Move four of thirteen: on a phone the ticker is a marquee rather than a pin.
 */
 @media (max-width: 47.99rem) {
   @keyframes ticker-drift {
@@ -351,7 +426,7 @@
 }
 
 .hero-meanings {
-  background-color: var(--color-thaw);
+  background-color: var(--color-void);
 }
 
 .hero-flood {
@@ -378,9 +453,9 @@
   aspect-ratio: 1;
   background: radial-gradient(
     circle at 50% 50%,
-    var(--color-thaw) 0%,
-    color-mix(in oklab, var(--color-thaw) 62%, transparent) 38%,
-    transparent 68%
+    color-mix(in oklab, var(--color-ember) 34%, transparent) 0%,
+    color-mix(in oklab, var(--color-haze) 46%, transparent) 34%,
+    transparent 70%
   );
   pointer-events: none;
 }
@@ -475,10 +550,23 @@
   pointer-events: none;
 }
 
+/*
+  On the dark ground the flood is light spilling from behind the eyes, not
+  paint covering the page. An ember core falls off through haze into void, so
+  as it scales it washes the screen back to the ground colour and leaves a
+  warm halo where the apertures were. A flat ember screen would have been
+  deafening, and the palette forbids flat ember anyway.
+*/
 .hero-stage[data-stage="motion"] .hero-flood-circle {
   position: absolute;
   border-radius: 50%;
-  background-color: var(--color-thaw);
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--color-ember) 0%,
+    color-mix(in oklab, var(--color-ember) 55%, var(--color-void)) 16%,
+    color-mix(in oklab, var(--color-haze) 70%, var(--color-void)) 34%,
+    var(--color-void) 62%
+  );
   will-change: transform;
 }
 

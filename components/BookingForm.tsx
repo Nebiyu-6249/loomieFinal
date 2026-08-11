@@ -97,7 +97,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
 
   if (status.state === "sent") {
     return (
-      <div className="border-t border-ink pt-step-3" role="status">
+      <div className="border-t border-haze pt-step-3" role="status">
         <h3 className="type-heading text-[clamp(1.5rem,3.4vw,2.25rem)]">
           Request received.
         </h3>
@@ -123,13 +123,13 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
         <p
           id={slotErrorId}
           tabIndex={-1}
-          className="type-meta mt-step-2 text-ink"
+          className="type-meta mt-step-2 text-field"
           hidden={!slotError}
         >
           Pick one of the times below before sending the request.
         </p>
 
-        <div className="mt-step-3 grid grid-cols-2 gap-px bg-drift sm:grid-cols-3">
+        <div className="mt-step-3 grid grid-cols-2 gap-px bg-smoke sm:grid-cols-3">
           {slots.map((slot) => {
             // Dubai's side arrives preformatted from the server; only the
             // visitor's side is computed here, and only after mount.
@@ -145,8 +145,8 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
                 key={slot.iso}
                 className={`flex min-h-24 cursor-pointer flex-col justify-center gap-1 p-step-2 transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-4 ${
                   isSelected
-                    ? "bg-ink text-field has-[:focus-visible]:outline-field"
-                    : "bg-field hover:bg-drift has-[:focus-visible]:outline-ink"
+                    ? "bg-field text-void has-[:focus-visible]:outline-void"
+                    : "bg-void hover:bg-smoke has-[:focus-visible]:outline-field"
                 }`}
               >
                 <input
@@ -194,7 +194,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
             type="text"
             required
             autoComplete="name"
-            className="min-h-12 border-b border-ink bg-transparent pb-2 text-[1rem]"
+            className="min-h-12 border-b border-slate bg-transparent pb-2 text-[1rem]"
           />
         </p>
 
@@ -209,7 +209,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
             required
             autoComplete="email"
             inputMode="email"
-            className="min-h-12 border-b border-ink bg-transparent pb-2 text-[1rem]"
+            className="min-h-12 border-b border-slate bg-transparent pb-2 text-[1rem]"
           />
         </p>
       </div>
@@ -222,7 +222,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
           id={noteId}
           name="note"
           rows={3}
-          className="border-b border-ink bg-transparent pb-2 text-[1rem]"
+          className="border-b border-slate bg-transparent pb-2 text-[1rem]"
         />
       </p>
 
@@ -230,7 +230,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
         <button
           type="submit"
           disabled={status.state === "sending"}
-          className="type-micro min-h-12 border border-ink px-step-2 py-step-1 text-ink hover:bg-ink hover:text-field disabled:opacity-50"
+          className="type-micro min-h-12 border border-slate px-step-2 py-step-1 text-field hover:border-field hover:bg-field hover:text-void disabled:opacity-50"
         >
           {status.state === "sending" ? "Sending…" : "[ Request this time ]"}
         </button>

@@ -37,10 +37,11 @@ const FRAMES: Record<Ratio, { w: number; h: number }> = {
   "16/9": { w: 640, h: 360 },
 };
 
-const INK = "#0e1113";
+const VOID = "#0a0b0d";
+const SMOKE = "#1c1f23";
+const HAZE = "#3a4046";
 const FIELD = "#f2f3f4";
-const DRIFT = "#dde3e6";
-const THAW = "#efd9b4";
+const EMBER = "#f0b45a";
 
 interface Palette {
   panel: string;
@@ -53,12 +54,16 @@ interface Palette {
   fieldOpacity: number;
 }
 
-/** Three grounds, so a grid of plates is not four of the same tone. */
+/**
+ * Four grounds, so a grid of plates is not four of the same tone. The third
+ * gives the mark ember eyes, which ties the plates to the robot rather than
+ * leaving them as an unrelated system of their own.
+ */
 const PALETTES: Palette[] = [
-  { panel: DRIFT, capsule: INK, aperture: FIELD, pupil: INK, line: INK, fieldOpacity: 0.14 },
-  { panel: INK, capsule: FIELD, aperture: INK, pupil: FIELD, line: FIELD, fieldOpacity: 0.22 },
-  { panel: THAW, capsule: INK, aperture: FIELD, pupil: INK, line: INK, fieldOpacity: 0.16 },
-  { panel: DRIFT, capsule: INK, aperture: FIELD, pupil: INK, line: INK, fieldOpacity: 0.34 },
+  { panel: SMOKE, capsule: VOID, aperture: FIELD, pupil: VOID, line: HAZE, fieldOpacity: 0.5 },
+  { panel: VOID, capsule: SMOKE, aperture: FIELD, pupil: VOID, line: HAZE, fieldOpacity: 0.7 },
+  { panel: SMOKE, capsule: VOID, aperture: EMBER, pupil: VOID, line: HAZE, fieldOpacity: 0.34 },
+  { panel: VOID, capsule: SMOKE, aperture: FIELD, pupil: SMOKE, line: HAZE, fieldOpacity: 0.42 },
 ];
 
 interface PlateProps {
@@ -309,7 +314,7 @@ export function Plate({
   if (src) {
     return (
       <div
-        className={`relative overflow-hidden bg-drift ${className}`}
+        className={`relative overflow-hidden bg-smoke ${className}`}
         style={{ aspectRatio: ratio.replace("/", " / ") }}
       >
         <Image
@@ -355,5 +360,5 @@ export function Plate({
 
 /** So a caption can pick a legible colour against whichever panel it drew. */
 export function plateIsDark(seed: string): boolean {
-  return PALETTES[hash(seed) % PALETTES.length].panel === INK;
+  return PALETTES[hash(seed) % PALETTES.length].panel === VOID;
 }
