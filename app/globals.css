@@ -297,6 +297,46 @@
   }
 }
 
+/*
+  Move eleven of fourteen: the cursor light.
+
+  z-index 39 puts it directly beneath the grain, which is the whole point.
+  The grain blends in overlay, so it is near-invisible over the deepest Void
+  and comes up as the ground lightens — the light therefore develops the grain
+  inside its own falloff rather than washing it out.
+
+  Screen blend: it can only lighten, so it crosses type without muddying it.
+  Sized in vmin so it stays a pool of light on a laptop and on a large
+  display, rather than a fixed disc that reads as a spotlight on one and a
+  smudge on the other.
+
+  No `will-change`. A 60rem element promoted for the life of the page costs
+  more than the compositor saves on a transform it can already handle.
+*/
+.cursor-light {
+  position: fixed;
+  z-index: 39;
+  top: 0;
+  left: 0;
+  height: min(60rem, 105vmin);
+  width: min(60rem, 105vmin);
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in oklab, var(--color-ember) 11%, transparent) 0%,
+    color-mix(in oklab, var(--color-ember) 5.5%, transparent) 38%,
+    color-mix(in oklab, var(--color-ember) 1.6%, transparent) 64%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms ease;
+}
+
+.cursor-light[data-lit] {
+  opacity: 1;
+}
+
 /* Move one of thirteen: the page transition, as a keyframe rather than a library. */
 @keyframes page-enter {
   from {
