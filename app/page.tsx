@@ -9,7 +9,7 @@ import { JourneyLine } from "@/components/JourneyLine";
 import { LetterReveal } from "@/components/LetterReveal";
 import { Reveal } from "@/components/Reveal";
 import { Ticker } from "@/components/Ticker";
-import { SERVICES, STORY, WORK_PLACEHOLDERS } from "@/lib/content";
+import { SERVICES, STORY, WORK } from "@/lib/content";
 
 export default function Home() {
   return (
@@ -83,7 +83,7 @@ export default function Home() {
             </Reveal>
 
             <div className="mt-step-4">
-              <WorkCorridor items={WORK_PLACEHOLDERS} />
+              <WorkCorridor items={WORK} />
             </div>
 
             <p className="mt-step-4">
