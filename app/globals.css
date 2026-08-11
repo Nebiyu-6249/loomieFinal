@@ -392,6 +392,116 @@
   }
 }
 
+/*
+  Move thirteen of fourteen: the robot.
+
+  Three layers at three depths inside one perspective. Standing still that
+  costs nothing — it is three absolutely positioned SVGs — and it is what lets
+  the hero's camera push move *through* the machine rather than scale a
+  picture of it.
+
+  The eyes' blink transition lives here rather than in the script so the
+  script only ever writes a transform, never a duration.
+*/
+.robot {
+  position: relative;
+  aspect-ratio: 460 / 900;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.robot-layer {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.robot-field {
+  transform: translateZ(-90px) scale(1.07);
+}
+
+.robot-body {
+  transform: translateZ(0);
+}
+
+.robot-head {
+  transform: translateZ(46px) rotateX(4deg);
+  transform-origin: 50% 78%;
+}
+
+.robot-head g {
+  transition: transform 90ms linear;
+}
+
+/*
+  The torso rises and falls 1.5%, easing at both ends. Anchored at the waist,
+  because a body that breathes from its centre reads as a balloon.
+*/
+@keyframes robot-breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.015);
+  }
+}
+
+.robot-breathe {
+  transform-origin: 50% 100%;
+  animation: robot-breathe 4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/*
+  Three indicators on three periods that share no common multiple worth
+  noticing, so they never fall into step and the machine never looks like it
+  is keeping time.
+*/
+@keyframes robot-dot {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.robot-dot {
+  animation: robot-dot 4s ease-in-out infinite;
+}
+
+.robot-dot-1 {
+  animation-duration: 3.4s;
+}
+
+.robot-dot-2 {
+  animation-duration: 4.1s;
+  animation-delay: -1.2s;
+}
+
+.robot-dot-3 {
+  animation-duration: 4.8s;
+  animation-delay: -2.7s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .robot-breathe,
+  .robot-dot {
+    animation: none;
+  }
+
+  /* Lit, not dark: a still robot should read as on, not as unplugged. */
+  .robot-dot {
+    opacity: 0.7;
+  }
+
+  .robot-head g {
+    transition: none;
+  }
+}
+
 /* Ember as light behind the call to action, never as a fill. */
 .cta-bloom {
   position: absolute;
