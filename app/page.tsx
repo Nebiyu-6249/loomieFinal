@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ContactCta } from "@/components/ContactCta";
+import { DarkSection } from "@/components/DarkSection";
 import { HeroAperture } from "@/components/HeroAperture";
 import { Reveal } from "@/components/Reveal";
 import { WorkCard } from "@/components/WorkCard";
@@ -74,30 +75,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The story, in the founder's words. */}
-      <section
-        className="px-step-2 py-step-5 md:px-step-3"
-        aria-labelledby="studio"
-      >
-        <div className="mx-auto max-w-[100rem]">
-          <Reveal step={0} steps={2}>
-            <h2 id="studio" className="type-micro text-slate">
-              The studio
-            </h2>
-          </Reveal>
+      {/* The page's one tonal event. */}
+      <DarkSection labelledBy="studio">
+        <Reveal step={0} steps={2}>
+          <h2 id="studio" className="type-micro text-thaw">
+            The studio
+          </h2>
+        </Reveal>
 
-          <Reveal step={1} steps={2} className="mt-step-3">
-            <p className="type-display measure text-[clamp(2.5rem,3.8vw,3.5rem)]">
-              {STORY}
-            </p>
-            <p className="mt-step-3">
-              <Link href="/studio" className="type-micro hover-line text-ink">
-                [ Read the studio ]
-              </Link>
-            </p>
-          </Reveal>
-        </div>
-      </section>
+        <Reveal step={1} steps={2} className="mt-step-3">
+          <p className="type-display measure text-[clamp(2.5rem,3.8vw,3.5rem)]">
+            {STORY}
+          </p>
+          <p className="mt-step-4">
+            <Link href="/studio" className="type-micro hover-line text-thaw">
+              [ Read the studio ]
+            </Link>
+          </p>
+        </Reveal>
+      </DarkSection>
 
       <ContactCta />
     </>
