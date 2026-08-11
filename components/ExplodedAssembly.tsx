@@ -50,7 +50,7 @@ const PLATES: PlateSpec[] = [
     y: -0.22,
     rotate: -9,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full p-3" aria-hidden="true">
+      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
         <rect
           width={MARK.gridWidth}
           height={MARK.gridHeight}
@@ -68,7 +68,7 @@ const PLATES: PlateSpec[] = [
     y: -0.26,
     rotate: 7,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full p-3" aria-hidden="true">
+      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
         <circle
           cx={APERTURE_INSET}
           cy={APERTURE_CY}
@@ -92,7 +92,7 @@ const PLATES: PlateSpec[] = [
     y: 0.2,
     rotate: 6,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full p-3" aria-hidden="true">
+      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
         <circle
           cx={MARK.gridWidth / 2}
           cy={APERTURE_CY}
@@ -137,11 +137,25 @@ const PLATES: PlateSpec[] = [
   },
   {
     label: "Grid",
-    x: 0.08,
+    // Was 0.08, which put its right edge through the Aperture plate at every
+    // width from 1280 up. Two plates of the same Void fill, separated by a
+    // Haze hairline, do not read as a deliberate overlap the way two white
+    // plates with Ink hairlines did — they read as a collision.
+    x: -0.02,
     y: -0.36,
     rotate: -4,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full p-3" aria-hidden="true">
+      // The only plate that draws outside the mark's own box: the clear-space
+      // rule is a statement about the space around the mark, so the viewBox
+      // opens up to hold it. At 0 0 70 36 it was clipped to two stubs at the
+      // plate's edges and read as crop marks.
+      <svg
+        viewBox={`${-CLEAR_SPACE / 2 - 2} ${-CLEAR_SPACE / 2 - 2} ${
+          MARK.gridWidth + CLEAR_SPACE + 4
+        } ${MARK.gridHeight + CLEAR_SPACE + 4}`}
+        className="h-full w-full px-3 pb-8 pt-3"
+        aria-hidden="true"
+      >
         <rect
           x={-CLEAR_SPACE / 2}
           y={-CLEAR_SPACE / 2}
