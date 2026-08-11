@@ -80,6 +80,18 @@ interface RobotProps {
    * change rather than a CSS scale or it rasterises and smears.
    */
   fill?: boolean;
+  /**
+   * A point in viewport coordinates to look at instead of the pointer. The
+   * booking form aims it at the slot you chose, which is the whole reason the
+   * machine is standing there.
+   */
+  lookAt?: { x: number; y: number } | null;
+  /**
+   * Increment to make it acknowledge something: the three chest indicators
+   * fire in sequence and it blinks once. A counter rather than a boolean, so
+   * two acknowledgements in a row both land.
+   */
+  signal?: number;
 }
 
 export function Robot({
@@ -87,6 +99,8 @@ export function Robot({
   label,
   intensity = 1,
   fill = false,
+  lookAt = null,
+  signal = 0,
 }: RobotProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
@@ -94,6 +108,39 @@ export function Robot({
   const rightEyeRef = useRef<SVGGElement>(null);
   const leftPupilRef = useRef<SVGGElement>(null);
   const rightPupilRef = useRef<SVGGElement>(null);
+
+  // Read inside the frame loop, so a new target does not restart it.
+  const lookAtRef = useRef(lookAt);
+  const blinkNowRef = useRef(false);
+
+  useEffect(() => {
+    lookAtRef.current = lookAt;
+  }, [lookAt]);
+
+  /*
+    Acknowledgement. The indicator sequence is a CSS class the element carries
+    for the length of the animation; the blink is a flag the frame loop picks
+    up, so it goes through the same path as an ordinary blink instead of
+    fighting it for control of the same elements.
+  */
+  useEffect(() => {
+    if (signal === 0) return;
+    const root = rootRef.current;
+    if (!root) return;
+
+    blinkNowRef.current = true;
+    root.classList.remove("robot-acknowledge");
+    // Reading offsetWidth restarts the animation; without it a second signal
+    // inside the animation's own duration does nothing at all.
+    void root.offsetWidth;
+    root.classList.add("robot-acknowledge");
+
+    const id = window.setTimeout(
+      () => root.classList.remove("robot-acknowledge"),
+      1400,
+    );
+    return () => window.clearTimeout(id);
+  }, [signal]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -116,10 +163,25 @@ export function Robot({
         let targetX = 0;
         let targetY = 0;
 
+        const aim = lookAtRef.current;
         const tracking = pointer.seen && pointer.fine;
         const idleFor = tracking ? pointer.idleFor : 0;
 
-        if (tracking && idleFor > IDLE_AFTER_MS) {
+        if (aim) {
+          // An explicit target wins over both the pointer and the glance.
+          const rect = root.getBoundingClientRect();
+          const originX = rect.left + rect.width * (ROBOT.cx / ROBOT.viewWidth);
+          const originY = rect.top + rect.height * (EYE_CY / ROBOT.viewHeight);
+          const dx = aim.x - originX;
+          const dy = aim.y - originY;
+          const distance = Math.hypot(dx, dy);
+
+          if (distance > 0.001) {
+            const strength = Math.min(distance / SATURATION, 1) * intensity;
+            targetX = (dx / distance) * strength;
+            targetY = (dy / distance) * strength;
+          }
+        } else if (tracking && idleFor > IDLE_AFTER_MS) {
           /*
             Glance: the eyes drift away and back over about two seconds, on a
             cycle rather than once, so a reader who leaves the page open sees
@@ -161,6 +223,11 @@ export function Robot({
         head.style.transform =
           `translateZ(46px) rotateX(${(HEAD_TILT - headAngle.x * HEAD_DEGREES).toFixed(2)}deg)` +
           ` rotateY(${(headAngle.y * HEAD_DEGREES).toFixed(2)}deg)`;
+
+        if (blinkNowRef.current && !closed) {
+          blinkNowRef.current = false;
+          blinkAt = time;
+        }
 
         if (time >= blinkAt && !closed) {
           closed = true;

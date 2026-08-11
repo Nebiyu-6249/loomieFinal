@@ -1,17 +1,30 @@
 "use client";
 
-import { useId, useState, useSyncExternalStore } from "react";
+import { useId, useRef, useState, useSyncExternalStore } from "react";
 
-import { DUBAI_TIME_ZONE, formatTime, type ProposedSlot } from "@/lib/booking";
+import { Robot } from "./Robot";
+import { DUBAI_TIME_ZONE, formatTime, type DayColumn } from "@/lib/booking";
 
 /**
  * A booking request, not a calendar.
  *
+ * The week is a strip of seven day columns rather than a flat list of times,
+ * because a time is only meaningful once you know which day it is on and a
+ * list makes you read that off every row. Closed days are shown and labelled
+ * rather than omitted — a week with two days missing is not a week — and
+ * today is marked, so a reader can find where they are before reading forward.
+ *
  * The slots are native radios inside a fieldset, so the whole thing is
- * keyboard-operable by default — arrow keys move between times, tab moves
- * between groups — and there is no custom date picker to get wrong. Calendars
- * are among the most reliably inaccessible widgets on the web, and the way to
+ * keyboard-operable by default: arrow keys move between times, tab moves
+ * between groups, and there is no custom date picker to get wrong. Calendars
+ * are among the most reliably inaccessible widgets on the web and the way to
  * pass that test is not to build one.
+ *
+ * The robot stands beside it and watches. When a time is chosen it looks at
+ * that time and its indicators fire once in sequence; on a successful send it
+ * blinks. That is the only feedback on this page that is not text, and it is
+ * deliberately never the *only* feedback — every one of those moments also
+ * changes a label a screen reader will read.
  *
  * Every time is shown in both zones once the visitor's own zone is known. The
  * server does not know it, so the server renders Dubai alone and the reader's
@@ -29,7 +42,14 @@ type Status =
   | { state: "sent" }
   | { state: "error"; message: string };
 
-export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
+const BUTTON_LABEL: Record<Status["state"], string> = {
+  idle: "Request this time",
+  sending: "Sending",
+  sent: "Requested",
+  error: "Request this time",
+};
+
+export function BookingForm({ week }: { week: readonly DayColumn[] }) {
   const visitorZone = useSyncExternalStore(
     subscribeNever,
     getTimeZone,
@@ -39,6 +59,9 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
   const [selected, setSelected] = useState<string>("");
   const [status, setStatus] = useState<Status>({ state: "idle" });
   const [slotError, setSlotError] = useState(false);
+  const [lookAt, setLookAt] = useState<{ x: number; y: number } | null>(null);
+  const [signal, setSignal] = useState(0);
+  const stripRef = useRef<HTMLDivElement>(null);
 
   const nameId = useId();
   const emailId = useId();
@@ -46,6 +69,19 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
   const slotErrorId = useId();
 
   const showsBothZones = visitorZone !== null && visitorZone !== DUBAI_TIME_ZONE;
+  const open = week.filter((day) => day.slots.length > 0);
+  const nothingOffered = open.length === 0;
+
+  function choose(iso: string, element: HTMLElement) {
+    setSelected(iso);
+    setSlotError(false);
+    setSignal((value) => value + 1);
+
+    // The robot looks at the slot itself, in viewport coordinates, so the
+    // gaze lands on the thing that was chosen rather than near it.
+    const rect = element.getBoundingClientRect();
+    setLookAt({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -86,6 +122,7 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
       }
 
       setStatus({ state: "sent" });
+      setSignal((value) => value + 1);
     } catch {
       setStatus({
         state: "error",
@@ -95,16 +132,43 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
     }
   }
 
+  /*
+    The form replaces itself rather than raising a toast. A toast is a message
+    that arrives beside the thing it is about and then leaves; a confirmation
+    is the new state of the page, and this is a page whose only job was to
+    send one request.
+  */
   if (status.state === "sent") {
+    const day = week.find((entry) =>
+      entry.slots.some((slot) => slot.iso === selected),
+    );
+    const slot = day?.slots.find((entry) => entry.iso === selected);
+
     return (
-      <div className="border-t border-haze pt-step-3" role="status">
-        <h3 className="type-heading text-[clamp(1.5rem,3.4vw,2.25rem)]">
-          Request received.
-        </h3>
-        <p className="type-body measure mt-step-2 text-slate">
-          Nothing is booked yet — the studio will confirm the time by email, or
-          propose another if that one has gone.
-        </p>
+      <div className="booking-confirmed" role="status">
+        <div className="booking-confirmed-robot" aria-hidden="true">
+          <Robot className="h-full" signal={signal} intensity={0.5} />
+        </div>
+
+        <div>
+          <h3 className="type-heading text-[clamp(1.5rem,3.4vw,2.25rem)]">
+            Request received.
+          </h3>
+          {slot ? (
+            <p className="type-lead mt-step-2">
+              {slot.dubaiDay}, {slot.dubaiTime} in Dubai
+              {showsBothZones
+                ? ` — ${formatTime(slot.iso, visitorZone)} your time`
+                : ""}
+            </p>
+          ) : null}
+          <p className="type-body measure mt-step-2 text-slate">
+            Nothing is booked yet. The studio will confirm that time by email,
+            or propose another if it has gone. If you do not hear back within
+            two working days, reply to this request or write to the studio
+            directly — the address is at the top of this page.
+          </p>
+        </div>
       </div>
     );
   }
@@ -129,66 +193,94 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
           Pick one of the times below before sending the request.
         </p>
 
-        <div className="mt-step-3 grid grid-cols-2 gap-px bg-smoke sm:grid-cols-3">
-          {slots.map((slot) => {
-            // Dubai's side arrives preformatted from the server; only the
-            // visitor's side is computed here, and only after mount.
-            const { dubaiTime, dubaiDay } = slot;
-            const isSelected = selected === slot.iso;
+        <div className="booking-layout mt-step-3">
+          {/*
+            Beside the strip, small, waiting. It is aria-hidden because
+            everything it expresses is also said in text: the selection is a
+            checked radio, the acknowledgement is a changed label.
+          */}
+          <div className="booking-robot" aria-hidden="true">
+            <Robot className="h-full" lookAt={lookAt} signal={signal} intensity={0.55} />
+          </div>
 
-            // The radio itself is visually hidden, so the focus ring has to
-            // move to the label a reader can actually see — otherwise it lands
-            // on a one-pixel box and keyboard focus is invisible. Drawn inside
-            // the cell, and inverted when the cell is selected.
-            return (
-              <label
-                key={slot.iso}
-                className={`flex min-h-24 cursor-pointer flex-col justify-center gap-1 p-step-2 transition-colors duration-200 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-4 ${
-                  isSelected
-                    ? "bg-field text-void has-[:focus-visible]:outline-void"
-                    : "bg-void hover:bg-smoke has-[:focus-visible]:outline-field"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="slot"
-                  value={slot.iso}
-                  checked={isSelected}
-                  onChange={() => {
-                    setSelected(slot.iso);
-                    setSlotError(false);
-                  }}
-                  className="sr-only"
-                />
-
-                <span className="type-micro opacity-70">{dubaiDay}</span>
-
-                {/*
-                  Three line boxes in every state, so the cell's contents are
-                  in the same place before and after the visitor's zone is
-                  known. Rendering two lines and then adding a third re-centred
-                  the two that were already there — the cell held its 96px, but
-                  the text inside it moved, which is still a layout shift and
-                  was the last non-zero CLS on the site.
-
-                  A visitor already in Dubai keeps an empty third line. That
-                  costs a few pixels of a cell that has them spare; the
-                  alternative costs everyone else a shift.
-                */}
-                <span className="type-heading text-[1.0625rem]">
-                  {showsBothZones
-                    ? `${formatTime(slot.iso, visitorZone)} your time`
-                    : `${dubaiTime} in Dubai`}
-                </span>
-                <span
-                  className="type-micro opacity-70"
-                  aria-hidden={showsBothZones ? undefined : "true"}
+          {nothingOffered ? (
+            <p className="type-body text-slate">
+              There are no times left this week. Email the studio and it will
+              propose some for next week.
+            </p>
+          ) : (
+            <div ref={stripRef} className="booking-week" data-chosen={selected || undefined}>
+              {week.map((day) => (
+                <div
+                  key={day.key}
+                  className="booking-day"
+                  data-today={day.isToday || undefined}
+                  data-closed={day.closed || undefined}
                 >
-                  {showsBothZones ? `${dubaiTime} in Dubai` : " "}
-                </span>
-              </label>
-            );
-          })}
+                  <p className="booking-day-head">
+                    <span className="type-micro block text-slate">
+                      {day.weekday}
+                      {day.isToday ? " · today" : ""}
+                    </span>
+                    <span className="type-heading mt-1 block text-[1.25rem]">
+                      {day.dayNumber} {day.month}
+                    </span>
+                  </p>
+
+                  {day.closed ? (
+                    <p className="type-micro booking-empty">Closed</p>
+                  ) : day.slots.length === 0 ? (
+                    <p className="type-micro booking-empty">No times left</p>
+                  ) : (
+                    <ul className="booking-times">
+                      {day.slots.map((slot) => {
+                        const isSelected = selected === slot.iso;
+
+                        return (
+                          <li key={slot.iso}>
+                            <label
+                              className="booking-slot"
+                              data-selected={isSelected || undefined}
+                            >
+                              <input
+                                type="radio"
+                                name="slot"
+                                value={slot.iso}
+                                checked={isSelected}
+                                onChange={(event) =>
+                                  choose(slot.iso, event.currentTarget.closest("label")!)
+                                }
+                                className="sr-only"
+                              />
+
+                              {/*
+                                Three line boxes in every state, so the cell's
+                                contents do not move when the visitor's zone
+                                becomes known after hydration.
+                              */}
+                              <span className="type-heading block text-[1.0625rem]">
+                                {showsBothZones
+                                  ? `${formatTime(slot.iso, visitorZone)}`
+                                  : slot.dubaiTime}
+                              </span>
+                              <span className="type-micro block text-slate">
+                                {showsBothZones ? "your time" : "in Dubai"}
+                              </span>
+                              <span className="type-micro block text-slate">
+                                {showsBothZones ? `${slot.dubaiTime} Dubai` : " "}
+                              </span>
+
+                              <span className="booking-underline" aria-hidden="true" />
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </fieldset>
 
@@ -217,7 +309,6 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
             type="email"
             required
             autoComplete="email"
-            inputMode="email"
             className="min-h-12 border-b border-slate bg-transparent pb-2 text-[1rem]"
           />
         </p>
@@ -239,19 +330,19 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
         <button
           type="submit"
           disabled={status.state === "sending"}
-          className="type-micro min-h-12 border border-slate px-step-2 py-step-1 text-field hover:border-field hover:bg-field hover:text-void disabled:opacity-50"
+          className="booking-submit type-micro"
+          data-state={status.state}
         >
-          {status.state === "sending" ? "Sending…" : "[ Request this time ]"}
+          {BUTTON_LABEL[status.state]}
         </button>
 
-        <p className="type-meta" role="status" aria-live="polite">
-          {status.state === "error" ? status.message : ""}
+        <p className="type-meta max-w-[34ch]">
+          It requests a time. It does not confirm one.
         </p>
       </div>
 
-      <p className="type-meta mt-step-3">
-        Sending this asks the studio to hold the time. It is a request, not a
-        confirmed booking.
+      <p className="type-meta mt-step-3 text-field" role="alert">
+        {status.state === "error" ? status.message : ""}
       </p>
     </form>
   );
