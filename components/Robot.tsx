@@ -73,9 +73,21 @@ interface RobotProps {
   label?: string;
   /** Damps the gaze for the small instance beside the booking form. */
   intensity?: number;
+  /**
+   * Fills its container instead of holding the figure's aspect, and lets
+   * something outside drive the viewBox. The hero's camera push needs both:
+   * the drawing has to cover the frame, and the push has to be a viewBox
+   * change rather than a CSS scale or it rasterises and smears.
+   */
+  fill?: boolean;
 }
 
-export function Robot({ className = "", label, intensity = 1 }: RobotProps) {
+export function Robot({
+  className = "",
+  label,
+  intensity = 1,
+  fill = false,
+}: RobotProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const leftEyeRef = useRef<SVGGElement>(null);
@@ -199,7 +211,7 @@ export function Robot({ className = "", label, intensity = 1 }: RobotProps) {
   return (
     <div
       ref={rootRef}
-      className={`robot ${className}`}
+      className={`robot ${fill ? "robot-fill" : ""} ${className}`}
       {...(label
         ? { role: "img", "aria-label": label }
         : { "aria-hidden": "true" as const })}
@@ -210,14 +222,14 @@ export function Robot({ className = "", label, intensity = 1 }: RobotProps) {
         one copy serves all three layers and three copies would be three sets
         of duplicate ids.
       */}
-      <svg viewBox={view} className="robot-layer robot-field" aria-hidden="true">
+      <svg data-robot-view="" viewBox={view} className="robot-layer robot-field" aria-hidden="true">
         <RobotDefs />
         <HeadGlow />
         <GroundPool />
       </svg>
 
       {/* The body, at the stage's own depth. */}
-      <svg viewBox={view} className="robot-layer robot-body" aria-hidden="true">
+      <svg data-robot-view="" viewBox={view} className="robot-layer robot-body" aria-hidden="true">
         <Arm side="left" />
         <Arm side="right" />
         <Base />
@@ -230,7 +242,7 @@ export function Robot({ className = "", label, intensity = 1 }: RobotProps) {
 
       {/* Nearest the camera, and the only layer that turns. */}
       <div ref={headRef} className="robot-layer robot-head">
-        <svg viewBox={view} className="h-full w-full" aria-hidden="true">
+        <svg data-robot-view="" viewBox={view} className="h-full w-full" aria-hidden="true">
           <HeadShell />
           <Eye side="left" eyeRef={leftEyeRef} pupilRef={leftPupilRef} />
           <Eye side="right" eyeRef={rightEyeRef} pupilRef={rightPupilRef} />
