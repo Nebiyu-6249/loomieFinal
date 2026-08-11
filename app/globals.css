@@ -356,14 +356,29 @@
     transform-origin: left center;
     transition:
       transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
-      opacity 500ms ease;
+      opacity 500ms ease,
+      visibility 0ms;
   }
 
-  /* Anything past the fourth card is behind the stack and not worth painting. */
+  /*
+    Anything past the fourth card is behind the stack and not worth painting.
+
+    visibility, not opacity alone: these cards hold real links, and an
+    invisible link still takes a tab stop. That was survivable when the same
+    six links sat in a grid underneath; now that the stack is the homepage's
+    only view of them, a focus ring landing on nothing would be the whole
+    keyboard path. The flip is delayed by the length of the fade so the card
+    still dissolves on its way to the back rather than popping out.
+  */
   .card-stack-item[data-depth="4"],
   .card-stack-item[data-depth="5"] {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
+    transition:
+      transform 900ms cubic-bezier(0.2, 1.2, 0.3, 1),
+      opacity 500ms ease,
+      visibility 0ms linear 500ms;
   }
 }
 
