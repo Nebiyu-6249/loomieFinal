@@ -3,10 +3,11 @@
 /*
   SNOWFIELD.
 
-  Five colours. Thaw is the only warm value in the system and appears in
-  exactly two places on the whole site: behind the hero apertures, and on the
-  contact call to action. If a third use appears, one of the first two was
-  wrong.
+  Five values. Thaw is the only warm one, and it is light rather than paint:
+  it sits behind the mark as a glow, grounds the contact call to action, and
+  is the single accent allowed on the Ink sections. It never appears inside
+  the mark — the eyes are Field over Ink, and warmth falling on the capsule is
+  a different thing from warmth filling it.
 */
 @theme {
   --color-field: #f2f3f4;
@@ -213,6 +214,16 @@
   script, so the fallback is the thing that ships by default rather than an
   afterthought.
 */
+/*
+  The stage starts under the fixed header rather than after it. Without this
+  the 100svh frame begins 4rem down the document, so a viewport-height hero
+  runs 4rem past the fold and crops its own eyes. The header is transparent
+  over the hero anyway, which is what makes the overlap read as intended.
+*/
+.hero-stage {
+  margin-top: -4rem;
+}
+
 .hero-veil {
   position: relative;
   min-height: 78svh;
@@ -233,14 +244,35 @@
 }
 
 /*
-  On a phone the mark sits below the headline with both apertures fully in
-  frame. They are the thing that opens, so cropping them off the bottom edge
-  would cost the hero its whole point — the desktop bleed is a luxury of a
-  wide viewport, not the composition itself.
+  The warmth sits behind the mark rather than inside it — light falling on the
+  capsule, not paint filling its eyes. Snow becomes a river under the warmth
+  of the sun, and the sun is behind the snow.
+*/
+.hero-glow {
+  position: absolute;
+  z-index: 0;
+  right: -46%;
+  bottom: -14%;
+  width: 190%;
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--color-thaw) 0%,
+    color-mix(in oklab, var(--color-thaw) 62%, transparent) 38%,
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+/*
+  On a phone the mark sits below the headline with both eyes fully in frame.
+  They are the thing that opens, so cropping them off the bottom edge would
+  cost the hero its whole point — the desktop bleed is a luxury of a wide
+  viewport, not the composition itself.
 */
 .hero-mark {
   position: absolute;
-  z-index: 0;
+  z-index: 1;
   right: -20%;
   bottom: 11%;
   width: 118%;
@@ -257,12 +289,30 @@
 }
 
 @media (min-width: 768px) {
-  .hero-mark {
-    top: 54%;
-    right: -11%;
+  .hero-glow {
+    top: calc(82% - min(78vw, 66rem) / 2);
+    right: -24%;
     bottom: auto;
-    width: min(70vw, 62rem);
-    transform: translateY(-50%);
+    width: min(78vw, 66rem);
+  }
+
+  /*
+    Roughly 900px at a 1440 viewport, sitting low and right so it bleeds off
+    both edges while leaving the left half clear for the headline. The two are
+    meant to be in tension, not overlapping.
+  */
+  /*
+    Anchored by the eyes rather than by an edge: the aperture centreline is
+    height/2, so placing top at 82% minus half the height puts the gaze at a
+    fixed 82% of the viewport whatever its height, and lets the capsule bleed
+    off the bottom without ever cropping an eye.
+  */
+  .hero-mark {
+    --mark-w: min(56vw, 50rem);
+    top: calc(82% - var(--mark-w) / 1.9444 / 2);
+    right: -12%;
+    bottom: auto;
+    width: var(--mark-w);
   }
 
   .hero-scroll {

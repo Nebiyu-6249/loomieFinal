@@ -26,10 +26,13 @@ interface WordmarkProps {
   className?: string;
   /** The mark tracks the cursor unless this lockup is decorative repetition. */
   track?: boolean;
+  /** Approximate rendered width in px — decides whether the pupil goes compact. */
+  renderWidth?: number;
 }
 
 export function Wordmark({
-  markWidth = `clamp(${MARK.minRenderWidth}px, 7vw, 38px)`,
+  markWidth = `clamp(34px, 7vw, 46px)`,
+  renderWidth = 46,
   className = "",
   track = true,
 }: WordmarkProps) {
@@ -52,7 +55,7 @@ export function Wordmark({
           paddingInline: `calc(var(--mark-w) * ${CLEAR_SPACE_RATIO})`,
         }}
       >
-        <LoomieEyes className="w-full" track={track} />
+        <LoomieEyes className="w-full" track={track} renderWidth={renderWidth} />
       </span>
       <span aria-hidden="true">MIE</span>
       <span className="sr-only">Loomie</span>

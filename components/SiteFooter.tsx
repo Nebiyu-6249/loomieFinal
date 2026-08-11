@@ -26,7 +26,12 @@ export function SiteFooter() {
                 padding: clearSpaceFor(MARK_WIDTH),
               }}
             >
-              <LoomieEyes className="w-full" track={false} label="Loomie" />
+              <LoomieEyes
+                className="w-full"
+                track={false}
+                label="Loomie"
+                renderWidth={MARK_WIDTH}
+              />
             </div>
             <p className="type-micro mt-step-2 text-slate">{SITE.specLine}</p>
           </div>
