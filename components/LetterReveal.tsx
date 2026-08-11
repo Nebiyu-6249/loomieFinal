@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { loadScrollTrigger } from "./useScrollEffect";
 
 /**
- * Move one of nine — the letter reveal.
+ * Move one of fourteen — the letter reveal.
  *
  * Per character: opacity 0→1, y 24px→0, blur 10px→0, stagger 0.03, power3.out.
  * Adapted from the Stagger List preset at the expo tier (400–700ms), which is

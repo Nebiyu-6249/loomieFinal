@@ -12,8 +12,8 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 /**
- * The share card is the hero, reduced: Field ground, a Thaw glow, and the Ink
- * mark bleeding off the right with Field apertures and Ink pupils. Geometry
+ * The share card is the hero, reduced: void ground, a warm bloom, and the
+ * visor bleeding off the right with ember eyes. Geometry
  * comes off the same constants the site uses, so the card cannot drift out of
  * spec either.
  */
@@ -33,8 +33,8 @@ export default function OpengraphImage() {
           height: "100%",
           display: "flex",
           position: "relative",
-          backgroundColor: "#f2f3f4",
-          color: "#0e1113",
+          backgroundColor: "#0a0b0d",
+          color: "#f2f3f4",
           padding: 72,
           fontFamily: "sans-serif",
         }}
@@ -48,7 +48,7 @@ export default function OpengraphImage() {
             width: 920,
             height: 920,
             borderRadius: 920,
-            backgroundColor: "#efd9b4",
+            backgroundColor: "#2a2118",
             display: "flex",
           }}
         />
@@ -60,7 +60,7 @@ export default function OpengraphImage() {
             top: 630 / 2 - markHeight / 2,
             width: markWidth,
             height: markHeight,
-            backgroundColor: "#0e1113",
+            backgroundColor: "#1c1f23",
             borderRadius: markHeight / 2,
             display: "flex",
             alignItems: "center",
@@ -76,7 +76,7 @@ export default function OpengraphImage() {
                 width: aperture,
                 height: aperture,
                 borderRadius: aperture,
-                backgroundColor: "#f2f3f4",
+                backgroundColor: "#f0b45a",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -87,7 +87,7 @@ export default function OpengraphImage() {
                   width: pupil,
                   height: pupil,
                   borderRadius: pupil,
-                  backgroundColor: "#0e1113",
+                  backgroundColor: "#0a0b0d",
                   display: "flex",
                 }}
               />
@@ -125,7 +125,7 @@ export default function OpengraphImage() {
                 display: "flex",
                 marginTop: 24,
                 fontSize: 28,
-                color: "#5f6b72",
+                color: "#8a949b",
               }}
             >
               Clear. Connected. Complete.

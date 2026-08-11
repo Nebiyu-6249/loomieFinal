@@ -1,18 +1,23 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { ContactCta } from "@/components/ContactCta";
-import { DarkSection } from "@/components/DarkSection";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
-import { PROCESS, SERVICES, TIMELINE } from "@/lib/content";
+import { SERVICES } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Logo design, web brand identity, marketing design and website design — with the studio's five-step process and its four-week timeline.",
+    "Logo design, web brand identity, marketing design and website design.",
   alternates: { canonical: "/services" },
 };
 
+/**
+ * Four services and nothing else. The process, the timeline and the packages
+ * moved to /process — a short page that says one thing beats a long page that
+ * says four.
+ */
 export default function Services() {
   return (
     <>
@@ -32,8 +37,8 @@ export default function Services() {
           </h2>
 
           {/*
-            Not numbered. Four services are a set, not a sequence — the process
-            below is the only ordered thing on this page, so it gets the numbers.
+            Not numbered. Four services are a set, not a sequence — the only
+            ordered thing on the site is the process, and it lives elsewhere.
           */}
           <ul className="flex flex-col">
             {SERVICES.map((service, index) => (
@@ -55,63 +60,15 @@ export default function Services() {
               </li>
             ))}
           </ul>
-        </div>
-      </section>
 
-      {/* A real sequence, which is why it is the one thing here that counts. */}
-      <DarkSection labelledBy="process">
-        <Reveal step={0} steps={2}>
-          <h2 id="process" className="type-micro text-thaw">
-            How the work runs — five steps
-          </h2>
-        </Reveal>
-
-        <Reveal step={1} steps={2} className="mt-step-4" rule={false}>
-          <ol className="grid gap-px bg-field/20 sm:grid-cols-2 lg:grid-cols-5">
-            {PROCESS.map((step, index) => (
-              <li
-                key={step.title}
-                className="flex flex-col gap-step-2 bg-ink p-step-3 lg:min-h-64"
-              >
-                <span className="type-micro text-thaw">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3 className="type-heading text-[1.25rem]">{step.title}</h3>
-                <p className="type-body text-field/70">{step.detail}</p>
-              </li>
-            ))}
-          </ol>
-        </Reveal>
-      </DarkSection>
-
-      <section
-        className="px-step-2 pb-step-5 md:px-step-3"
-        aria-labelledby="timeline"
-      >
-        <div className="mx-auto max-w-[100rem]">
-          <Reveal step={0} steps={2}>
-            <h2 id="timeline" className="type-micro text-slate">
-              Typical timeline — four weeks
-            </h2>
-          </Reveal>
-
-          <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
-            <dl className="flex flex-col">
-              {TIMELINE.map((entry) => (
-                <div
-                  key={entry.week}
-                  className="flex flex-col gap-step-1 border-t border-drift py-step-2 sm:flex-row sm:gap-step-4"
-                >
-                  <dt className="type-micro shrink-0 text-slate sm:w-40">
-                    {entry.week}
-                  </dt>
-                  <dd className="type-heading text-[clamp(1.125rem,2.4vw,1.625rem)]">
-                    {entry.detail}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
+          <p className="mt-step-4">
+            <Link
+              href="/process"
+              className="type-micro hover-line inline-flex min-h-11 items-center text-field"
+            >
+              [ How the work runs ]
+            </Link>
+          </p>
         </div>
       </section>
 

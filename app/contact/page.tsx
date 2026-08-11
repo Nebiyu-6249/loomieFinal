@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { BookingForm } from "@/components/BookingForm";
-import { DarkSection } from "@/components/DarkSection";
+import { ToneSection } from "@/components/ToneSection";
 import { DubaiClock } from "@/components/DubaiClock";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
@@ -60,7 +60,7 @@ export default function Contact() {
             </Reveal>
           </div>
 
-          <div className="border-t border-ink pt-step-3">
+          <div className="border-t border-haze pt-step-3">
             <h2 className="type-micro text-slate">Request a call</h2>
             <div className="mt-step-3">
               <BookingForm slots={slots} />
@@ -69,9 +69,9 @@ export default function Contact() {
         </div>
       </section>
 
-      <DarkSection labelledBy="faq">
+      <ToneSection labelledBy="faq">
           <Reveal step={0} steps={2}>
-            <h2 id="faq" className="type-micro text-thaw">
+            <h2 id="faq" className="type-micro text-ember">
               Questions people ask first
             </h2>
           </Reveal>
@@ -85,13 +85,13 @@ export default function Contact() {
           <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
             <ul>
               {FAQ.map((item) => (
-                <li key={item.question} className="border-t border-field/25">
+                <li key={item.question} className="border-t border-haze">
                   <details className="group">
                     <summary className="type-heading flex min-h-16 cursor-pointer list-none items-center justify-between gap-step-2 py-step-2 text-[clamp(1.0625rem,2.2vw,1.375rem)] [&::-webkit-details-marker]:hidden">
                       {item.question}
                       <span
                         aria-hidden="true"
-                        className="type-micro shrink-0 text-thaw"
+                        className="type-micro shrink-0 text-ember"
                       >
                         <span className="group-open:hidden">[ + ]</span>
                         <span className="hidden group-open:inline">[ − ]</span>
@@ -105,7 +105,7 @@ export default function Contact() {
               ))}
             </ul>
           </Reveal>
-      </DarkSection>
+      </ToneSection>
     </>
   );
 }

@@ -20,7 +20,7 @@ export default function NotFound() {
         </p>
 
         <div className="mt-step-4 flex flex-wrap gap-step-3">
-          <Link href="/" className="type-micro hover-line text-ink">
+          <Link href="/" className="type-micro hover-line text-field">
             [ Home ]
           </Link>
           <Link href="/work" className="type-micro hover-line text-slate">

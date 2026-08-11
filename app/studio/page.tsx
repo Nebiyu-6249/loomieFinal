@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { ContactCta } from "@/components/ContactCta";
-import { DarkSection } from "@/components/DarkSection";
 import { PageIntro } from "@/components/PageIntro";
 import { Plate } from "@/components/Plate";
 import { Reveal } from "@/components/Reveal";
-import {
-  MEANINGS,
-  MISSION,
-  PILLARS,
-  SITE,
-  STORY,
-  TAGLINE,
-  VALUES,
-  VISION,
-} from "@/lib/content";
+import { ToneSection } from "@/components/ToneSection";
+import { MEANINGS, SITE, STORY, TAGLINE } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Studio",
@@ -23,6 +15,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/studio" },
 };
 
+/**
+ * The story, the origin and the three meanings. The values, pillars, mission
+ * and vision moved to /studio/principles — this page ran five sections on one
+ * rhythm and the eye stopped being led.
+ */
 export default function Studio() {
   return (
     <>
@@ -32,7 +29,6 @@ export default function Studio() {
         lede={SITE.origin}
       />
 
-      {/* The measure widens from here down: 42ch, then 58ch, then full. */}
       <section className="px-step-2 pb-step-5 md:px-step-3" aria-labelledby="story">
         <div className="mx-auto max-w-[100rem]">
           <Reveal step={0} steps={3}>
@@ -53,9 +49,9 @@ export default function Studio() {
         </div>
       </section>
 
-      <DarkSection labelledBy="meanings">
+      <ToneSection labelledBy="meanings">
         <Reveal step={0} steps={2}>
-          <h2 id="meanings" className="type-micro text-thaw">
+          <h2 id="meanings" className="type-micro text-ember">
             The name
           </h2>
         </Reveal>
@@ -64,11 +60,11 @@ export default function Studio() {
           <div className="grid gap-step-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-center md:gap-step-5">
             <dl className="grid gap-step-3 sm:grid-cols-3">
               {MEANINGS.map((meaning) => (
-                <div key={meaning.language} className="border-t border-field/25 pt-step-2">
+                <div key={meaning.language} className="border-t border-haze pt-step-2">
                   <dt className="type-display text-[clamp(2.5rem,5vw,3.5rem)]">
                     {meaning.word}
                   </dt>
-                  <dd className="type-micro mt-step-1 text-thaw">
+                  <dd className="type-micro mt-step-1 text-ember">
                     {meaning.language}
                   </dd>
                 </div>
@@ -78,85 +74,23 @@ export default function Studio() {
             <Plate seed="studio-name" ratio="3/2" sizes="(max-width: 768px) 100vw, 40vw" />
           </div>
         </Reveal>
-      </DarkSection>
+      </ToneSection>
 
-      <section
-        className="px-step-2 pb-step-5 md:px-step-3"
-        aria-labelledby="values"
-      >
+      <section className="px-step-2 py-step-5 md:px-step-3">
         <div className="mx-auto max-w-[100rem]">
-          <Reveal step={0} steps={2}>
-            <h2 id="values" className="type-micro text-slate">
-              Core values
-            </h2>
-          </Reveal>
-
-          <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
-            <dl className="grid gap-step-3 md:grid-cols-3 md:gap-step-4">
-              {VALUES.map((value) => (
-                <div key={value.name} className="border-t border-ink pt-step-2">
-                  <dt className="type-heading text-[clamp(1.375rem,2.8vw,2rem)]">
-                    {value.name}
-                  </dt>
-                  <dd className="type-body mt-step-2 text-slate">{value.detail}</dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
-        </div>
-      </section>
-
-      <section
-        className="px-step-2 pb-step-5 md:px-step-3"
-        aria-labelledby="pillars"
-      >
-        <div className="mx-auto max-w-[100rem]">
-          <Reveal step={0} steps={2}>
-            <h2 id="pillars" className="type-micro text-slate">
-              Pillars
-            </h2>
-          </Reveal>
-
-          <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
-            <dl className="flex flex-col">
-              {PILLARS.map((pillar) => (
-                <div
-                  key={pillar.name}
-                  className="flex flex-col gap-step-1 border-t border-drift py-step-3 md:flex-row md:gap-step-4"
-                >
-                  <dt className="type-heading shrink-0 text-[clamp(1.5rem,3.4vw,2.5rem)] md:w-72">
-                    {pillar.name}
-                  </dt>
-                  <dd className="type-body measure self-end text-slate">
-                    {pillar.detail}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
-        </div>
-      </section>
-
-      <section
-        className="px-step-2 pb-step-5 md:px-step-3"
-        aria-labelledby="intent"
-      >
-        <div className="mx-auto max-w-[100rem]">
-          <Reveal step={0} steps={2}>
-            <h2 id="intent" className="type-micro text-slate">
-              Mission and vision
-            </h2>
-          </Reveal>
-
-          <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
-            <div className="grid gap-step-4 md:grid-cols-2 md:gap-step-5">
-              <p className="type-heading text-[clamp(1.125rem,2.4vw,1.625rem)] leading-[1.35]">
-                {MISSION}
-              </p>
-              <p className="type-heading text-[clamp(1.125rem,2.4vw,1.625rem)] leading-[1.35] text-slate">
-                {VISION}
-              </p>
-            </div>
+          <Reveal>
+            <p className="type-lead measure text-slate">
+              What the studio holds to — the values, the pillars, and the
+              mission behind them — has a page of its own.
+            </p>
+            <p className="mt-step-3">
+              <Link
+                href="/studio/principles"
+                className="type-micro hover-line inline-flex min-h-11 items-center text-field"
+              >
+                [ Principles ]
+              </Link>
+            </p>
           </Reveal>
         </div>
       </section>

@@ -62,11 +62,11 @@ export default function Clients() {
           </Reveal>
 
           <Reveal step={1} steps={2} className="mt-step-4" rule={false}>
-            <ul className="grid grid-cols-2 gap-px bg-drift sm:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-px bg-smoke sm:grid-cols-3">
               {PLACEHOLDER_WORDMARKS.map((name) => (
                 <li
                   key={name}
-                  className="flex min-h-32 items-center justify-center bg-field p-step-2 text-slate"
+                  className="flex min-h-32 items-center justify-center bg-void p-step-2 text-slate"
                 >
                   <PlaceholderWordmark name={name} />
                 </li>
@@ -94,7 +94,7 @@ export default function Clients() {
           <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
             <dl className="grid gap-step-3 md:grid-cols-3 md:gap-step-4">
               {VALUES.map((value) => (
-                <div key={value.name} className="border-t border-ink pt-step-2">
+                <div key={value.name} className="border-t border-slate pt-step-2">
                   <dt className="type-heading text-[clamp(1.375rem,2.8vw,2rem)]">
                     {value.name}
                   </dt>

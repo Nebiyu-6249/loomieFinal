@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { useScrollEffect } from "./useScrollEffect";
 
 /**
- * Move six of nine — the drawn line.
+ * Move six of fourteen — the drawn line.
  *
  * A single SVG path that draws itself across the middle of the homepage:
  * stroke-dasharray and stroke-dashoffset seeded from getTotalLength(),

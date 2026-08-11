@@ -13,7 +13,7 @@ import {
 } from "@/lib/mark";
 
 /**
- * Move three of nine — the exploded assembly.
+ * Move three of fourteen — the exploded assembly.
  *
  * Six plates, stacked as one object, that explode outward on scroll with
  * rotation and scale and then lock into a labelled grid. 2D throughout: CSS
@@ -23,9 +23,12 @@ import {
  * system taking itself apart and putting itself back together rather than six
  * decorative rectangles.
  *
- * Pinned with scrub: 1 and end "+=180%", following the pin preset. On a phone
- * there is no pin — pinning a viewport-height section on a touch device
- * fights the scroll — so the plates stagger into a two-column grid instead.
+ * Pinned with scrub: 1 and end "+=120%". The preset's 180% held the page for
+ * nearly two screens of scroll on an animation that has finished its work in
+ * one, which read as the page having stopped rather than the object having
+ * been examined. On a phone there is no pin — pinning a viewport-height
+ * section on a touch device fights the scroll — so the plates stagger into a
+ * two-column grid instead.
  */
 
 const PUPIL_R = pupilRadiusFor(Number.MAX_SAFE_INTEGER);
@@ -47,13 +50,13 @@ const PLATES: PlateSpec[] = [
     y: -0.22,
     rotate: -9,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full p-3" aria-hidden="true">
+      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
         <rect
           width={MARK.gridWidth}
           height={MARK.gridHeight}
           rx={CAPSULE_RADIUS}
           fill="none"
-          stroke="var(--color-ink)"
+          stroke="var(--color-field)"
           strokeWidth="1.4"
         />
       </svg>
@@ -65,19 +68,19 @@ const PLATES: PlateSpec[] = [
     y: -0.26,
     rotate: 7,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full p-3" aria-hidden="true">
+      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
         <circle
           cx={APERTURE_INSET}
           cy={APERTURE_CY}
           r={MARK.apertureRadius}
-          fill="var(--color-ink)"
+          fill="var(--color-field)"
         />
         <circle
           cx={MARK.gridWidth - APERTURE_INSET}
           cy={APERTURE_CY}
           r={MARK.apertureRadius}
           fill="none"
-          stroke="var(--color-ink)"
+          stroke="var(--color-field)"
           strokeWidth="1.2"
         />
       </svg>
@@ -89,18 +92,18 @@ const PLATES: PlateSpec[] = [
     y: 0.2,
     rotate: 6,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full p-3" aria-hidden="true">
+      <svg viewBox="0 0 70 36" className="h-full w-full px-3 pb-8 pt-3" aria-hidden="true">
         <circle
           cx={MARK.gridWidth / 2}
           cy={APERTURE_CY}
           r={MARK.apertureRadius}
-          fill="var(--color-drift)"
+          fill="var(--color-haze)"
         />
         <circle
           cx={MARK.gridWidth / 2}
           cy={APERTURE_CY}
           r={PUPIL_R}
-          fill="var(--color-ink)"
+          fill="var(--color-field)"
         />
       </svg>
     ),
@@ -113,7 +116,7 @@ const PLATES: PlateSpec[] = [
     content: (
       // Stops short of the bottom edge so the caption has clear ground.
       <div className="flex h-[calc(100%-1.6rem)] w-full">
-        {["#0e1113", "#5f6b72", "#dde3e6", "#efd9b4"].map((fill) => (
+        {["#0a0b0d", "#3a4046", "#8a949b", "#f0b45a"].map((fill) => (
           <span key={fill} className="h-full flex-1" style={{ backgroundColor: fill }} />
         ))}
       </div>
@@ -134,11 +137,25 @@ const PLATES: PlateSpec[] = [
   },
   {
     label: "Grid",
-    x: 0.08,
+    // Was 0.08, which put its right edge through the Aperture plate at every
+    // width from 1280 up. Two plates of the same Void fill, separated by a
+    // Haze hairline, do not read as a deliberate overlap the way two white
+    // plates with Ink hairlines did — they read as a collision.
+    x: -0.02,
     y: -0.36,
     rotate: -4,
     content: (
-      <svg viewBox="0 0 70 36" className="h-full w-full p-3" aria-hidden="true">
+      // The only plate that draws outside the mark's own box: the clear-space
+      // rule is a statement about the space around the mark, so the viewBox
+      // opens up to hold it. At 0 0 70 36 it was clipped to two stubs at the
+      // plate's edges and read as crop marks.
+      <svg
+        viewBox={`${-CLEAR_SPACE / 2 - 2} ${-CLEAR_SPACE / 2 - 2} ${
+          MARK.gridWidth + CLEAR_SPACE + 4
+        } ${MARK.gridHeight + CLEAR_SPACE + 4}`}
+        className="h-full w-full px-3 pb-8 pt-3"
+        aria-hidden="true"
+      >
         <rect
           x={-CLEAR_SPACE / 2}
           y={-CLEAR_SPACE / 2}
@@ -172,15 +189,16 @@ export function ExplodedAssembly() {
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: "+=180%",
+          end: "+=120%",
           scrub: 1,
           pin: stage,
           anticipatePin: 1,
-          // Pinned with transforms rather than position: fixed. The page
-          // transition wrapper animates a transform, which makes it the
-          // containing block for fixed descendants while it runs — a pin
-          // measured during that lands thousands of pixels off. Transform
-          // pinning is immune to it.
+          // Pinned with transforms rather than position: fixed. The cause
+          // is gone — the transition that wrapped main in an animating
+          // transform, making it the containing block for fixed descendants
+          // and landing this pin thousands of pixels off, is now two fixed
+          // lids outside the content tree. The setting stays because it does
+          // not depend on nothing above it ever growing a transform again.
           pinType: "transform",
           invalidateOnRefresh: true,
         },
@@ -260,7 +278,7 @@ export function ExplodedAssembly() {
             <figure
               key={plate.label}
               data-plate=""
-              className="relative aspect-[4/3] w-full border border-drift bg-field md:absolute md:left-1/2 md:top-1/2 md:h-[clamp(8rem,13vw,11rem)] md:w-[clamp(11rem,17vw,15rem)]"
+              className="relative aspect-[4/3] w-full border border-haze bg-void md:absolute md:left-1/2 md:top-1/2 md:h-[clamp(8rem,13vw,11rem)] md:w-[clamp(11rem,17vw,15rem)]"
             >
               {plate.content}
               <figcaption

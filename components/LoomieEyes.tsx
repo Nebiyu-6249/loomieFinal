@@ -215,9 +215,9 @@ export function LoomieEyes({
   track = true,
   label,
   renderWidth = 120,
-  capsuleClassName = "fill-foreground",
-  apertureClassName = "fill-background",
-  pupilClassName = "fill-foreground",
+  capsuleClassName = "fill-smoke",
+  apertureClassName = "fill-field",
+  pupilClassName = "fill-void",
 }: LoomieEyesProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const leftPupilRef = useRef<SVGGElement>(null);

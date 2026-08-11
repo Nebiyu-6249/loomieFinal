@@ -8,9 +8,16 @@ interface WorkCardProps {
   /** At most one per page. */
   priority?: boolean;
   sizes?: string;
+  /** Position in the page's run of slots; sets the reveal's opening edge. */
+  index?: number;
 }
 
-export function WorkCard({ item, priority = false, sizes }: WorkCardProps) {
+export function WorkCard({
+  item,
+  priority = false,
+  sizes,
+  index = 0,
+}: WorkCardProps) {
   return (
     <Link
       href={`/work/${item.slug}`}
@@ -25,6 +32,7 @@ export function WorkCard({ item, priority = false, sizes }: WorkCardProps) {
           alt=""
           priority={priority}
           sizes={sizes}
+          index={index}
         />
 
         {/*
@@ -33,7 +41,7 @@ export function WorkCard({ item, priority = false, sizes }: WorkCardProps) {
           the row out of alignment with its neighbours.
         */}
         {item.image ? null : (
-          <span className="type-micro absolute left-step-2 top-step-2 text-ink/70">
+          <span className="type-micro absolute left-step-2 top-step-2 text-field/70">
             Reserved
           </span>
         )}
@@ -41,7 +49,7 @@ export function WorkCard({ item, priority = false, sizes }: WorkCardProps) {
 
       <span
         aria-hidden="true"
-        className="mt-step-2 block h-px w-full bg-ink"
+        className="mt-step-2 block h-px w-full bg-field"
         data-card-rule=""
       />
 
