@@ -6,9 +6,9 @@ import {
 } from "next/font/google";
 
 import "./globals.css";
+import { Blink } from "@/components/Blink";
 import { CursorLight } from "@/components/CursorLight";
 import { Grain } from "@/components/Grain";
-import { PageTransition } from "@/components/PageTransition";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SITE, TAGLINE } from "@/lib/content";
@@ -100,6 +100,7 @@ export default function RootLayout({
           Order matters as much as nesting: the light is z-39 and the grain
           z-40, so the grain develops inside the lit area.
         */}
+        <Blink />
         <CursorLight />
         <Grain />
 
@@ -108,9 +109,14 @@ export default function RootLayout({
         {/* Clears the fixed header, which is a fixed 4rem at every width. */}
         <div className="h-16" aria-hidden="true" />
 
-        <PageTransition>
-          <main id="main">{children}</main>
-        </PageTransition>
+        {/*
+          No wrapper. The old transition animated a transform here, which made
+          this element the containing block for every fixed descendant while
+          it ran and sent the pinned sections thousands of pixels off-screen.
+          The blink lives in its own fixed siblings above, so the content tree
+          is plain again.
+        */}
+        <main id="main">{children}</main>
 
         <SiteFooter />
       </body>

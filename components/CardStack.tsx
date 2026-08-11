@@ -8,7 +8,7 @@ import { useMotionAllowed } from "./useMotionPreference";
 import type { WorkPlaceholder } from "@/lib/content";
 
 /**
- * Move five of nine — the card stack.
+ * Move five of fourteen — the card stack.
  *
  * A perspective stack that cycles: the front card drops away, the rest
  * promote forward, and the dropped card returns to the back. CSS transforms
@@ -118,9 +118,9 @@ export function CardStack({ items }: CardStackProps) {
       </ul>
 
       {/*
-        The stack is now the homepage's only view of these six, so the cycle
+        The stack is now the homepage's only view of these slots, so the cycle
         has to be operable rather than decorative: [ Next ] advances it without
-        waiting for the timer, and /work holds the same six as a plain grid.
+        waiting for the timer, and /work holds the same set as a plain grid.
       */}
       <div className="mt-step-3 flex items-center gap-step-2">
         <button

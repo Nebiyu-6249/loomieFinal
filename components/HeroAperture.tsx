@@ -19,7 +19,7 @@ import {
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Move two of five. The signature scroll moment, homepage only.
+ * Move two of fourteen. The signature scroll moment, homepage only.
  *
  * The mark sits at the right of the hero at enormous scale in Ink — the
  * darkest thing on the page apart from the headline, so the two are in
