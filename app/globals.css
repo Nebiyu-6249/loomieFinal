@@ -502,6 +502,182 @@
   }
 }
 
+/*
+  The three-languages section, as three states.
+
+  Everything cross-fades on one duration so the picture and the temperature
+  change together. All three media stay mounted — mounting a canvas or an SVG
+  filter mid-transition drops frames at exactly the moment somebody is
+  watching — and the inactive ones are told to stop painting rather than being
+  unmounted.
+
+  `data-meaning` on the root drives all of it, so a state change is one
+  attribute write and the browser does the interpolation.
+*/
+.meanings {
+  position: relative;
+  height: 100%;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.meanings-ambient,
+.meanings-media {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.meanings-ambient {
+  z-index: -2;
+}
+
+.meanings-media {
+  z-index: -1;
+}
+
+.meanings-ambient > span,
+.meanings-media > div {
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.meanings[data-meaning="snow"] [data-field="snow"],
+.meanings[data-meaning="snow"] [data-state="snow"],
+.meanings[data-meaning="river"] [data-field="river"],
+.meanings[data-meaning="river"] [data-state="river"],
+.meanings[data-meaning="lights"] [data-field="lights"],
+.meanings[data-meaning="lights"] [data-state="lights"] {
+  opacity: 1;
+}
+
+/*
+  The ambient fields. Each one moves the light as well as recolouring it, so
+  the section's weather changes rather than its tint: cold and high for snow,
+  deep and central for the river, warm and low for the lights.
+*/
+[data-field="snow"] {
+  background:
+    radial-gradient(
+      120% 90% at 24% 8%,
+      color-mix(in oklab, var(--color-frost) 22%, transparent) 0%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, #0f1418 0%, var(--color-void) 78%);
+}
+
+[data-field="river"] {
+  background:
+    radial-gradient(
+      110% 80% at 62% 52%,
+      color-mix(in oklab, var(--color-frost) 10%, transparent) 0%,
+      transparent 68%
+    ),
+    linear-gradient(180deg, #0c1013 0%, var(--color-void) 82%);
+}
+
+[data-field="lights"] {
+  background:
+    radial-gradient(
+      130% 100% at 74% 88%,
+      color-mix(in oklab, var(--color-ember) 26%, transparent) 0%,
+      transparent 64%
+    ),
+    linear-gradient(180deg, var(--color-void) 0%, #14100c 100%);
+}
+
+.meaning-media {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/* Held back so the words never fight the picture for contrast. */
+.meanings-media [data-state="snow"] {
+  opacity: 0;
+}
+
+.meanings-media > div {
+  mix-blend-mode: screen;
+}
+
+.meaning-bokeh-point {
+  position: absolute;
+  display: block;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in oklab, var(--color-ember) 62%, transparent) 0%,
+    color-mix(in oklab, var(--color-ember) 22%, transparent) 52%,
+    transparent 78%
+  );
+  filter: blur(6px);
+  animation: bokeh-pulse 8s ease-in-out infinite;
+}
+
+@keyframes bokeh-pulse {
+  0%,
+  100% {
+    opacity: 0.34;
+    scale: 0.92;
+  }
+  50% {
+    opacity: 0.9;
+    scale: 1.06;
+  }
+}
+
+/*
+  A real button, so focus behaves exactly as hover does and the browser
+  supplies the keyboard handling. Stripped of the chrome a button arrives
+  with, but not of the semantics.
+*/
+.meaning-word {
+  display: block;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  transition:
+    opacity 400ms ease,
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The two that are not active step back rather than the active one shouting. */
+.meanings[data-meaning="snow"] li:not(:nth-child(1)) .meaning-word,
+.meanings[data-meaning="river"] li:not(:nth-child(2)) .meaning-word,
+.meanings[data-meaning="lights"] li:not(:nth-child(3)) .meaning-word {
+  opacity: 0.42;
+}
+
+@media (min-width: 48rem) {
+  .meanings[data-meaning="snow"] li:nth-child(1) .meaning-word,
+  .meanings[data-meaning="river"] li:nth-child(2) .meaning-word,
+  .meanings[data-meaning="lights"] li:nth-child(3) .meaning-word {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meanings-ambient > span,
+  .meanings-media > div,
+  .meaning-word {
+    transition-duration: 1ms;
+  }
+
+  .meaning-bokeh-point {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
 /* Ember as light behind the call to action, never as a fill. */
 .cta-bloom {
   position: absolute;
@@ -894,13 +1070,29 @@
   cost the hero its whole point — the desktop bleed is a luxury of a wide
   viewport, not the composition itself.
 */
-.hero-mark {
+/*
+  The camera.
+
+  The push is a viewBox animation, not a CSS scale. A scale looked right for
+  about three frames and then fell apart: the robot's three layers are 3D
+  transformed, so the compositor promotes and rasterises them once, and at 85x
+  a vector eye came back as a blurred smear with visible pixel edges. Writing
+  the viewBox makes the browser re-render the vector at every frame, so the
+  pupil has a hard edge the whole way in — which is the entire reason for
+  pushing into a drawing rather than a photograph.
+
+  It also does the re-aim for free: narrowing the box onto the pupil moves the
+  frame there. Two transforms became one attribute.
+*/
+.hero-robot {
   position: absolute;
-  z-index: 1;
-  right: -20%;
-  bottom: 11%;
-  width: 118%;
-  height: auto;
+  inset: 0;
+}
+
+.robot-fill {
+  aspect-ratio: auto;
+  height: 100%;
+  width: 100%;
 }
 
 .hero-scroll {
@@ -918,25 +1110,6 @@
     right: -24%;
     bottom: auto;
     width: min(78vw, 66rem);
-  }
-
-  /*
-    Roughly 900px at a 1440 viewport, sitting low and right so it bleeds off
-    both edges while leaving the left half clear for the headline. The two are
-    meant to be in tension, not overlapping.
-  */
-  /*
-    Anchored by the eyes rather than by an edge: the aperture centreline is
-    height/2, so placing top at 82% minus half the height puts the gaze at a
-    fixed 82% of the viewport whatever its height, and lets the capsule bleed
-    off the bottom without ever cropping an eye.
-  */
-  .hero-mark {
-    --mark-w: min(56vw, 50rem);
-    top: calc(82% - var(--mark-w) / 1.9444 / 2);
-    right: -12%;
-    bottom: auto;
-    width: var(--mark-w);
   }
 
   .hero-scroll {
