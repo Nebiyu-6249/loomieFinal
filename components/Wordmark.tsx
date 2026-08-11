@@ -17,6 +17,29 @@ const TYPE_TO_MARK_HEIGHT = 1.42;
 
 const CLEAR_SPACE_RATIO = CLEAR_SPACE / MARK.gridWidth;
 
+/**
+ * The lockup uses optical kerning, not the standalone clear-space rule.
+ *
+ * Clear space governs the mark standing alone against other content. Inside a
+ * word it is the wrong rule twice over: the capsule already carries 13.5 grid
+ * units of its own dark between its outer edge and the first aperture, and
+ * the apertures — not the capsule — are what the eye reads as the two O's.
+ * Applying the full 1.5r on top of that put 27 units between the L and the
+ * first "O", 38.6% of the mark's own width and visibly wider than the gap
+ * between the M and the I.
+ *
+ * The value is negative because the correction has to cancel part of the
+ * capsule's own margin: the L overlaps the capsule's rounded end slightly,
+ * which is invisible because that end is a curve and the L's stem is
+ * straight. It brings the perceived L-to-O gap from 11.5px to 7.6px at a
+ * 46px mark.
+ *
+ * Set by eye at 46px and at 200px against the word's own letter gaps rather
+ * than derived — 0.3 still read loose and -0.45 collided with the letters.
+ * That judgement is what optical kerning is; there is no formula here.
+ */
+const LOCKUP_KERN = -0.15;
+
 interface WordmarkProps {
   /**
    * Any CSS length for the mark's width. Keep the lower bound of a clamp at or
@@ -51,8 +74,11 @@ export function Wordmark({
         aria-hidden="true"
         className="inline-flex"
         style={{
-          width: `calc(var(--mark-w) + var(--mark-w) * ${CLEAR_SPACE_RATIO} * 2)`,
-          paddingInline: `calc(var(--mark-w) * ${CLEAR_SPACE_RATIO})`,
+          // A negative margin, not negative padding: padding cannot go below
+          // zero, so the browser dropped it and shrank the mark instead of
+          // tucking the letters in. Margin keeps the mark at its full width.
+          width: `var(--mark-w)`,
+          marginInline: `calc(var(--mark-w) * ${CLEAR_SPACE_RATIO * LOCKUP_KERN})`,
         }}
       >
         <LoomieEyes className="w-full" track={track} renderWidth={renderWidth} />
