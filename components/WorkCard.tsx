@@ -8,9 +8,16 @@ interface WorkCardProps {
   /** At most one per page. */
   priority?: boolean;
   sizes?: string;
+  /** Position in the page's run of slots; sets the reveal's opening edge. */
+  index?: number;
 }
 
-export function WorkCard({ item, priority = false, sizes }: WorkCardProps) {
+export function WorkCard({
+  item,
+  priority = false,
+  sizes,
+  index = 0,
+}: WorkCardProps) {
   return (
     <Link
       href={`/work/${item.slug}`}
@@ -25,6 +32,7 @@ export function WorkCard({ item, priority = false, sizes }: WorkCardProps) {
           alt=""
           priority={priority}
           sizes={sizes}
+          index={index}
         />
 
         {/*
