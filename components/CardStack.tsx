@@ -117,7 +117,11 @@ export function CardStack({ items }: CardStackProps) {
         })}
       </ul>
 
-      {/* The cycle is decorative; the same links live in the grid below. */}
+      {/*
+        The stack is now the homepage's only view of these six, so the cycle
+        has to be operable rather than decorative: [ Next ] advances it without
+        waiting for the timer, and /work holds the same six as a plain grid.
+      */}
       <div className="mt-step-3 flex items-center gap-step-2">
         <button
           type="button"

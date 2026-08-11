@@ -9,7 +9,6 @@ import { JourneyLine } from "@/components/JourneyLine";
 import { LetterReveal } from "@/components/LetterReveal";
 import { Reveal } from "@/components/Reveal";
 import { Ticker } from "@/components/Ticker";
-import { WorkCard } from "@/components/WorkCard";
 import { SERVICES, STORY, WORK_PLACEHOLDERS } from "@/lib/content";
 
 export default function Home() {
@@ -62,9 +61,19 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured work cycles; the full set sits in the grid beneath it. */}
+        {/*
+          The stack is the featured view, and the only one. It used to sit
+          above a four-up grid of the same six slots, which meant the homepage
+          showed every reserved slot twice and neither presentation carried any
+          weight. The full set lives on /work, one click away.
+        */}
         <section className="px-step-2 py-step-5 md:px-step-3" aria-labelledby="work">
           <div className="mx-auto max-w-[100rem]">
+            {/*
+              The stack is this section's second block. It carries no hairline
+              of its own, so the heading's measure stays short and the widening
+              resumes in the section below.
+            */}
             <Reveal step={0} steps={2}>
               <LetterReveal
                 as="h2"
@@ -77,20 +86,6 @@ export default function Home() {
             <div className="mt-step-4">
               <CardStack items={WORK_PLACEHOLDERS} />
             </div>
-
-            <Reveal step={1} steps={2} className="mt-step-5" rule={false}>
-              <ul className="grid grid-cols-2 gap-step-2 md:grid-cols-4 md:gap-step-3">
-                {WORK_PLACEHOLDERS.map((item, index) => (
-                  <li key={item.slug}>
-                    <WorkCard
-                      item={item}
-                      priority={index === 0}
-                      sizes="(max-width: 768px) 50vw, 23vw"
-                    />
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
 
             <p className="mt-step-4">
               <Link href="/work" className="type-micro hover-line text-field">
