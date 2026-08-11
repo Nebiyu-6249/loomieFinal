@@ -1,0 +1,349 @@
+@import "tailwindcss";
+
+/*
+  SNOWFIELD.
+
+  Five colours. Thaw is the only warm value in the system and appears in
+  exactly two places on the whole site: behind the hero apertures, and on the
+  contact call to action. If a third use appears, one of the first two was
+  wrong.
+*/
+@theme {
+  --color-field: #f2f3f4;
+  --color-ink: #0e1113;
+  /*
+    Slate was specified at #7C868C, which measures 3.35:1 on Field and fails
+    AA for the captions, nav and body copy it carries. Darkened to hold 4.9:1
+    while staying the same cool grey. On Thaw it still only reaches 4.0:1, so
+    nothing on a Thaw ground uses Slate — those surfaces use Ink at 70%.
+  */
+  --color-slate: #5f6b72;
+  --color-drift: #dde3e6;
+  --color-thaw: #efd9b4;
+
+  /* LoomieEyes ships against `fill-foreground` / `fill-background`. */
+  --color-background: #f2f3f4;
+  --color-foreground: #0e1113;
+
+  --font-display: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-martian), ui-monospace, monospace;
+
+  /*
+    Big jumps. The gaps carry the direction, so the scale is deliberately
+    sparse — there is no 20px or 40px step to reach for.
+  */
+  --spacing-step-1: 0.5rem;
+  --spacing-step-2: 1rem;
+  --spacing-step-3: 2rem;
+  --spacing-step-4: 4rem;
+  --spacing-step-5: 8rem;
+  --spacing-step-6: 14rem;
+
+  --text-micro: 0.6875rem;
+  --text-meta: 0.8125rem;
+}
+
+/*
+  The mobile pass, in one place.
+
+  The spacing utilities compile to var(--spacing-step-*), so retuning the scale
+  here retunes every section on the site at once. A phone gets roughly half the
+  vertical rhythm: the same composition needs far less air when the viewport is
+  390px wide, and at desktop values the page reads as abandoned rather than
+  quiet. The type scale is left alone — it is already clamped.
+*/
+@media (max-width: 47.999rem) {
+  :root {
+    --spacing-step-3: 1.5rem;
+    --spacing-step-4: 2.5rem;
+    --spacing-step-5: 4rem;
+    --spacing-step-6: 6rem;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-field);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /*
+    One focus treatment for the entire site: a 1px ink ring held off the
+    element by 3px of Field, so it reads on both the ground and on Drift
+    panels without ever being removed.
+  */
+  :focus-visible {
+    outline: 1px solid var(--color-ink);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background-color: var(--color-thaw);
+    color: var(--color-ink);
+  }
+
+  /* Everything that is not one of the five motion moves. */
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary {
+    transition:
+      color 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease,
+      opacity 180ms ease;
+  }
+}
+
+@layer utilities {
+  /*
+    Display setting. Familjen Grotesk is doing the whole job here, so the
+    tracking is pulled in hard at size and released as the type gets smaller.
+  */
+  .type-display {
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 0.92;
+  }
+
+  .type-heading {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+  }
+
+  /* Martian Mono, at the two sizes it is allowed to appear at. */
+  .type-micro {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .type-meta {
+    font-size: var(--text-meta);
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+    color: var(--color-slate);
+  }
+
+  .type-body {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    letter-spacing: 0.005em;
+  }
+
+  /* Body copy exists on /studio and the case studies. Nowhere else. */
+  .measure {
+    max-width: 58ch;
+  }
+
+  .measure-tight {
+    max-width: 42ch;
+  }
+
+  /*
+    Move four of five. One hover treatment for every card and every link on
+    the site: a hairline draws in from the left, and a card lifts three
+    pixels with it. Same easing and same duration as the text reveal, so the
+    two read as one language. Focus gets it too — a keyboard should see what
+    a mouse sees.
+  */
+  .hover-line {
+    position: relative;
+  }
+
+  .hover-line::after {
+    content: "";
+    position: absolute;
+    bottom: -0.18em;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hover-line:hover::after,
+  .hover-line:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .hover-card {
+    transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hover-card [data-card-rule] {
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hover-card:hover,
+  .hover-card:focus-visible {
+    transform: translateY(-3px);
+  }
+
+  .hover-card:hover [data-card-rule],
+  .hover-card:focus-visible [data-card-rule] {
+    transform: scaleX(1);
+  }
+}
+
+/*
+  The signature scroll moment. Homepage only.
+
+  The default here is the static structure: two ordinary stacked sections,
+  which is what the server sends and what a reader gets with JavaScript off or
+  with reduced motion asked for. The pinned structure is only switched on by
+  script, so the fallback is the thing that ships by default rather than an
+  afterthought.
+*/
+.hero-veil {
+  position: relative;
+  min-height: 78svh;
+}
+
+.hero-meanings {
+  background-color: var(--color-thaw);
+}
+
+.hero-flood {
+  display: none;
+}
+
+.hero-veil-content {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+}
+
+/*
+  On a phone the mark sits below the headline with both apertures fully in
+  frame. They are the thing that opens, so cropping them off the bottom edge
+  would cost the hero its whole point — the desktop bleed is a luxury of a
+  wide viewport, not the composition itself.
+*/
+.hero-mark {
+  position: absolute;
+  z-index: 0;
+  right: -20%;
+  bottom: 11%;
+  width: 118%;
+  height: auto;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: var(--spacing-step-2);
+  left: var(--spacing-step-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .hero-mark {
+    top: 54%;
+    right: -11%;
+    bottom: auto;
+    width: min(70vw, 62rem);
+    transform: translateY(-50%);
+  }
+
+  .hero-scroll {
+    left: var(--spacing-step-3);
+  }
+}
+
+/*
+  Three viewport heights: the first opens the apertures, the second and third
+  hold the meanings still long enough to actually be read rather than passed.
+*/
+.hero-stage[data-stage="motion"] {
+  height: 300svh;
+}
+
+.hero-stage[data-stage="motion"] .hero-frame {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.hero-stage[data-stage="motion"] .hero-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-stage[data-stage="motion"] .hero-veil {
+  z-index: 1;
+  min-height: 0;
+}
+
+.hero-stage[data-stage="motion"] .hero-flood {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-stage[data-stage="motion"] .hero-flood-circle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: var(--color-thaw);
+  will-change: transform;
+}
+
+.hero-stage[data-stage="motion"] .hero-meanings {
+  z-index: 3;
+  visibility: hidden;
+  background-color: transparent;
+  opacity: 0;
+}
+
+/*
+  While the hero owns the viewport the header carries no ground of its own —
+  otherwise it holds a Field-coloured band across the top of the warm flood.
+  Set only by the homepage, and only when the pinned structure is running.
+*/
+html[data-hero="open"] .site-header {
+  background-color: transparent;
+  backdrop-filter: none;
+}
+
+html[data-hero="open"] .site-header-rule {
+  opacity: 0;
+}
+
+/*
+  Every move renders in its final visible state when motion is reduced. The
+  individual components check the query too — this is the backstop for
+  anything that slips through as a CSS transition.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
