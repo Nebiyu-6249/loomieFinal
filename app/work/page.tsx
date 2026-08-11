@@ -32,6 +32,7 @@ export default function WorkIndex() {
                   item={item}
                   priority={index === 0}
                   sizes="(max-width: 640px) 100vw, 48vw"
+                  index={index}
                 />
               </li>
             ))}

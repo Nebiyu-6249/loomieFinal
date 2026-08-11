@@ -227,6 +227,173 @@
   }
 }
 
+/*
+  Move fourteen of fourteen: the image reveal.
+
+  The wrapper is the stable box — it holds the aspect ratio and never moves,
+  so nothing here can shift the page. The clip opens inside it, the picture
+  scales and drifts inside that, and the Ember glow sits behind all of it.
+
+  .frame-drift is 124% tall and pulled up 12%, so the parallax has ground to
+  travel through. Without the overscan a 12% drift would expose the frame's
+  own background at one end of the travel.
+
+  Every value the script animates is also written here, so a slot with no
+  JavaScript, a failed chunk, or reduced motion is a finished image rather
+  than a blank box: clip open, scale 1, hairline invisible.
+*/
+.frame {
+  position: relative;
+  isolation: isolate;
+}
+
+.frame-clip {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  overflow: hidden;
+  clip-path: inset(0% 0% 0% 0%);
+}
+
+/*
+  Two nested elements rather than one, because two different systems animate a
+  transform here. The script owns .frame-drift — the reveal's scale and the
+  scroll parallax, merged into one matrix by GSAP. The stylesheet owns
+  .frame-lift — the hover. On a single element GSAP's inline transform would
+  win outright and the hover would silently stop working the moment the reveal
+  had run.
+*/
+.frame-drift {
+  /*
+    Offset with `top`, not `margin-top`. A percentage margin resolves against
+    the containing block's *inline* size, so -12% on a 672x840 slot pulled the
+    artwork up by 80px instead of 101 — and by a different amount at every
+    aspect ratio, since it was tracking the width while the 124% height
+    tracked the height. `top` on a positioned element resolves against the
+    height, which is the axis this is actually about.
+  */
+  position: absolute;
+  top: -12%;
+  left: 0;
+  height: 124%;
+  width: 100%;
+  transform: scale(1);
+  transform-origin: center;
+}
+
+/* Positioned, because a next/image with `fill` needs an ancestor that is. */
+.frame-lift {
+  position: relative;
+  height: 100%;
+  transform-origin: center;
+}
+
+/* The picture fills the overscan; the frame keeps the authored ratio. */
+.frame-lift > * {
+  height: 100%;
+}
+
+/*
+  Ember behind the frame rather than over it — the same rule the hero and the
+  call to action follow. Only on a real pointer: a glow that latches on after
+  a tap and stays is worse than no glow.
+*/
+.frame::before {
+  position: absolute;
+  z-index: 0;
+  content: "";
+  inset: -12%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in oklab, var(--color-ember) 22%, transparent) 0%,
+    color-mix(in oklab, var(--color-ember) 8%, transparent) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.frame-edge {
+  position: absolute;
+  z-index: 2;
+  background-color: var(--color-haze);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.frame-edge-vertical {
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: scaleY(0);
+}
+
+.frame-edge-horizontal {
+  left: 0;
+  height: 1px;
+  width: 100%;
+  transform: scaleX(0);
+}
+
+.frame-edge-left {
+  left: 0;
+  transform-origin: top center;
+}
+
+.frame-edge-right {
+  right: 0;
+  transform-origin: bottom center;
+}
+
+.frame-edge-top {
+  top: 0;
+  transform-origin: center left;
+}
+
+.frame-edge-bottom {
+  bottom: 0;
+  transform-origin: center right;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .frame-lift {
+    transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .frame::before {
+    transition: opacity 420ms ease;
+  }
+
+  /*
+    Driven from whatever link contains the frame as well as from the frame
+    itself, so a card lights its image on hover anywhere on the card and on
+    keyboard focus — not only when a pointer is over the picture.
+  */
+  .frame:hover .frame-lift,
+  a:hover .frame-lift,
+  a:focus-visible .frame-lift {
+    transform: scale(1.04);
+  }
+
+  .frame:hover::before,
+  a:hover .frame::before,
+  a:focus-visible .frame::before {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame-lift {
+    transition: none;
+  }
+
+  .frame:hover .frame-lift,
+  a:hover .frame-lift,
+  a:focus-visible .frame-lift {
+    transform: none;
+  }
+}
+
 /* Ember as light behind the call to action, never as a fill. */
 .cta-bloom {
   position: absolute;
