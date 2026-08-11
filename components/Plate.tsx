@@ -1,6 +1,16 @@
 import Image from "next/image";
 
 import { Frame } from "./Frame";
+import {
+  Arm,
+  Base,
+  ChestPanel,
+  Eye,
+  HeadShell,
+  NeckRings,
+  RobotDefs,
+  Torso,
+} from "./RobotParts";
 import { SlotVideo } from "./SlotVideo";
 import {
   APERTURE_INSET,
@@ -10,16 +20,23 @@ import {
   pupilRadiusFor,
 } from "@/lib/mark";
 import { FRAME_OVERSCAN } from "@/lib/frame";
+import { EYE_CY, ROBOT } from "@/lib/robot";
 
 /**
  * The image slot.
  *
  * There is no photography yet and no date for it, so a plate is not a
  * placeholder waiting to be rescued — it is a finished composition drawn from
- * the mark's own construction geometry, of the kind a brand manual would
- * print on a specimen page. Five compositions across three palettes, chosen
- * deterministically from the seed so the server and the client always agree
- * and a project keeps its plate.
+ * the studio's own geometry, of the kind a brand manual would print on a
+ * specimen page. Chosen deterministically from the seed, so the server and
+ * the client always agree and a piece keeps its plate.
+ *
+ * Seven compositions across four palettes. The composition comes from the
+ * slot's position on its page, so no two slots on a page can draw the same
+ * one; the palette comes from the seed, so two pages laid out the same way
+ * are not the same picture. Two of the seven are the robot itself, close
+ * cropped and full figure, because a page of plates that only ever showed the
+ * bare capsule was showing half the system.
  *
  * Every capsule here is the real three-tone construction: Ink shell, Field
  * aperture, Ink pupil. A plate is a specimen of the mark, so drawing it
@@ -66,6 +83,9 @@ interface Palette {
  * gives the mark ember eyes, which ties the plates to the robot rather than
  * leaving them as an unrelated system of their own.
  */
+/** Keep in step with the switch in Composition. */
+const COMPOSITIONS = 7;
+
 const PALETTES: Palette[] = [
   { panel: SMOKE, capsule: VOID, aperture: FIELD, pupil: VOID, line: HAZE, fieldOpacity: 0.5 },
   { panel: VOID, capsule: SMOKE, aperture: FIELD, pupil: VOID, line: HAZE, fieldOpacity: 0.7 },
@@ -91,9 +111,16 @@ interface PlateProps {
   priority?: boolean;
   sizes?: string;
   /**
-   * Position in this page's run of slots. Only decides which edge the reveal
-   * opens from, so a page numbers its slots once instead of choosing edges by
-   * hand and accidentally making a rhythm.
+   * Position in this page's run of slots. It decides two things: which edge
+   * the reveal opens from, and which composition the plate draws.
+   *
+   * Composition is driven by position rather than by the seed, because
+   * "no two slots on a page share a composition" is a guarantee and hashing
+   * cannot make it. Two slugs on /work hashed to the same variant and the
+   * page drew the full robot twice in a row; a second hash moved the
+   * collision rather than removing it. Position gives it for nothing, for up
+   * to seven slots, and the palette still comes from the seed so two pages
+   * with the same layout are not the same picture.
    */
   index?: number;
   /** Suppress the parallax where a slot is too small for 12% to read. */
@@ -299,6 +326,57 @@ function Composition({
       );
     }
 
+    /*
+      The machine, cropped close. A plate is a specimen page, and the robot is
+      now the thing the system is most itself in — a page of plates that only
+      ever showed the bare capsule was showing half the system.
+    */
+    case 5: {
+      const scale = Math.min(w / ROBOT.viewWidth, h / ROBOT.viewHeight) * 2.1;
+      const x = w / 2 - ROBOT.cx * scale;
+      const y = h * 0.42 - EYE_CY * scale;
+
+      return (
+        <>
+          <RobotDefs />
+          <g transform={`translate(${x} ${y}) scale(${scale})`}>
+            <NeckRings />
+            <HeadShell />
+            <Eye side="left" />
+            <Eye side="right" />
+          </g>
+        </>
+      );
+    }
+
+    /* The whole machine, standing in the plate's own field. */
+    case 6: {
+      const scale = (h * 0.82) / ROBOT.viewHeight;
+      const x = w / 2 - ROBOT.cx * scale;
+      const y = h * 0.09;
+
+      return (
+        <>
+          <RobotDefs />
+          <g opacity={palette.fieldOpacity * 0.5}>
+            <rect x={0} y={h * 0.72} width={w} height={1} fill={palette.line} />
+            <rect x={0} y={h * 0.78} width={w} height={1} fill={palette.line} />
+          </g>
+          <g transform={`translate(${x} ${y}) scale(${scale})`}>
+            <Base />
+            <Arm side="left" />
+            <Arm side="right" />
+            <Torso />
+            <ChestPanel pulse={false} />
+            <NeckRings />
+            <HeadShell />
+            <Eye side="left" />
+            <Eye side="right" />
+          </g>
+        </>
+      );
+    }
+
     /* Two marks overlapping — the construction the silhouette comes from. */
     default: {
       const markWidth = w * 0.74;
@@ -391,7 +469,7 @@ export function Plate({
           focusable="false"
         >
           <Composition
-            variant={Math.floor(key / PALETTES.length) % 5}
+            variant={index % COMPOSITIONS}
             palette={palette}
             w={frame.w}
             h={boxHeight}

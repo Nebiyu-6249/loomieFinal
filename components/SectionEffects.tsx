@@ -227,6 +227,13 @@ export function TypeIn({ children }: { children: React.ReactNode }) {
             ease: "none",
             delay: index * 0.07,
             onStart: () => {
+              /*
+                Hold the box before emptying it. A paragraph typed from empty
+                collapses to one line and then grows back, which is a layout
+                shift on every label — 0.0104 on /clients, and the only
+                non-zero CLS the animation pass introduced.
+              */
+              label.style.minHeight = `${label.offsetHeight}px`;
               label.textContent = "";
             },
             onUpdate: () => {
@@ -234,6 +241,7 @@ export function TypeIn({ children }: { children: React.ReactNode }) {
             },
             onComplete: () => {
               label.textContent = full;
+              label.style.minHeight = "";
             },
             scrollTrigger: { trigger: label, start: "top 90%", once: true },
           });

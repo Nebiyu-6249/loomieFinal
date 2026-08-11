@@ -59,12 +59,17 @@ export default async function WorkPiece({ params }: Params) {
 
       <section className="px-step-2 py-step-5 md:px-step-3">
         <div className="mx-auto max-w-[100rem]">
+          {/*
+            Offset past the four the index page uses, so a piece's own page
+            does not open with the same composition its card just showed.
+          */}
           <Plate
             seed={item.slug}
             ratio="16/9"
             src={item.image}
             alt=""
             priority
+            index={index + 4}
             sizes="(max-width: 768px) 100vw, 92vw"
           />
         </div>
