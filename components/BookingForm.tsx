@@ -163,20 +163,29 @@ export function BookingForm({ slots }: { slots: readonly ProposedSlot[] }) {
 
                 <span className="type-micro opacity-70">{dubaiDay}</span>
 
-                {showsBothZones ? (
-                  <>
-                    <span className="type-heading text-[1.0625rem]">
-                      {formatTime(slot.iso, visitorZone)} your time
-                    </span>
-                    <span className="type-micro opacity-70">
-                      {dubaiTime} in Dubai
-                    </span>
-                  </>
-                ) : (
-                  <span className="type-heading text-[1.0625rem]">
-                    {dubaiTime} in Dubai
-                  </span>
-                )}
+                {/*
+                  Three line boxes in every state, so the cell's contents are
+                  in the same place before and after the visitor's zone is
+                  known. Rendering two lines and then adding a third re-centred
+                  the two that were already there — the cell held its 96px, but
+                  the text inside it moved, which is still a layout shift and
+                  was the last non-zero CLS on the site.
+
+                  A visitor already in Dubai keeps an empty third line. That
+                  costs a few pixels of a cell that has them spare; the
+                  alternative costs everyone else a shift.
+                */}
+                <span className="type-heading text-[1.0625rem]">
+                  {showsBothZones
+                    ? `${formatTime(slot.iso, visitorZone)} your time`
+                    : `${dubaiTime} in Dubai`}
+                </span>
+                <span
+                  className="type-micro opacity-70"
+                  aria-hidden={showsBothZones ? undefined : "true"}
+                >
+                  {showsBothZones ? `${dubaiTime} in Dubai` : " "}
+                </span>
               </label>
             );
           })}
