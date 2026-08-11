@@ -13,7 +13,7 @@ import {
 } from "@/lib/mark";
 
 /**
- * Move three of nine — the exploded assembly.
+ * Move three of fourteen — the exploded assembly.
  *
  * Six plates, stacked as one object, that explode outward on scroll with
  * rotation and scale and then lock into a labelled grid. 2D throughout: CSS
@@ -193,11 +193,12 @@ export function ExplodedAssembly() {
           scrub: 1,
           pin: stage,
           anticipatePin: 1,
-          // Pinned with transforms rather than position: fixed. The page
-          // transition wrapper animates a transform, which makes it the
-          // containing block for fixed descendants while it runs — a pin
-          // measured during that lands thousands of pixels off. Transform
-          // pinning is immune to it.
+          // Pinned with transforms rather than position: fixed. The cause
+          // is gone — the transition that wrapped main in an animating
+          // transform, making it the containing block for fixed descendants
+          // and landing this pin thousands of pixels off, is now two fixed
+          // lids outside the content tree. The setting stays because it does
+          // not depend on nothing above it ever growing a transform again.
           pinType: "transform",
           invalidateOnRefresh: true,
         },

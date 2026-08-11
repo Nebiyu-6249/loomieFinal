@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 /**
- * Move ten of thirteen — the living grain.
+ * Move ten of fourteen — the living grain.
  *
  * Two layers of procedurally generated noise over the whole viewport. Nothing
  * is committed to the repo: the frames are drawn into a canvas on first paint

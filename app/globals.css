@@ -178,7 +178,7 @@
   }
 
   /*
-    Move eight of thirteen. One hover treatment for every card and every link on
+    Move eight of fourteen. One hover treatment for every card and every link on
     the site: a hairline draws in from the left, and a card lifts three
     pixels with it. Same easing and same duration as the text reveal, so the
     two read as one language. Focus gets it too — a keyboard should see what
@@ -246,7 +246,7 @@
 }
 
 /*
-  Move ten of thirteen: the living grain.
+  Move ten of fourteen: the living grain.
 
   Sits above the content and below the header, so the navigation stays crisp
   while everything it floats over is in the same film. Never intercepts a
@@ -337,24 +337,90 @@
   opacity: 1;
 }
 
-/* Move one of thirteen: the page transition, as a keyframe rather than a library. */
-@keyframes page-enter {
+/*
+  Move twelve of fourteen: the blink, which replaces the page transition.
+
+  Two Void lids meeting at the middle and retracting, with a Field hairline at
+  the seam. 420ms end to end, expo-out — nearly all the distance is covered in
+  the first third, so the eye reads as snapping open and then settling.
+
+  The lids are 51svh so they overlap at the seam rather than risking a
+  hairline of content between them on a browser whose svh and visual viewport
+  disagree by a pixel.
+
+  z-38 puts them under the cursor light and the grain, so a shut lid is lit
+  and grained like everything else, and over the content, which is what makes
+  them lids. Nothing here is in the layout, so CLS is untouched.
+*/
+@keyframes blink-open {
   from {
-    opacity: 0;
-    transform: translate3d(0, 10px, 0);
+    transform: scaleY(1);
   }
   to {
-    opacity: 1;
-    transform: none;
+    transform: scaleY(0);
   }
 }
 
-.page-enter {
-  animation: page-enter 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+@keyframes blink-seam {
+  0% {
+    opacity: 0.85;
+  }
+  14% {
+    opacity: 0.85;
+  }
+  62% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.blink-lid {
+  position: fixed;
+  z-index: 38;
+  left: 0;
+  display: block;
+  height: 51svh;
+  width: 100%;
+  background-color: var(--color-void);
+  pointer-events: none;
+  transform: scaleY(0);
+  /*
+    Not the site's usual expo-out. On a 420ms lid that curve is 86% open by
+    120ms, so the closed state is never really seen and it reads as a flash
+    rather than a blink. This holds for a beat, accelerates hard, then
+    settles — still weighted to the reveal, but the lid is visibly a lid.
+  */
+  animation: blink-open 420ms cubic-bezier(0.4, 0, 0.12, 1) both;
+}
+
+.blink-lid-top {
+  top: 0;
+  transform-origin: top center;
+}
+
+.blink-lid-bottom {
+  bottom: 0;
+  transform-origin: bottom center;
+}
+
+.blink-seam {
+  position: fixed;
+  z-index: 38;
+  top: 50svh;
+  left: 0;
+  display: block;
+  height: 1px;
+  width: 100%;
+  background-color: var(--color-field);
+  opacity: 0;
+  pointer-events: none;
+  animation: blink-seam 420ms linear both;
 }
 
 /*
-  Move five of thirteen: the card stack.
+  Move five of fourteen: the card stack.
 
   A perspective stack on desktop; a snap-scroll row on a phone, which is what
   a thumb expects and what avoids stacking six cards a touch device cannot
@@ -423,7 +489,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-enter {
+  /*
+    The lids do not animate, they simply are not there. Unlike the grain,
+    which is the ground and stays, a lid that never retracts is a black
+    rectangle over half the page.
+  */
+  .blink-lid,
+  .blink-seam {
     animation: none;
   }
 
@@ -433,7 +505,7 @@
 }
 
 /*
-  Move four of thirteen: on a phone the ticker is a marquee rather than a pin.
+  Move four of fourteen: on a phone the ticker is a marquee rather than a pin.
 */
 @media (max-width: 47.99rem) {
   @keyframes ticker-drift {

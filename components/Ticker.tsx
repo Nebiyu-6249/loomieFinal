@@ -6,7 +6,7 @@ import { useScrollEffect } from "./useScrollEffect";
 import { APERTURE_INSET, CAPSULE_RADIUS, MARK, pupilRadiusFor } from "@/lib/mark";
 
 /**
- * Move four of nine — the ticker.
+ * Move four of fourteen — the ticker.
  *
  * One row, nowrap, pinned and scrubbed horizontally. The gaps between phrases
  * are deliberately uneven — between 3rem and 10rem — so it reads like ticker
@@ -147,11 +147,12 @@ export function Ticker() {
           scrub: 1,
           pin: frame,
           anticipatePin: 1,
-          // Pinned with transforms rather than position: fixed. The page
-          // transition wrapper animates a transform, which makes it the
-          // containing block for fixed descendants while it runs — a pin
-          // measured during that lands thousands of pixels off. Transform
-          // pinning is immune to it.
+          // Pinned with transforms rather than position: fixed. The cause
+          // is gone — the transition that wrapped main in an animating
+          // transform, making it the containing block for fixed descendants
+          // and landing this pin thousands of pixels off, is now two fixed
+          // lids outside the content tree. The setting stays because it does
+          // not depend on nothing above it ever growing a transform again.
           pinType: "transform",
           invalidateOnRefresh: true,
         },
