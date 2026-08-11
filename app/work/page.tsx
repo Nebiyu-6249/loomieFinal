@@ -5,12 +5,12 @@ import { ToneSection } from "@/components/ToneSection";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
 import { WorkCard } from "@/components/WorkCard";
-import { WORK_PLACEHOLDERS } from "@/lib/content";
+import { WORK } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Work",
   description:
-    "Identity, marketing and website projects from Loomie. The index is live and the project slots are reserved while the studio's first published work is prepared.",
+    "Four sector pieces — hospitality, professional services, retail and product — each setting out the brand problem the sector arrives with and how Loomie's five steps meet it.",
   alternates: { canonical: "/work" },
 };
 
@@ -19,14 +19,14 @@ export default function WorkIndex() {
     <>
       <PageIntro
         eyebrow="Work"
-        title="Four slots, held open."
-        lede="The studio's published projects are being prepared. Each slot below shows the kind of work it is reserved for, and nothing here is presented as a project that has happened."
+        title="Four sectors, four problems."
+        lede="These are capability pieces rather than client stories. Each one sets out the brand problem a sector usually arrives with, how the studio's five steps meet it, and what is handed over at the end."
       />
 
       <section className="px-step-2 pb-step-5 md:px-step-3">
         <div className="mx-auto max-w-[100rem]">
           <ul className="grid grid-cols-1 gap-step-4 sm:grid-cols-2 md:gap-step-3">
-            {WORK_PLACEHOLDERS.map((item, index) => (
+            {WORK.map((item, index) => (
               <li key={item.slug}>
                 <WorkCard
                   item={item}

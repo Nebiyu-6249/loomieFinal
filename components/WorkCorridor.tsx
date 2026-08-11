@@ -8,7 +8,7 @@ import { LetterReveal } from "./LetterReveal";
 import { Plate } from "./Plate";
 import { subscribeToPointerFrame } from "./pointerStore";
 import { useScrollEffect } from "./useScrollEffect";
-import type { WorkPlaceholder } from "@/lib/content";
+import type { CapabilityPiece } from "@/lib/content";
 
 /**
  * The work corridor. Replaces the card stack.
@@ -45,7 +45,7 @@ const RUN_OUT = 700;
 const SWAY = 2.4;
 
 interface WorkCorridorProps {
-  items: readonly WorkPlaceholder[];
+  items: readonly CapabilityPiece[];
 }
 
 export function WorkCorridor({ items }: WorkCorridorProps) {
@@ -193,7 +193,7 @@ export function WorkCorridor({ items }: WorkCorridorProps) {
             className="type-display block text-[clamp(2rem,4.6vw,4rem)]"
           />
           <p className="type-micro corridor-meta mt-step-2 text-slate">
-            {current.sector} — {current.scope.join(" · ")}
+            {current.sector} — {current.services.join(" · ")}
           </p>
         </div>
 
