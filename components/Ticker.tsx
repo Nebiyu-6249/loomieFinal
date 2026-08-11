@@ -13,7 +13,8 @@ import { APERTURE_INSET, CAPSULE_RADIUS, MARK, pupilRadiusFor } from "@/lib/mark
  * tape rather than a row of evenly spaced panels, and the glyphs sit in the
  * flow as punctuation rather than as separate slides.
  *
- * Scrub-driven with no easing, following the pin preset.
+ * Scrub-driven with no easing, following the pin preset — but at half a pixel
+ * of page scroll per pixel of travel, not the preset's 1:1.
  *
  * On a phone there is no pin: a CSS marquee scrolls it instead, because
  * pinning and then hijacking horizontal scroll on a touch device is a good
@@ -21,6 +22,9 @@ import { APERTURE_INSET, CAPSULE_RADIUS, MARK, pupilRadiusFor } from "@/lib/mark
  */
 
 const PUPIL_R = pupilRadiusFor(Number.MAX_SAFE_INTEGER);
+
+/** Vertical scroll spent per pixel of horizontal travel. */
+const SCROLL_RATIO = 0.5;
 
 function Snowflake() {
   return (
@@ -88,6 +92,7 @@ function Glyph({ kind }: { kind: "snow" | "mark" | "river" }) {
 function Run({ ariaHidden = false }: { ariaHidden?: boolean }) {
   return (
     <div
+      data-run=""
       className="flex shrink-0 items-center"
       {...(ariaHidden ? { "aria-hidden": "true" } : {})}
     >
@@ -114,16 +119,31 @@ export function Ticker() {
     onMotion("(min-width: 48rem)", () => {
       const track = root.querySelector<HTMLElement>("[data-track]");
       const frame = root.querySelector<HTMLElement>("[data-frame]");
-      if (!track || !frame) return;
+      const run = root.querySelector<HTMLElement>("[data-run]");
+      if (!track || !frame || !run) return;
+
+      /*
+        Measured against the first run, not the whole track. The track holds
+        two copies of the phrases so the phone's CSS marquee has no seam, and
+        measuring the whole thing made the desktop pin scroll the same five
+        phrases twice — 9,400px of the homepage's 18,000, for one sentence
+        read two times. The duplicate still earns its place here: it fills the
+        right of the frame as the first run leaves, so the travel never ends
+        on empty ground.
+      */
+      const travel = () => Math.max(0, run.scrollWidth - frame.clientWidth);
 
       const tween = gsap.to(track, {
         // Recomputed on refresh so a resize cannot leave it short or overrun.
-        x: () => -(track.scrollWidth - frame.clientWidth),
+        x: () => -travel(),
         ease: "none",
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: () => `+=${track.scrollWidth - frame.clientWidth}`,
+          // Half the travel in scroll distance: the line moves at twice the
+          // speed of the page, which reads as a deliberate pass rather than a
+          // section the page got stuck in.
+          end: () => `+=${travel() * SCROLL_RATIO}`,
           scrub: 1,
           pin: frame,
           anticipatePin: 1,

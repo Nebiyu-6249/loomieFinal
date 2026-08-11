@@ -23,9 +23,12 @@ import {
  * system taking itself apart and putting itself back together rather than six
  * decorative rectangles.
  *
- * Pinned with scrub: 1 and end "+=180%", following the pin preset. On a phone
- * there is no pin — pinning a viewport-height section on a touch device
- * fights the scroll — so the plates stagger into a two-column grid instead.
+ * Pinned with scrub: 1 and end "+=120%". The preset's 180% held the page for
+ * nearly two screens of scroll on an animation that has finished its work in
+ * one, which read as the page having stopped rather than the object having
+ * been examined. On a phone there is no pin — pinning a viewport-height
+ * section on a touch device fights the scroll — so the plates stagger into a
+ * two-column grid instead.
  */
 
 const PUPIL_R = pupilRadiusFor(Number.MAX_SAFE_INTEGER);
@@ -172,7 +175,7 @@ export function ExplodedAssembly() {
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: "+=180%",
+          end: "+=120%",
           scrub: 1,
           pin: stage,
           anticipatePin: 1,
