@@ -4,6 +4,7 @@ import { ContactCta } from "@/components/ContactCta";
 import { PageIntro } from "@/components/PageIntro";
 import { PlaceholderWordmark } from "@/components/PlaceholderWordmark";
 import { Reveal } from "@/components/Reveal";
+import { TypeIn } from "@/components/SectionEffects";
 import { AUDIENCE, PLACEHOLDER_WORDMARKS, VALUES } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -31,17 +32,27 @@ export default function Clients() {
             Who Loomie works with
           </h2>
 
-          <ul className="flex flex-col">
-            {AUDIENCE.map((entry, index) => (
-              <li key={entry}>
-                <Reveal step={index} steps={AUDIENCE.length} className="py-step-3">
-                  <p className="type-heading measure text-[clamp(1.375rem,3.4vw,2.5rem)] leading-[1.25]">
-                    {entry}
-                  </p>
-                </Reveal>
-              </li>
-            ))}
-          </ul>
+          {/*
+            Typed rather than revealed. The neighbouring section fades its
+            wordmarks in, and two adjacent sections arriving the same way is
+            the thing this pass exists to stop.
+          */}
+          <TypeIn>
+            <ul className="flex flex-col">
+              {AUDIENCE.map((entry, index) => (
+                <li key={entry}>
+                  <Reveal step={index} steps={AUDIENCE.length} className="py-step-3">
+                    <p
+                      data-type-in=""
+                      className="type-heading measure text-[clamp(1.375rem,3.4vw,2.5rem)] leading-[1.25]"
+                    >
+                      {entry}
+                    </p>
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
+          </TypeIn>
         </div>
       </section>
 

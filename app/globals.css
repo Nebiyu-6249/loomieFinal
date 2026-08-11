@@ -843,8 +843,15 @@
   of the same shape at a different place. That is what keeps the reassembly
   exact: returning a part to 0,0,0 puts it back in the figure by construction.
 */
+/*
+  `clip` at every width, not only where the parts fly. The field below bleeds
+  20% either side, and on a phone — where there is no pinned figure and the
+  desktop clip does not apply — that bleed was the only horizontal scroll left
+  on the site.
+*/
 .assembly-stage {
   position: relative;
+  overflow: clip;
 }
 
 .assembly-field {
@@ -894,6 +901,12 @@
 }
 
 @media (min-width: 48rem) {
+  /*
+    The parts fly up to 180px either side of the figure, which the base rule's
+    clip contains. `clip` rather than `hidden` throughout: it holds the spill
+    without making this a scroll container, which a pinned element must not
+    become.
+  */
   .assembly-stage {
     height: 100svh;
   }
@@ -1099,6 +1112,156 @@
   .booking-slot,
   .booking-underline {
     transition-duration: 1ms;
+  }
+}
+
+/*
+  The line mask.
+
+  The inner span is what moves; the outer one is the mask it moves out from
+  behind. Both are inline-block because an inline element has no reliable box
+  to clip against — an overflow rule on an inline span is ignored, which is
+  the failure that makes most line-mask implementations look like a fade.
+*/
+.line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.line-mask-inner {
+  display: inline-block;
+  will-change: transform;
+}
+
+/*
+  The page's weather. One fixed field per route whose position is scrubbed
+  against the whole document, so descending the page moves the light rather
+  than swapping one gradient for another at each boundary.
+
+  It sits below everything — behind content, behind the cursor light, behind
+  the grain — because it is the ground those things are lit against.
+*/
+.ambient-field {
+  --field-x: 22%;
+  --field-y: 18%;
+
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    68% 52% at var(--field-x) var(--field-y),
+    color-mix(in oklab, var(--tone) 15%, transparent) 0%,
+    color-mix(in oklab, var(--tone) 5%, transparent) 42%,
+    transparent 74%
+  );
+}
+
+.ambient-field[data-tone="warm"] {
+  --tone: var(--color-ember);
+}
+
+.ambient-field[data-tone="cold"] {
+  --tone: var(--color-frost);
+}
+
+.ambient-field[data-tone="neutral"] {
+  --tone: var(--color-haze);
+}
+
+/*
+  Cards rise on Z, so the container needs the depth to rise through — and the
+  clip, because a perspective container renders its children at a size the
+  layout does not know about, which turned into 37px of horizontal scroll on
+  /process.
+*/
+.package-grid {
+  perspective: 1200px;
+  overflow-x: clip;
+}
+
+/*
+  The one rule on the site that opens from its centre rather than an edge.
+  Everything else draws left to right; these are statements, not sequence.
+*/
+[data-principle-rule] {
+  transform-origin: center;
+}
+
+/*
+  The process run. The line is drawn behind the steps and scrubbed as you
+  descend, so the sequence is demonstrated rather than asserted by five
+  numbers in a row.
+*/
+.process-run {
+  position: relative;
+}
+
+.process-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  display: block;
+  height: 100%;
+  width: 1px;
+  background-color: var(--color-ember);
+  opacity: 0.45;
+  transform-origin: top;
+}
+
+@media (min-width: 64rem) {
+  /* Five across on a wide screen, so the line runs the other way. */
+  .process-line {
+    top: 50%;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    transform-origin: left;
+  }
+}
+
+/*
+  Packages. An ember edge-light sweeping the tier the studio leads with, once
+  the card has arrived — light passing over it rather than a border it wears.
+*/
+.package-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.package-sweep {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    104deg,
+    transparent 34%,
+    color-mix(in oklab, var(--color-ember) 22%, transparent) 50%,
+    transparent 66%
+  );
+}
+
+@keyframes package-sweep {
+  from {
+    opacity: 1;
+    translate: -110% 0;
+  }
+  to {
+    opacity: 1;
+    translate: 110% 0;
+  }
+}
+
+.package-card[data-package-lead] .package-sweep {
+  animation: package-sweep 1.9s cubic-bezier(0.4, 0, 0.2, 1) 0.5s 1 both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .package-card[data-package-lead] .package-sweep {
+    animation: none;
   }
 }
 
