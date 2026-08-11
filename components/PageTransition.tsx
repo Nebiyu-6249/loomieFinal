@@ -17,19 +17,27 @@ import { MOTION } from "@/lib/motion";
  *
  * Wraps main content only. The header is fixed and stays outside, because a
  * transform on an ancestor would make it a containing block and break the fix.
+ *
+ * The wrapper is rendered in every case. Returning a bare fragment under
+ * reduced motion would change the shape of the tree between the server and
+ * the client and fail hydration — so the element stays and only the animation
+ * is switched off, which is also what "renders in its final visible state"
+ * means here.
  */
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const reduced = useReducedMotion();
 
-  if (reduced) return <>{children}</>;
-
   return (
     <motion.div
       key={pathname}
-      initial={{ opacity: 0, y: 10 }}
+      initial={reduced ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: MOTION.pageMs / 1000, ease: MOTION.ease }}
+      transition={
+        reduced
+          ? { duration: 0 }
+          : { duration: MOTION.pageMs / 1000, ease: MOTION.ease }
+      }
     >
       {children}
     </motion.div>

@@ -92,6 +92,12 @@ function Capsule({
   );
 }
 
+/*
+  A plate is a Drift panel with the mark's geometry knocked out of it in
+  Field. Two tones, one shape family, and a solid block of tone on the page —
+  which is what makes the composition read as a finished plate rather than as
+  a faint drawing floating on the ground.
+*/
 const FIELD = "#f2f3f4";
 const DRIFT = "#dde3e6";
 
@@ -99,7 +105,7 @@ function Composition({ variant, w, h }: { variant: number; w: number; h: number 
   switch (variant) {
     /* An aperture field, with one silhouette resting across it. */
     case 0: {
-      const unit = (w * 0.22) / MARK.gridWidth;
+      const unit = (w * 0.2) / MARK.gridWidth;
       const r = MARK.pupilRadius * unit;
       const gap = PUPIL_INSET * 2 * unit;
       const cols = Math.ceil(w / gap) + 1;
@@ -114,56 +120,68 @@ function Composition({ variant, w, h }: { variant: number; w: number; h: number 
               cx={col * gap + gap / 2}
               cy={row * gap + gap / 2}
               r={r}
-              fill={DRIFT}
+              fill={FIELD}
             />,
           );
         }
       }
 
-      const markWidth = w * 0.78;
+      const markWidth = w * 0.8;
 
       return (
         <>
-          <g opacity={0.55}>{dots}</g>
+          <g opacity={0.42}>{dots}</g>
           <Capsule
             x={(w - markWidth) / 2}
             y={h / 2 - markWidth / MARK_ASPECT / 2}
             width={markWidth}
-            fill={DRIFT}
-            apertureFill={FIELD}
+            fill={FIELD}
+            apertureFill={DRIFT}
           />
         </>
       );
     }
 
-    /* An extreme crop: one aperture, and the curve of the outer edge. */
+    /* A detail crop: the rounded cap, the field, and one aperture. */
     case 1: {
-      const markWidth = w * 2.6;
+      const markHeight = h * 0.9;
+      const markWidth = markHeight * MARK_ASPECT;
+
       return (
         <Capsule
-          x={-markWidth * 0.06}
-          y={h / 2 - markWidth / MARK_ASPECT / 2}
+          x={w * 0.09}
+          y={(h - markHeight) / 2}
           width={markWidth}
-          fill={DRIFT}
-          apertureFill={FIELD}
+          fill={FIELD}
+          apertureFill={DRIFT}
         />
       );
     }
 
-    /* A scale chart. Clear space between each step, taken off the constant. */
+    /* A scale chart, sized so the whole run fits the plate exactly. */
     case 2: {
       const steps = [1, 0.72, 0.52, 0.37];
-      const base = w * 0.74;
-      const left = w * 0.13;
-      let cursor = h * 0.14;
+      const gapRatio = (CLEAR_SPACE / MARK.gridWidth) * 1.5;
+
+      // Lay the run out at unit width, then scale it to the frame.
+      const unitRun = steps.reduce(
+        (total, step, index) =>
+          total +
+          step / MARK_ASPECT +
+          (index < steps.length - 1 ? step * gapRatio : 0),
+        0,
+      );
+
+      const base = Math.min(w * 0.76, (h * 0.86) / unitRun);
+      const left = w * 0.12;
+      let cursor = (h - base * unitRun) / 2;
 
       return (
         <>
           {steps.map((step, index) => {
             const width = base * step;
-            const height = width / MARK_ASPECT;
             const y = cursor;
-            cursor += height + (width / MARK.gridWidth) * CLEAR_SPACE * 1.6;
+            cursor += width / MARK_ASPECT + width * gapRatio;
 
             return (
               <Capsule
@@ -171,9 +189,9 @@ function Composition({ variant, w, h }: { variant: number; w: number; h: number 
                 x={left}
                 y={y}
                 width={width}
-                fill={DRIFT}
-                apertureFill={FIELD}
-                opacity={1 - index * 0.14}
+                fill={FIELD}
+                apertureFill={DRIFT}
+                opacity={1 - index * 0.16}
               />
             );
           })}
@@ -183,7 +201,7 @@ function Composition({ variant, w, h }: { variant: number; w: number; h: number 
 
     /* The clear-space rule, drawn. */
     case 3: {
-      const markWidth = w * 0.6;
+      const markWidth = w * 0.58;
       const markHeight = markWidth / MARK_ASPECT;
       const unit = markWidth / MARK.gridWidth;
       const pad = CLEAR_SPACE * unit;
@@ -198,8 +216,8 @@ function Composition({ variant, w, h }: { variant: number; w: number; h: number 
             width={markWidth + pad * 2}
             height={markHeight + pad * 2}
             fill="none"
-            stroke={DRIFT}
-            strokeWidth={1}
+            stroke={FIELD}
+            strokeWidth={1.5}
           />
           <rect
             x={x - pad * 2}
@@ -207,16 +225,16 @@ function Composition({ variant, w, h }: { variant: number; w: number; h: number 
             width={markWidth + pad * 4}
             height={markHeight + pad * 4}
             fill="none"
-            stroke={DRIFT}
-            strokeWidth={1}
-            opacity={0.5}
+            stroke={FIELD}
+            strokeWidth={1.5}
+            opacity={0.45}
           />
           <Capsule
             x={x}
             y={y}
             width={markWidth}
-            fill={DRIFT}
-            apertureFill={FIELD}
+            fill={FIELD}
+            apertureFill={DRIFT}
           />
         </>
       );
@@ -224,29 +242,31 @@ function Composition({ variant, w, h }: { variant: number; w: number; h: number 
 
     /* Two silhouettes overlapping — the construction the mark comes from. */
     default: {
-      const markWidth = w * 0.82;
+      const markWidth = w * 0.74;
       const markHeight = markWidth / MARK_ASPECT;
       const x = (w - markWidth) / 2;
       const y = (h - markHeight) / 2;
-      const shift = markHeight * 0.42;
+      const shiftX = markWidth * 0.14;
+      const shiftY = markHeight * 0.34;
 
+      // Held under full strength so the intersection reads as a third tone.
       return (
         <>
           <Capsule
-            x={x}
-            y={y - shift}
+            x={x - shiftX}
+            y={y - shiftY}
             width={markWidth}
-            fill={DRIFT}
-            apertureFill={FIELD}
-            opacity={0.6}
+            fill={FIELD}
+            apertureFill={DRIFT}
+            opacity={0.58}
           />
           <Capsule
-            x={x}
-            y={y + shift}
+            x={x + shiftX}
+            y={y + shiftY}
             width={markWidth}
-            fill={DRIFT}
-            apertureFill={FIELD}
-            opacity={0.6}
+            fill={FIELD}
+            apertureFill={DRIFT}
+            opacity={0.58}
           />
         </>
       );
@@ -285,7 +305,7 @@ export function Plate({
 
   return (
     <div
-      className={`relative overflow-hidden bg-field ${className}`}
+      className={`relative overflow-hidden bg-drift ${className}`}
       style={{ aspectRatio: ratio.replace("/", " / ") }}
     >
       <svg

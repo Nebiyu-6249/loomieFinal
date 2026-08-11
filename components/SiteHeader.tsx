@@ -49,7 +49,7 @@ export function SiteHeader() {
     pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-field/85 backdrop-blur-sm">
+    <header className="site-header fixed inset-x-0 top-0 z-50 bg-field transition-colors duration-200">
       <div className="mx-auto flex max-w-[100rem] items-start justify-between gap-step-3 px-step-2 py-step-2 md:px-step-3">
         <div className="flex items-center gap-step-2">
           <Link
@@ -77,8 +77,8 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
-              className={`type-micro hover:text-ink ${
-                isActive(item.href) ? "text-ink" : "text-slate"
+              className={`type-micro hover-line hover:text-ink ${
+                isActive(item.href) ? "text-ink" : "text-ink/75"
               }`}
             >
               {item.label}
@@ -88,7 +88,7 @@ export function SiteHeader() {
           <Link
             href="/contact"
             aria-current={isActive("/contact") ? "page" : undefined}
-            className="type-micro text-ink hover:opacity-60"
+            className="type-micro hover-line text-ink"
           >
             [ Contact ]
           </Link>
@@ -105,7 +105,10 @@ export function SiteHeader() {
         </button>
       </div>
 
-      <span aria-hidden="true" className="block h-px w-full bg-drift" />
+      <span
+        aria-hidden="true"
+        className="site-header-rule block h-px w-full bg-drift transition-opacity duration-200"
+      />
 
       {/*
         The mobile panel is a plain full-height list, not a drawer that slides.
