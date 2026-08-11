@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ContactCta } from "@/components/ContactCta";
+import { DarkSection } from "@/components/DarkSection";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
 import { WorkCard } from "@/components/WorkCard";
@@ -38,19 +39,19 @@ export default function WorkIndex() {
         </div>
       </section>
 
-      <section className="px-step-2 pb-step-5 md:px-step-3">
-        <div className="mx-auto max-w-[100rem]">
-          <Reveal step={0} steps={2}>
-            <h2 className="type-micro text-slate">Working with the studio</h2>
-          </Reveal>
-          <Reveal step={1} steps={2} className="mt-step-3">
-            <p className="type-display measure text-[clamp(2.5rem,3.4vw,3rem)]">
-              Every project runs the same five steps, on a four-week timeline,
-              and ends with editable files rather than a single export.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <DarkSection labelledBy="working">
+        <Reveal step={0} steps={2}>
+          <h2 id="working" className="type-micro text-thaw">
+            Working with the studio
+          </h2>
+        </Reveal>
+        <Reveal step={1} steps={2} className="mt-step-3">
+          <p className="type-display measure text-[clamp(2.5rem,3.4vw,3rem)]">
+            Every project runs the same five steps, on a four-week timeline,
+            and ends with editable files rather than a single export.
+          </p>
+        </Reveal>
+      </DarkSection>
 
       <ContactCta />
     </>

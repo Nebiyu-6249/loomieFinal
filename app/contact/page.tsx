@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { BookingForm } from "@/components/BookingForm";
+import { DarkSection } from "@/components/DarkSection";
 import { DubaiClock } from "@/components/DubaiClock";
 import { PageIntro } from "@/components/PageIntro";
 import { Reveal } from "@/components/Reveal";
@@ -68,10 +69,9 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="px-step-2 pb-step-5 md:px-step-3" aria-labelledby="faq">
-        <div className="mx-auto max-w-[100rem]">
+      <DarkSection labelledBy="faq">
           <Reveal step={0} steps={2}>
-            <h2 id="faq" className="type-micro text-slate">
+            <h2 id="faq" className="type-micro text-thaw">
               Questions people ask first
             </h2>
           </Reveal>
@@ -85,19 +85,19 @@ export default function Contact() {
           <Reveal step={1} steps={2} className="mt-step-3" rule={false}>
             <ul>
               {FAQ.map((item) => (
-                <li key={item.question} className="border-t border-drift">
+                <li key={item.question} className="border-t border-field/25">
                   <details className="group">
                     <summary className="type-heading flex min-h-16 cursor-pointer list-none items-center justify-between gap-step-2 py-step-2 text-[clamp(1.0625rem,2.2vw,1.375rem)] [&::-webkit-details-marker]:hidden">
                       {item.question}
                       <span
                         aria-hidden="true"
-                        className="type-micro shrink-0 text-slate"
+                        className="type-micro shrink-0 text-thaw"
                       >
                         <span className="group-open:hidden">[ + ]</span>
                         <span className="hidden group-open:inline">[ − ]</span>
                       </span>
                     </summary>
-                    <p className="type-body measure pb-step-3 text-slate">
+                    <p className="type-body measure pb-step-3 text-field/75">
                       {item.answer}
                     </p>
                   </details>
@@ -105,8 +105,7 @@ export default function Contact() {
               ))}
             </ul>
           </Reveal>
-        </div>
-      </section>
+      </DarkSection>
     </>
   );
 }
