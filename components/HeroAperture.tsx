@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { LetterReveal } from "./LetterReveal";
 import { subscribeToPointerFrame } from "./pointerStore";
 import { useMotionAllowed } from "./useMotionPreference";
 import { MEANINGS, SITE } from "@/lib/content";
@@ -308,9 +309,12 @@ export function HeroAperture() {
             <div className="mx-auto flex h-full max-w-[100rem] flex-col justify-start px-step-2 pb-step-5 pt-step-5 md:justify-center md:px-step-3 md:pt-step-4">
               {/* Held to the left half so the mark can never crowd it. */}
               <div className="md:w-[50%]">
-                <h1 className="type-display text-[clamp(3rem,8.4vw,8.5rem)]">
-                  Snow, river, lights.
-                </h1>
+                <LetterReveal
+                  as="h1"
+                  text="Snow, river, lights."
+                  onMount
+                  className="type-display block text-[clamp(3rem,8.4vw,8.5rem)]"
+                />
                 <p className="type-meta mt-step-3 max-w-[42ch]">
                   One pronunciation. Three meanings. One identity.
                 </p>
