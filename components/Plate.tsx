@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { Frame } from "./Frame";
+import { SlotVideo } from "./SlotVideo";
 import {
   APERTURE_INSET,
   CLEAR_SPACE,
@@ -28,6 +29,10 @@ import { FRAME_OVERSCAN } from "@/lib/frame";
  *
  *   <Plate seed="identity-slot-01" ratio="4/5" />
  *   <Plate seed="identity-slot-01" ratio="4/5" src="/work/roastery.jpg" alt="…" />
+ *   <Plate seed="identity-slot-01" ratio="4/5" src="/work/roastery.jpg" video="/work/roastery.mp4" />
+ *
+ * A video slot takes the still as its poster, so the reduced-motion path and
+ * the first paint are both a real picture rather than a black rectangle.
  */
 
 type Ratio = "1/1" | "4/5" | "3/2" | "16/9";
@@ -76,6 +81,12 @@ interface PlateProps {
   /** Supply to replace the composition with real photography. */
   src?: string;
   alt?: string;
+  /**
+   * Supply instead of `src` where the slot suits motion. `src` is then the
+   * poster frame and is required — it is what a reader with reduced motion
+   * set actually sees.
+   */
+  video?: string;
   /** At most one per page. */
   priority?: boolean;
   sizes?: string;
@@ -325,6 +336,7 @@ export function Plate({
   className = "",
   src,
   alt,
+  video,
   priority = false,
   sizes = "(max-width: 768px) 100vw, 45vw",
   index = 0,
@@ -359,7 +371,9 @@ export function Plate({
         backgroundColor: src ? SMOKE : palette.panel,
       }}
     >
-      {src ? (
+      {video && src ? (
+        <SlotVideo src={video} poster={src} />
+      ) : src ? (
         <Image
           src={src}
           alt={alt ?? ""}
